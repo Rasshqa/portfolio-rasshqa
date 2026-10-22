@@ -703,13 +703,13 @@ export default function Portfolio() {
         )}
 
         {/* MAIN BODY AREA (Strictly hidden during intro sequence so no emblem leaks!) */}
-        <main className={`flex-1 w-full max-w-[1380px] mx-auto px-4 sm:px-10 py-6 flex items-center justify-center relative transition-opacity duration-500 ${
+        <main className={`flex-1 w-full max-w-[1400px] mx-auto px-4 sm:px-8 xl:px-12 py-3 sm:py-6 flex items-center justify-center relative transition-opacity duration-500 ${
           isReady ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}>
           
           {/* TAB: HOME */}
           {activeTab === 'HOME' && (
-            <div className="w-full relative min-h-[560px] flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-6 py-4">
+            <div className="w-full relative min-h-[580px] flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-6 xl:gap-8 py-2 sm:py-4">
               
               {/* Top-left Plus '+' Sign */}
               <div 
@@ -720,27 +720,27 @@ export default function Portfolio() {
                 +
               </div>
 
-              {/* Left Mint Green Sticker: "FULL STACK DEVELOPER" */}
-              <div className="hidden xl:block absolute top-28 -left-6 z-20">
+              {/* Left Mint Green Sticker: "FULL STACK DEVELOPER" (Spaced safely outside the headline) */}
+              <div className="hidden xl:block absolute top-24 -left-2 xl:-left-6 2xl:-left-10 z-20">
                 <InspectableBox
-                  dimensions="130 × 108"
+                  dimensions="120 × 96"
                   color="#10b981"
                   badgePosition="bottom"
                   defaultDraggable={true}
                   delay={180}
                   isReady={isReady}
                 >
-                  <div className="w-32 h-24 bg-[#a7f3d0] text-[#111] p-3 -rotate-12 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-xl leading-tight font-bold neo-sticker-grand">
+                  <div className="w-28 h-22 sm:w-30 sm:h-24 bg-[#a7f3d0] text-[#111] p-2.5 -rotate-12 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-lg sm:text-xl leading-tight font-bold neo-sticker-grand">
                     <span>{t.hero.stickers.fullstackLine1}</span>
                     <span>{t.hero.stickers.fullstackLine2}</span>
-                    <div className="w-12 h-0.5 bg-[#111]/40 mt-1 rounded-full" />
+                    <div className="w-10 h-0.5 bg-[#111]/40 mt-1 rounded-full" />
                   </div>
                 </InspectableBox>
               </div>
 
-              {/* Left Blue Zigzag 'W' Doodle */}
+              {/* Left Blue Zigzag 'W' Doodle (Positioned in open whitespace) */}
               <div 
-                className={`hidden xl:block absolute bottom-44 left-6 transition-opacity duration-700 ${
+                className={`hidden xl:block absolute top-[280px] left-2 xl:left-4 z-10 transition-opacity duration-700 ${
                   isReady ? 'opacity-100' : 'opacity-0'
                 }`}
               >
@@ -749,17 +749,17 @@ export default function Portfolio() {
                 </svg>
               </div>
 
-              {/* Bottom-left Yellow Sticky Note */}
-              <div className="hidden xl:block absolute bottom-8 -left-4 z-20">
+              {/* Bottom-left Yellow Sticky Note (Clear of action buttons) */}
+              <div className="hidden xl:block absolute bottom-4 -left-2 xl:-left-6 2xl:-left-8 z-20">
                 <InspectableBox
-                  dimensions="132 × 128"
+                  dimensions="120 × 120"
                   color="#f59e0b"
                   badgePosition="top"
                   defaultDraggable={true}
                   delay={260}
                   isReady={isReady}
                 >
-                  <div className="w-32 h-32 bg-[#fde047] text-[#111] p-3 rotate-6 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-xl leading-tight font-bold neo-sticker-grand">
+                  <div className="w-28 h-28 sm:w-30 sm:h-30 bg-[#fde047] text-[#111] p-2.5 rotate-6 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-base sm:text-lg leading-tight font-bold neo-sticker-grand">
                     {t.hero.stickers.goodDesign.map((line, idx) => (
                       <span key={idx}>{line}</span>
                     ))}
@@ -768,7 +768,7 @@ export default function Portfolio() {
               </div>
 
               {/* LEFT COLUMN: Hey, I'm RASHQA + Bio + CTA Buttons */}
-              <div className="w-full lg:w-[52%] xl:pl-20 z-10 flex flex-col items-start text-left">
+              <div className="w-full lg:w-[48%] xl:w-[47%] xl:pl-28 2xl:pl-32 z-10 flex flex-col items-start text-left">
                 
                 {/* "Hey, I'm" Handwritten Greeting */}
                 <InspectableBox
@@ -788,10 +788,10 @@ export default function Portfolio() {
                 </InspectableBox>
 
                 {/* Giant "RASHQA ANDREAN" Heading with Yellow Crown & Doodles */}
-                <div className="relative mt-1 mb-5">
-                  {/* Floating Yellow Crown */}
+                <div className="relative mt-1 mb-4">
+                  {/* Floating Yellow Crown (Anchored over center of name) */}
                   <div 
-                    className={`absolute -top-10 right-2 sm:right-6 z-20 rotate-12 pointer-events-none transition-all duration-500 ${
+                    className={`absolute -top-9 sm:-top-10 right-20 sm:right-28 xl:right-36 z-20 rotate-12 pointer-events-none transition-all duration-500 ${
                       isReady ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
                     }`}
                   >
@@ -800,11 +800,11 @@ export default function Portfolio() {
 
                   {/* Curved Arrow Doodle Pointing to Name (Matching Image 0) */}
                   <div 
-                    className={`hidden sm:block absolute -right-12 top-10 pointer-events-none text-[#111] dark:text-white transition-opacity duration-700 ${
+                    className={`hidden sm:block absolute -right-6 top-8 pointer-events-none text-[#111] dark:text-white transition-opacity duration-700 ${
                       isReady ? 'opacity-100' : 'opacity-0'
                     }`}
                   >
-                    <svg width="46" height="46" viewBox="0 0 46 46" fill="none">
+                    <svg width="42" height="42" viewBox="0 0 46 46" fill="none">
                       <path d="M8 6 C 28 10, 38 22, 26 38" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />
                       <path d="M18 34 L 26 38 L 32 30" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
@@ -817,7 +817,7 @@ export default function Portfolio() {
                     delay={120}
                     isReady={isReady}
                   >
-                    <h1 className="font-display font-extrabold text-5xl sm:text-7xl xl:text-[80px] leading-[0.92] tracking-tight uppercase px-1">
+                    <h1 className="font-display font-extrabold text-5xl sm:text-6xl lg:text-[62px] xl:text-[72px] 2xl:text-[78px] leading-[0.92] tracking-tight uppercase px-1">
                       {data.profile.nickName}
                       <br />
                       ANDREAN
@@ -835,7 +835,7 @@ export default function Portfolio() {
 
                 {/* Subtitle / Role Tag (Safely guarded by isReady) */}
                 <div 
-                  className={`mb-4 inline-flex items-center gap-2 px-3 py-1 bg-[#38bdf8] text-[#111] font-mono-tech font-extrabold text-xs rounded border-2 border-[#111] neo-shadow-sm transition-opacity duration-300 ${
+                  className={`mb-3.5 inline-flex items-center gap-2 px-3 py-1 bg-[#38bdf8] text-[#111] font-mono-tech font-extrabold text-xs rounded border-2 border-[#111] neo-shadow-sm transition-opacity duration-300 ${
                     isReady ? 'opacity-100 animate-pop-in' : 'opacity-0 pointer-events-none'
                   }`}
                 >
@@ -849,17 +849,17 @@ export default function Portfolio() {
                   badgePosition="bottom"
                   delay={200}
                   isReady={isReady}
-                  className="w-full max-w-[460px] mb-7"
+                  className="w-full max-w-[440px] mb-6"
                 >
-                  <div className="border-y border-neutral-300 dark:border-neutral-700 py-3.5">
-                    <p className="font-mono-tech text-xs sm:text-[14px] leading-relaxed text-neutral-700 dark:text-neutral-300">
+                  <div className="border-y border-neutral-300 dark:border-neutral-700 py-3">
+                    <p className="font-mono-tech text-xs sm:text-[13.5px] leading-relaxed text-neutral-700 dark:text-neutral-300">
                       {lang === 'en' ? translations.en.hero.bio : data.profile.bio}
                     </p>
                   </div>
                 </InspectableBox>
 
                 {/* Action Buttons: VIEW MY WORK & TECH STACKS */}
-                <div className="flex flex-wrap items-center gap-4">
+                <div className="flex flex-wrap items-center gap-3.5">
                   <InspectableBox
                     dimensions="186 × 48"
                     color="#0ea5e9"
@@ -869,7 +869,7 @@ export default function Portfolio() {
                   >
                     <button
                       onClick={() => setActiveTab('WORKS')}
-                      className="px-6 py-3.5 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-mono-tech font-extrabold text-xs tracking-wider rounded-md border-2 border-[#111] neo-shadow neo-btn-grand flex items-center gap-3 transition-transform cursor-pointer"
+                      className="px-5 sm:px-6 py-3 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-mono-tech font-extrabold text-xs tracking-wider rounded-md border-2 border-[#111] neo-shadow neo-btn-grand flex items-center gap-2.5 transition-transform cursor-pointer"
                     >
                       <span className="w-5 h-5 rounded bg-white text-[#111] flex items-center justify-center">
                         <ArrowUpRight className="w-3.5 h-3.5 stroke-[3]" />
@@ -887,7 +887,7 @@ export default function Portfolio() {
                   >
                     <button
                       onClick={navigateToTechStack}
-                      className="px-6 py-3.5 bg-white dark:bg-[#23252a] hover:bg-neutral-100 dark:hover:bg-neutral-800 text-[#111] dark:text-white font-mono-tech font-extrabold text-xs tracking-wider rounded-md border-2 border-[#111] dark:border-neutral-400 neo-shadow neo-btn-grand flex items-center gap-2.5 transition-transform cursor-pointer"
+                      className="px-5 sm:px-6 py-3 bg-white dark:bg-[#23252a] hover:bg-neutral-100 dark:hover:bg-neutral-800 text-[#111] dark:text-white font-mono-tech font-extrabold text-xs tracking-wider rounded-md border-2 border-[#111] dark:border-neutral-400 neo-shadow neo-btn-grand flex items-center gap-2.5 transition-transform cursor-pointer"
                     >
                       <Code2 className="w-4 h-4 text-[#2563eb] stroke-[2.5]" />
                       <span>{t.hero.techStacks}</span>
@@ -897,12 +897,12 @@ export default function Portfolio() {
               </div>
 
               {/* RIGHT COLUMN: Portrait + Browser Window Card + Stickers */}
-              <div className="w-full lg:w-[48%] flex items-center justify-center relative min-h-[460px]">
+              <div className="w-full lg:w-[48%] xl:w-[48%] flex items-center justify-center relative min-h-[460px]">
                 
-                {/* Mini Retro Browser Window Card (Tech Stack Preview -> Click goes to Tech Stack) */}
-                <div className="absolute -top-6 left-2 sm:left-4 z-30">
+                {/* Mini Retro Browser Window Card (Positioned gracefully above the blue brush without covering face) */}
+                <div className="absolute -top-12 sm:-top-14 lg:-top-16 left-[-10px] sm:left-[-14px] lg:left-[-8px] xl:left-[-16px] z-30">
                   <InspectableBox
-                    dimensions="190 × 140"
+                    dimensions="172 × 126"
                     color="#0ea5e9"
                     badgePosition="top"
                     defaultDraggable={true}
@@ -912,20 +912,20 @@ export default function Portfolio() {
                     <div 
                       onClick={navigateToTechStack}
                       title="Klik untuk lihat detail Tech Stack di tab About"
-                      className="w-44 sm:w-48 bg-white dark:bg-[#23252a] border-2 border-[#111] rounded-xl p-3 -rotate-6 neo-shadow neo-card-grand cursor-pointer"
+                      className="w-40 sm:w-42 bg-white dark:bg-[#23252a] border-2 border-[#111] rounded-xl p-2.5 -rotate-6 neo-shadow neo-card-grand cursor-pointer"
                     >
                       {/* Window Header */}
-                      <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-neutral-200 dark:border-neutral-700">
+                      <div className="flex items-center justify-between pb-1 mb-1.5 border-b border-neutral-200 dark:border-neutral-700">
                         <div className="flex items-center gap-1.5">
-                          <span className="w-2.5 h-2.5 rounded-full bg-red-400 border border-[#111]" />
-                          <span className="w-2.5 h-2.5 rounded-full bg-yellow-400 border border-[#111]" />
-                          <span className="w-2.5 h-2.5 rounded-full bg-green-400 border border-[#111]" />
+                          <span className="w-2 h-2 rounded-full bg-red-400 border border-[#111]" />
+                          <span className="w-2 h-2 rounded-full bg-yellow-400 border border-[#111]" />
+                          <span className="w-2 h-2 rounded-full bg-green-400 border border-[#111]" />
                         </div>
                         <span className="text-[9px] font-mono-tech font-bold text-neutral-400">STACK.TS</span>
                       </div>
 
                       {/* Stack Items */}
-                      <div className="space-y-1.5 font-mono-tech text-[11px] font-extrabold text-[#111] dark:text-white">
+                      <div className="space-y-1 font-mono-tech text-[10.5px] font-extrabold text-[#111] dark:text-white">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-1.5">
                             <span className="w-3.5 h-3.5 rounded bg-[#111] text-white text-[8px] flex items-center justify-center">▲</span>
@@ -961,11 +961,11 @@ export default function Portfolio() {
 
                 {/* Blue 'Z' Doodle above Portrait */}
                 <div 
-                  className={`hidden sm:block absolute top-6 left-52 z-20 transition-opacity duration-700 ${
+                  className={`hidden sm:block absolute top-4 left-44 sm:left-48 z-20 transition-opacity duration-700 ${
                     isReady ? 'opacity-100' : 'opacity-0'
                   }`}
                 >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                     <path d="M5 6H19L6 18H20" stroke="#2563eb" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
@@ -985,21 +985,21 @@ export default function Portfolio() {
                   />
                 </InspectableBox>
 
-                {/* Pink Starburst Sticker: "BUILD COOL THINGS" */}
-                <div className="absolute bottom-14 right-4 sm:right-12 z-30">
+                {/* Pink Starburst Sticker: "BUILD COOL THINGS" (Pinned to hoodie chest like Image 0) */}
+                <div className="absolute bottom-12 sm:bottom-16 right-20 sm:right-28 z-30 pointer-events-auto">
                   <InspectableBox
-                    dimensions="118 × 118"
+                    dimensions="114 × 114"
                     color="#ec4899"
                     badgePosition="bottom"
                     defaultDraggable={true}
                     delay={300}
                     isReady={isReady}
                   >
-                    <div className="relative w-28 h-28 flex items-center justify-center rotate-12 neo-sticker-grand">
+                    <div className="relative w-26 h-26 sm:w-28 sm:h-28 flex items-center justify-center rotate-12 neo-sticker-grand">
                       <svg viewBox="0 0 120 120" className="w-full h-full fill-[#f472b6] drop-shadow">
                         <polygon points="60,2 73,18 93,9 96,30 116,33 107,52 120,68 103,80 106,101 86,102 77,120 60,108 43,120 34,102 14,101 17,80 0,68 13,52 4,33 24,30 27,9 47,18" />
                       </svg>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center text-center font-hand font-extrabold text-[#111] text-lg leading-none">
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-center font-hand font-extrabold text-[#111] text-base sm:text-lg leading-none">
                         {t.hero.stickers.buildCoolThings.map((word, idx) => (
                           <span key={idx}>{word}</span>
                         ))}
@@ -1008,8 +1008,8 @@ export default function Portfolio() {
                   </InspectableBox>
                 </div>
 
-                {/* Top-right Lime Green Sticky Note */}
-                <div className="hidden sm:block absolute -top-8 -right-4 z-20">
+                {/* Top-right Lime Green Sticky Note (Spaced cleanly at top right) */}
+                <div className="hidden sm:block absolute -top-10 sm:-top-12 -right-2 sm:-right-6 z-20">
                   <InspectableBox
                     dimensions="112 × 110"
                     color="#84cc16"
@@ -1018,7 +1018,7 @@ export default function Portfolio() {
                     delay={250}
                     isReady={isReady}
                   >
-                    <div className="w-28 h-28 bg-[#bef264] text-[#111] p-3 rotate-6 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-xl leading-tight font-bold neo-sticker-grand">
+                    <div className="w-26 h-26 sm:w-28 sm:h-28 bg-[#bef264] text-[#111] p-3 rotate-6 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-lg sm:text-xl leading-tight font-bold neo-sticker-grand">
                       {t.hero.stickers.designCodeShip.map((line, idx) => (
                         <span key={idx}>{line}</span>
                       ))}
@@ -1026,17 +1026,17 @@ export default function Portfolio() {
                   </InspectableBox>
                 </div>
 
-                {/* Right Oval Badge: "creativity + technology" */}
-                <div className="hidden sm:block absolute top-44 -right-6 z-20">
+                {/* Right Oval Badge: "creativity + technology" (Distinct vertical slot) */}
+                <div className="hidden sm:block absolute top-28 sm:top-32 -right-4 sm:-right-8 z-20">
                   <InspectableBox
-                    dimensions="132 × 84"
+                    dimensions="130 × 74"
                     color="#0ea5e9"
                     badgePosition="bottom"
                     defaultDraggable={true}
                     delay={320}
                     isReady={isReady}
                   >
-                    <div className="px-5 py-3.5 bg-white dark:bg-[#23252a] text-[#111] dark:text-white border-2 border-[#111] dark:border-white rounded-full -rotate-6 shadow-sm flex flex-col items-center justify-center text-center font-hand text-lg leading-none font-bold neo-sticker-grand">
+                    <div className="px-4 sm:px-5 py-3 bg-white dark:bg-[#23252a] text-[#111] dark:text-white border-2 border-[#111] dark:border-white rounded-full -rotate-6 shadow-sm flex flex-col items-center justify-center text-center font-hand text-base sm:text-lg leading-none font-bold neo-sticker-grand">
                       <span>{t.hero.stickers.creativityTech.line1}</span>
                       <span className="text-xs my-0.5">+</span>
                       <span>{t.hero.stickers.creativityTech.line2}</span>
@@ -1046,15 +1046,15 @@ export default function Portfolio() {
 
                 {/* Right Hand-drawn Heart Outline */}
                 <div 
-                  className={`hidden sm:block absolute bottom-32 -right-2 transition-opacity duration-700 ${
+                  className={`hidden sm:block absolute top-[230px] sm:top-[245px] -right-1 sm:-right-3 transition-opacity duration-700 ${
                     isReady ? 'opacity-100' : 'opacity-0'
                   }`}
                 >
-                  <Heart className="w-7 h-7 stroke-[2.2] text-[#111] dark:text-white rotate-12" />
+                  <Heart className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.2] text-[#111] dark:text-white rotate-12" />
                 </div>
 
-                {/* Bottom-right Circle Badge: "Let's Create Together" */}
-                <div className="hidden sm:block absolute -bottom-4 right-0 z-20">
+                {/* Bottom-right Circle Badge: "Let's Create Together" (Separated from pink starburst) */}
+                <div className="hidden sm:block absolute -bottom-6 sm:-bottom-8 -right-2 sm:-right-6 z-20">
                   <InspectableBox
                     dimensions="114 × 114"
                     color="#ec4899"
@@ -1065,7 +1065,7 @@ export default function Portfolio() {
                   >
                     <div 
                       onClick={() => setActiveTab('CONTACT')}
-                      className="w-28 h-28 rounded-full bg-white dark:bg-[#23252a] text-[#111] dark:text-white border-2 border-[#111] dark:border-white p-3 -rotate-6 shadow-md flex flex-col items-center justify-center text-center font-hand text-lg leading-tight font-bold cursor-pointer neo-sticker-grand"
+                      className="w-26 h-26 sm:w-28 sm:h-28 rounded-full bg-white dark:bg-[#23252a] text-[#111] dark:text-white border-2 border-[#111] dark:border-white p-2.5 -rotate-6 shadow-md flex flex-col items-center justify-center text-center font-hand text-base sm:text-lg leading-tight font-bold cursor-pointer neo-sticker-grand"
                     >
                       {t.hero.stickers.createTogether.map((word, idx) => (
                         <span key={idx}>{word}</span>
@@ -1076,7 +1076,7 @@ export default function Portfolio() {
 
                 {/* Bottom-center slash doodle matching Image 0 */}
                 <div 
-                  className={`hidden sm:block absolute bottom-4 -left-12 pointer-events-none text-2xl font-hand font-extrabold text-[#111] dark:text-white transition-opacity duration-700 ${
+                  className={`hidden sm:block absolute bottom-4 -left-8 sm:-left-12 pointer-events-none text-2xl font-hand font-extrabold text-[#111] dark:text-white transition-opacity duration-700 ${
                     isReady ? 'opacity-100' : 'opacity-0'
                   }`}
                 >
