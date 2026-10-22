@@ -20,6 +20,7 @@ import {
   Award
 } from 'lucide-react';
 import { PortfolioData, initialPortfolioData } from '@/lib/data';
+import { Language, translations } from '@/lib/translations';
 import WhatsAppWidget from './WhatsAppWidget';
 
 interface InspectableBoxProps {
@@ -294,6 +295,28 @@ export default function Portfolio() {
   const [activeTab, setActiveTab] = useState<'HOME' | 'ABOUT' | 'WORKS' | 'BLOG' | 'CONTACT'>('HOME');
   const [isDark, setIsDark] = useState(false);
   
+  // Language State: 'id' (Bahasa Indonesia) or 'en' (English)
+  const [lang, setLang] = useState<Language>('id');
+
+  useEffect(() => {
+    try {
+      const savedLang = localStorage.getItem('portfolio_lang') as Language;
+      if (savedLang === 'en' || savedLang === 'id') {
+        setLang(savedLang);
+      }
+    } catch {}
+  }, []);
+
+  const handleLangToggle = () => {
+    const nextLang: Language = lang === 'en' ? 'id' : 'en';
+    setLang(nextLang);
+    try {
+      localStorage.setItem('portfolio_lang', nextLang);
+    } catch {}
+  };
+
+  const t = translations[lang];
+
   // Spread Theme Transition State
   const [themeSpread, setThemeSpread] = useState<{ active: boolean; targetDark: boolean } | null>(null);
 
@@ -548,11 +571,11 @@ export default function Portfolio() {
 
             {/* Nav Items */}
             {[
-              { id: 'HOME' as const, label: 'HOME', icon: Home },
-              { id: 'ABOUT' as const, label: 'ABOUT', icon: Sparkles },
-              { id: 'WORKS' as const, label: 'WORKS', icon: Menu },
-              { id: 'BLOG' as const, label: 'ACHIEVEMENTS', icon: Award },
-              { id: 'CONTACT' as const, label: 'CONTACT', icon: Mail },
+              { id: 'HOME' as const, label: t.nav.home, icon: Home },
+              { id: 'ABOUT' as const, label: t.nav.about, icon: Sparkles },
+              { id: 'WORKS' as const, label: t.nav.works, icon: Menu },
+              { id: 'BLOG' as const, label: t.nav.achievements, icon: Award },
+              { id: 'CONTACT' as const, label: t.nav.contact, icon: Mail },
             ].map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -574,13 +597,29 @@ export default function Portfolio() {
             })}
           </div>
 
-          {/* Right Controls: Theme Switcher, Avatar, Let's Talk */}
-          <div className="flex items-center gap-3 sm:gap-4">
+          {/* Right Controls: Language Switcher, Theme Switcher, Avatar, Let's Talk */}
+          <div className="flex items-center gap-2.5 sm:gap-3.5">
+            {/* Language Switcher Pill (ID / EN) */}
+            <button
+              onClick={handleLangToggle}
+              aria-label="Toggle Language"
+              title={t.nav.langTitle}
+              className="h-7 px-2 bg-white dark:bg-neutral-800 border-2 border-[#111] dark:border-neutral-600 rounded-full flex items-center gap-1 cursor-pointer neo-shadow-sm neo-btn text-[10px] font-mono-tech font-extrabold select-none transition-all"
+            >
+              <span className={`px-1.5 py-0.5 rounded-full transition-all ${lang === 'id' ? 'bg-[#2563eb] text-white shadow-xs' : 'text-neutral-500 dark:text-neutral-400'}`}>
+                ID
+              </span>
+              <span className="text-neutral-300 dark:text-neutral-600 font-normal">/</span>
+              <span className={`px-1.5 py-0.5 rounded-full transition-all ${lang === 'en' ? 'bg-[#2563eb] text-white shadow-xs' : 'text-neutral-500 dark:text-neutral-400'}`}>
+                EN
+              </span>
+            </button>
+
             {/* Sun / Moon Pill Toggle with Top-Right Spread */}
             <button
               onClick={handleThemeToggle}
               aria-label="Toggle Dark Mode"
-              title="Ganti Tema (Spread dari atas kanan)"
+              title={t.nav.themeTitle}
               className="w-12 h-6 rounded-full bg-neutral-200 dark:bg-neutral-800 border-2 border-[#111] dark:border-neutral-700 p-0.5 flex items-center transition-colors relative cursor-pointer neo-shadow-sm neo-btn"
             >
               <div
@@ -615,7 +654,7 @@ export default function Portfolio() {
 
               {showAvatarToast && (
                 <div className="absolute right-0 top-12 z-50 bg-[#2563eb] text-white text-xs font-mono-tech font-bold px-3.5 py-2 rounded-lg border-2 border-[#111] neo-shadow whitespace-nowrap animate-pop-in">
-                  Have a productive day! 🚀
+                  {t.nav.avatarToast}
                 </div>
               )}
             </div>
@@ -626,7 +665,7 @@ export default function Portfolio() {
               className="hidden sm:flex items-center gap-2 px-3.5 py-2 bg-white dark:bg-[#23252a] text-[#111] dark:text-white text-xs font-mono-tech font-extrabold tracking-wider border-2 border-[#111] dark:border-neutral-300 rounded-[4px] neo-shadow neo-btn-grand cursor-pointer"
             >
               <Heart className="w-3.5 h-3.5 fill-current" />
-              <span>LET&apos;S TALK</span>
+              <span>{t.nav.talk}</span>
             </button>
           </div>
         </header>
@@ -636,7 +675,7 @@ export default function Portfolio() {
           <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-30">
             {(introStep === 'hey' || introStep === 'welcome') && (
               <div className="px-9 py-5 bg-[#2563eb] text-white font-display font-extrabold text-2xl sm:text-3xl rounded-2xl border-2 border-[#111] neo-shadow-lg animate-pop-in">
-                {introStep === 'hey' ? 'Hey there' : `Welcome to ${data.profile.nickName}'s World`}
+                {introStep === 'hey' ? t.intro.hey : t.intro.welcome}
               </div>
             )}
 
@@ -692,8 +731,8 @@ export default function Portfolio() {
                   isReady={isReady}
                 >
                   <div className="w-32 h-24 bg-[#a7f3d0] text-[#111] p-3 -rotate-12 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-xl leading-tight font-bold neo-sticker-grand">
-                    <span>FULL STACK</span>
-                    <span>DEVELOPER</span>
+                    <span>{t.hero.stickers.fullstackLine1}</span>
+                    <span>{t.hero.stickers.fullstackLine2}</span>
                     <div className="w-12 h-0.5 bg-[#111]/40 mt-1 rounded-full" />
                   </div>
                 </InspectableBox>
@@ -721,10 +760,9 @@ export default function Portfolio() {
                   isReady={isReady}
                 >
                   <div className="w-32 h-32 bg-[#fde047] text-[#111] p-3 rotate-6 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-xl leading-tight font-bold neo-sticker-grand">
-                    <span>Good</span>
-                    <span>Design</span>
-                    <span>Better</span>
-                    <span>Experience</span>
+                    {t.hero.stickers.goodDesign.map((line, idx) => (
+                      <span key={idx}>{line}</span>
+                    ))}
                   </div>
                 </InspectableBox>
               </div>
@@ -744,7 +782,7 @@ export default function Portfolio() {
                   <div className="flex items-center gap-2">
                     <span className="text-neutral-400 text-lg font-mono-tech">=</span>
                     <span className="font-hand text-4xl sm:text-5xl font-bold tracking-wide -rotate-3 inline-block">
-                      {data.profile.headline}
+                      {lang === 'id' ? (data.profile.headline || t.hero.greeting) : t.hero.greeting}
                     </span>
                   </div>
                 </InspectableBox>
@@ -801,7 +839,7 @@ export default function Portfolio() {
                     isReady ? 'opacity-100 animate-pop-in' : 'opacity-0 pointer-events-none'
                   }`}
                 >
-                  <span>⚡ {data.profile.role}</span>
+                  <span>{t.hero.roleTag}</span>
                 </div>
 
                 {/* Bio Paragraph */}
@@ -815,7 +853,7 @@ export default function Portfolio() {
                 >
                   <div className="border-y border-neutral-300 dark:border-neutral-700 py-3.5">
                     <p className="font-mono-tech text-xs sm:text-[14px] leading-relaxed text-neutral-700 dark:text-neutral-300">
-                      {data.profile.bio}
+                      {lang === 'en' ? translations.en.hero.bio : data.profile.bio}
                     </p>
                   </div>
                 </InspectableBox>
@@ -836,7 +874,7 @@ export default function Portfolio() {
                       <span className="w-5 h-5 rounded bg-white text-[#111] flex items-center justify-center">
                         <ArrowUpRight className="w-3.5 h-3.5 stroke-[3]" />
                       </span>
-                      <span>VIEW MY WORK</span>
+                      <span>{t.hero.viewWork}</span>
                     </button>
                   </InspectableBox>
 
@@ -852,7 +890,7 @@ export default function Portfolio() {
                       className="px-6 py-3.5 bg-white dark:bg-[#23252a] hover:bg-neutral-100 dark:hover:bg-neutral-800 text-[#111] dark:text-white font-mono-tech font-extrabold text-xs tracking-wider rounded-md border-2 border-[#111] dark:border-neutral-400 neo-shadow neo-btn-grand flex items-center gap-2.5 transition-transform cursor-pointer"
                     >
                       <Code2 className="w-4 h-4 text-[#2563eb] stroke-[2.5]" />
-                      <span>TECH STACKS</span>
+                      <span>{t.hero.techStacks}</span>
                     </button>
                   </InspectableBox>
                 </div>
@@ -962,9 +1000,9 @@ export default function Portfolio() {
                         <polygon points="60,2 73,18 93,9 96,30 116,33 107,52 120,68 103,80 106,101 86,102 77,120 60,108 43,120 34,102 14,101 17,80 0,68 13,52 4,33 24,30 27,9 47,18" />
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-center font-hand font-extrabold text-[#111] text-lg leading-none">
-                        <span>BUILD</span>
-                        <span>COOL</span>
-                        <span>THINGS</span>
+                        {t.hero.stickers.buildCoolThings.map((word, idx) => (
+                          <span key={idx}>{word}</span>
+                        ))}
                       </div>
                     </div>
                   </InspectableBox>
@@ -981,9 +1019,9 @@ export default function Portfolio() {
                     isReady={isReady}
                   >
                     <div className="w-28 h-28 bg-[#bef264] text-[#111] p-3 rotate-6 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-xl leading-tight font-bold neo-sticker-grand">
-                      <span>Design.</span>
-                      <span>Code.</span>
-                      <span>Ship</span>
+                      {t.hero.stickers.designCodeShip.map((line, idx) => (
+                        <span key={idx}>{line}</span>
+                      ))}
                     </div>
                   </InspectableBox>
                 </div>
@@ -999,9 +1037,9 @@ export default function Portfolio() {
                     isReady={isReady}
                   >
                     <div className="px-5 py-3.5 bg-white dark:bg-[#23252a] text-[#111] dark:text-white border-2 border-[#111] dark:border-white rounded-full -rotate-6 shadow-sm flex flex-col items-center justify-center text-center font-hand text-lg leading-none font-bold neo-sticker-grand">
-                      <span>creativity</span>
+                      <span>{t.hero.stickers.creativityTech.line1}</span>
                       <span className="text-xs my-0.5">+</span>
-                      <span>technology</span>
+                      <span>{t.hero.stickers.creativityTech.line2}</span>
                     </div>
                   </InspectableBox>
                 </div>
@@ -1029,9 +1067,9 @@ export default function Portfolio() {
                       onClick={() => setActiveTab('CONTACT')}
                       className="w-28 h-28 rounded-full bg-white dark:bg-[#23252a] text-[#111] dark:text-white border-2 border-[#111] dark:border-white p-3 -rotate-6 shadow-md flex flex-col items-center justify-center text-center font-hand text-lg leading-tight font-bold cursor-pointer neo-sticker-grand"
                     >
-                      <span>Let&apos;s</span>
-                      <span>Create</span>
-                      <span>Together</span>
+                      {t.hero.stickers.createTogether.map((word, idx) => (
+                        <span key={idx}>{word}</span>
+                      ))}
                     </div>
                   </InspectableBox>
                 </div>
@@ -1059,18 +1097,18 @@ export default function Portfolio() {
                   <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b-2 border-neutral-200 dark:border-neutral-700">
                     <div>
                       <div className="inline-block px-3 py-1 bg-[#fde047] text-[#111] font-mono-tech font-extrabold text-xs rounded border border-[#111] mb-1">
-                        * ABOUT RASHQA
+                        {t.about.tag}
                       </div>
                       <h2 className="font-display font-extrabold text-2xl sm:text-3xl">
-                        {aboutSlide === 0 && '01. PROFILE OVERVIEW'}
-                        {aboutSlide === 1 && '02. MY STORY & PHILOSOPHY'}
-                        {aboutSlide === 2 && '03. TECH STACK & EXPERTISE'}
+                        {aboutSlide === 0 && t.about.slideHeaders.profile}
+                        {aboutSlide === 1 && t.about.slideHeaders.story}
+                        {aboutSlide === 2 && t.about.slideHeaders.tech}
                       </h2>
                     </div>
 
                     {/* Slide Pill Navigation */}
                     <div className="flex items-center gap-1.5 bg-[#f6f5f0] dark:bg-neutral-800 p-1 rounded-lg border border-[#111]">
-                      {['Profile', 'About Me', 'Tech Stack'].map((label, idx) => (
+                      {[t.about.slideTabs.profile, t.about.slideTabs.story, t.about.slideTabs.tech].map((label, idx) => (
                         <button
                           key={label}
                           onClick={() => setAboutSlide(idx)}
@@ -1091,17 +1129,17 @@ export default function Portfolio() {
                     <div className="space-y-6 animate-slide-right">
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="p-4 bg-[#bae6fd] text-[#111] rounded-xl border-2 border-[#111] neo-shadow neo-card-grand">
-                          <span className="text-[10px] font-mono-tech font-extrabold uppercase">Full Name</span>
+                          <span className="text-[10px] font-mono-tech font-extrabold uppercase">{t.about.profile.fullName}</span>
                           <h3 className="font-display font-extrabold text-base sm:text-lg mt-0.5">{data.profile.fullName}</h3>
                           <p className="text-xs font-mono-tech mt-1 text-neutral-700">{data.profile.role}</p>
                         </div>
                         <div className="p-4 bg-[#a7f3d0] text-[#111] rounded-xl border-2 border-[#111] neo-shadow neo-card-grand">
-                          <span className="text-[10px] font-mono-tech font-extrabold uppercase">Experience</span>
+                          <span className="text-[10px] font-mono-tech font-extrabold uppercase">{t.about.profile.yearsExp}</span>
                           <h3 className="font-display font-extrabold text-xl sm:text-2xl mt-0.5">{data.profile.stats.experience}</h3>
-                          <p className="text-xs font-mono-tech mt-1 text-neutral-700">{data.profile.stats.projects} Proyek Terselesaikan</p>
+                          <p className="text-xs font-mono-tech mt-1 text-neutral-700">{data.profile.stats.projects} {lang === 'en' ? 'Completed' : 'Terselesaikan'}</p>
                         </div>
                         <div className="p-4 bg-[#fde047] text-[#111] rounded-xl border-2 border-[#111] neo-shadow neo-card-grand">
-                          <span className="text-[10px] font-mono-tech font-extrabold uppercase">Core Domains</span>
+                          <span className="text-[10px] font-mono-tech font-extrabold uppercase">{t.about.profile.focusAreas}</span>
                           <h3 className="font-display font-extrabold text-base sm:text-lg mt-0.5">Full Stack &amp; Cloud</h3>
                           <p className="text-xs font-mono-tech mt-1 text-neutral-700">Golang • Next.js • Laravel</p>
                         </div>
@@ -1109,10 +1147,12 @@ export default function Portfolio() {
 
                       <div className="p-5 bg-neutral-50 dark:bg-neutral-800/60 rounded-xl border border-neutral-300 dark:border-neutral-700">
                         <h4 className="font-display font-extrabold text-sm uppercase mb-2 tracking-wider text-[#2563eb]">
-                          Engineering Focus &amp; Principles
+                          {lang === 'en' ? 'Engineering Principles & Focus' : 'Fokus & Prinsip Rekayasa'}
                         </h4>
                         <p className="font-mono-tech text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">
-                          Berfokus pada pembuatan produk digital yang tahan uji (robust), performa tinggi, dan memiliki interaktivitas visual tingkat tinggi. Berpengalaman dari database modeling hingga frontend micro-interactions.
+                          {lang === 'en' 
+                            ? 'Specializing in building robust, high-performance digital products with uncompromising reliability and tactile visual polish. Experienced across database modeling, distributed backends, and frontend micro-interactions.'
+                            : 'Berfokus pada pembuatan produk digital yang tahan uji (robust), performa tinggi, dan memiliki interaktivitas visual tingkat tinggi. Berpengalaman dari database modeling hingga frontend micro-interactions.'}
                         </p>
                         <div className="mt-4 flex flex-wrap gap-2 text-xs font-mono-tech">
                           <span className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold">📍 {data.profile.location}</span>
@@ -1130,20 +1170,23 @@ export default function Portfolio() {
                   {aboutSlide === 1 && (
                     <div className="space-y-6 animate-slide-right">
                       <p className="font-mono-tech text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">
-                        {data.aboutStory.lead}
+                        {lang === 'en' ? t.about.story.lead : data.aboutStory.lead}
                       </p>
 
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        {data.aboutStory.pillars.map((pillar) => (
-                          <div key={pillar.title} className={`${pillar.bg} text-[#111] p-4 rounded-xl border-2 border-[#111] neo-shadow neo-card-grand`}>
-                            <h3 className="font-display font-extrabold text-base mb-1.5">{pillar.title}</h3>
-                            <p className="font-mono-tech text-xs leading-relaxed opacity-90">{pillar.desc}</p>
-                          </div>
-                        ))}
+                        {(lang === 'en' ? t.about.story.pillars : data.aboutStory.pillars).map((pillar, i) => {
+                          const bg = data.aboutStory.pillars[i]?.bg || 'bg-[#bae6fd]';
+                          return (
+                            <div key={pillar.title} className={`${bg} text-[#111] p-4 rounded-xl border-2 border-[#111] neo-shadow neo-card-grand`}>
+                              <h3 className="font-display font-extrabold text-base mb-1.5">{pillar.title}</h3>
+                              <p className="font-mono-tech text-xs leading-relaxed opacity-90">{pillar.desc}</p>
+                            </div>
+                          );
+                        })}
                       </div>
 
                       <div className="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg border border-neutral-200 dark:border-neutral-700 text-xs font-mono-tech text-neutral-600 dark:text-neutral-300 space-y-2">
-                        {data.aboutStory.paragraphs.map((para, i) => (
+                        {(lang === 'en' ? t.about.story.paragraphs : data.aboutStory.paragraphs).map((para, i) => (
                           <p key={i}>{para}</p>
                         ))}
                       </div>
@@ -1154,7 +1197,7 @@ export default function Portfolio() {
                   {aboutSlide === 2 && (
                     <div className="space-y-4 animate-slide-right">
                       <p className="font-mono-tech text-xs text-neutral-600 dark:text-neutral-400">
-                        Teknologi utama yang digunakan dalam membangun sistem berskala besar:
+                        {t.about.tech.lead}
                       </p>
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1198,11 +1241,11 @@ export default function Portfolio() {
                     className="px-4 py-2 bg-white dark:bg-neutral-800 border-2 border-[#111] rounded font-mono-tech font-bold text-xs neo-shadow neo-btn-grand disabled:opacity-40 flex items-center gap-1.5 cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
-                    <span>SEBELUMNYA</span>
+                    <span>{lang === 'en' ? 'PREV' : 'SEBELUMNYA'}</span>
                   </button>
 
                   <div className="text-xs font-mono-tech font-extrabold text-neutral-500">
-                    SLIDE {aboutSlide + 1} DARI 3
+                    SLIDE {aboutSlide + 1} {lang === 'en' ? 'OF' : 'DARI'} 3
                   </div>
 
                   <button
@@ -1210,7 +1253,7 @@ export default function Portfolio() {
                     disabled={aboutSlide === 2}
                     className="px-4 py-2 bg-[#2563eb] text-white border-2 border-[#111] rounded font-mono-tech font-extrabold text-xs neo-shadow neo-btn-grand disabled:opacity-40 flex items-center gap-1.5 cursor-pointer"
                   >
-                    <span>SELANJUTNYA</span>
+                    <span>{lang === 'en' ? 'NEXT' : 'SELANJUTNYA'}</span>
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -1224,9 +1267,9 @@ export default function Portfolio() {
             <div className="w-full max-w-5xl py-4 animate-pop-in">
               <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
                 <div>
-                  <h2 className="font-display font-extrabold text-3xl sm:text-4xl">SELECTED WORKS</h2>
+                  <h2 className="font-display font-extrabold text-3xl sm:text-4xl">{t.works.title}</h2>
                   <p className="font-mono-tech text-xs text-neutral-500 mt-0.5">
-                    Halaman {worksPage + 1} dari {totalWorksPages} (Menampilkan 4 proyek per slide)
+                    {t.works.pageIndicator(worksPage, totalWorksPages)} • {t.works.lead}
                   </p>
                 </div>
 
@@ -1238,14 +1281,14 @@ export default function Portfolio() {
                     className="px-3.5 py-2 bg-white dark:bg-[#23252a] border-2 border-[#111] font-mono-tech font-bold text-xs rounded neo-shadow neo-btn-grand disabled:opacity-40 flex items-center gap-1 cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
-                    <span>PREV</span>
+                    <span>{t.works.prev}</span>
                   </button>
                   <button
                     onClick={() => setWorksPage(prev => Math.min(totalWorksPages - 1, prev + 1))}
                     disabled={worksPage >= totalWorksPages - 1}
                     className="px-3.5 py-2 bg-[#2563eb] text-white border-2 border-[#111] font-mono-tech font-extrabold text-xs rounded neo-shadow neo-btn-grand disabled:opacity-40 flex items-center gap-1 cursor-pointer"
                   >
-                    <span>NEXT SLIDE</span>
+                    <span>{t.works.next}</span>
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -1292,7 +1335,7 @@ export default function Portfolio() {
                           rel="noopener noreferrer"
                           className="font-mono-tech text-xs font-bold flex items-center gap-1.5 text-[#2563eb] dark:text-[#38bdf8] hover:underline"
                         >
-                          LIVE PREVIEW <ExternalLink className="w-3.5 h-3.5" />
+                          {t.works.viewLive} <ExternalLink className="w-3.5 h-3.5" />
                         </a>
                         <a
                           href={proj.githubUrl}
@@ -1300,7 +1343,7 @@ export default function Portfolio() {
                           rel="noopener noreferrer"
                           className="font-mono-tech text-xs font-bold text-neutral-500 hover:text-[#111] dark:hover:text-white"
                         >
-                          GITHUB →
+                          {t.works.sourceCode} →
                         </a>
                       </div>
                     </div>
@@ -1318,18 +1361,18 @@ export default function Portfolio() {
                   <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b-2 border-neutral-200 dark:border-neutral-700">
                     <div>
                       <div className="inline-block px-3 py-1 bg-[#fde047] text-[#111] font-mono-tech font-extrabold text-xs rounded border border-[#111] mb-1">
-                        * MILESTONES &amp; CREDENTIALS
+                        {t.achievements.tag}
                       </div>
                       <h2 className="font-display font-extrabold text-2xl sm:text-3xl">
-                        {blogSlide === 0 && 'PRESTASI & PENGHARGAAN'}
-                        {blogSlide === 1 && 'SERTIFIKASI PROFESIONAL'}
-                        {blogSlide === 2 && 'ARTIKEL & PUBLIKASI TEKNIS'}
+                        {blogSlide === 0 && t.achievements.categoryHeaders.prestasi}
+                        {blogSlide === 1 && t.achievements.categoryHeaders.sertifikat}
+                        {blogSlide === 2 && t.achievements.categoryHeaders.artikel}
                       </h2>
                     </div>
 
                     {/* Category Tabs */}
                     <div className="flex items-center gap-1.5 bg-[#f6f5f0] dark:bg-neutral-800 p-1 rounded-lg border border-[#111]">
-                      {['Prestasi', 'Sertifikat', 'Artikel'].map((cat, idx) => (
+                      {[t.achievements.categories.prestasi, t.achievements.categories.sertifikat, t.achievements.categories.artikel].map((cat, idx) => (
                         <button
                           key={cat}
                           onClick={() => setBlogSlide(idx)}
@@ -1396,11 +1439,11 @@ export default function Portfolio() {
                     className="px-4 py-2 bg-white dark:bg-neutral-800 border-2 border-[#111] rounded font-mono-tech font-bold text-xs neo-shadow neo-btn-grand disabled:opacity-40 flex items-center gap-1.5 cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
-                    <span>PREV</span>
+                    <span>{t.achievements.prev}</span>
                   </button>
 
                   <div className="text-xs font-mono-tech font-extrabold text-neutral-500">
-                    KATEGORI {blogSlide + 1} DARI 3
+                    {lang === 'en' ? 'CATEGORY' : 'KATEGORI'} {blogSlide + 1} {lang === 'en' ? 'OF' : 'DARI'} 3
                   </div>
 
                   <button
@@ -1408,7 +1451,7 @@ export default function Portfolio() {
                     disabled={blogSlide === 2}
                     className="px-4 py-2 bg-[#2563eb] text-white border-2 border-[#111] rounded font-mono-tech font-extrabold text-xs neo-shadow neo-btn-grand disabled:opacity-40 flex items-center gap-1.5 cursor-pointer"
                   >
-                    <span>NEXT</span>
+                    <span>{t.achievements.next}</span>
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -1420,21 +1463,24 @@ export default function Portfolio() {
           {activeTab === 'CONTACT' && (
             <div className="w-full max-w-xl py-4 animate-pop-in">
               <div className="bg-white dark:bg-[#23252a] border-2 border-[#111] dark:border-neutral-400 rounded-xl p-6 sm:p-8 neo-shadow-lg">
-                <h2 className="font-display font-extrabold text-3xl sm:text-4xl mb-2">LET&apos;S CREATE TOGETHER</h2>
+                <div className="inline-block px-3 py-1 bg-[#fde047] text-[#111] font-mono-tech font-extrabold text-xs rounded border border-[#111] mb-2">
+                  {t.contact.tag}
+                </div>
+                <h2 className="font-display font-extrabold text-3xl sm:text-4xl mb-2">{t.contact.title}</h2>
                 <p className="font-mono-tech text-xs text-neutral-600 dark:text-neutral-300 mb-6">
-                  Have a web project, engineering challenge, or collaboration idea? Drop a message below:
+                  {t.contact.lead}
                 </p>
 
                 {contactSent ? (
                   <div className="p-6 bg-[#a7f3d0] text-[#111] border-2 border-[#111] rounded-lg text-center space-y-3">
-                    <CheckCircle2 className="w-10 h-10 mx-auto" />
-                    <h3 className="font-display font-extrabold text-xl">MESSAGE SENT!</h3>
-                    <p className="font-mono-tech text-xs">Thanks for reaching out, Rashqa will get back to you shortly.</p>
+                    <CheckCircle2 className="w-10 h-10 mx-auto text-emerald-700" />
+                    <h3 className="font-display font-extrabold text-xl">{t.contact.form.successTitle}</h3>
+                    <p className="font-mono-tech text-xs">{t.contact.form.successDesc}</p>
                     <button
                       onClick={() => setContactSent(false)}
                       className="px-4 py-2 bg-white border-2 border-[#111] font-mono-tech font-bold text-xs rounded neo-shadow neo-btn-grand cursor-pointer"
                     >
-                      SEND ANOTHER
+                      {lang === 'en' ? 'TRANSMIT ANOTHER' : 'KIRIM PESAN LAIN'}
                     </button>
                   </div>
                 ) : (
@@ -1446,29 +1492,29 @@ export default function Portfolio() {
                     className="space-y-4"
                   >
                     <div>
-                      <label className="block font-mono-tech text-xs font-bold mb-1">YOUR NAME</label>
+                      <label className="block font-mono-tech text-xs font-bold mb-1">{t.contact.form.name}</label>
                       <input
                         type="text"
                         required
-                        placeholder="John Doe"
+                        placeholder={t.contact.form.namePlaceholder}
                         className="w-full px-3.5 py-2.5 bg-[#f6f5f0] dark:bg-neutral-800 border-2 border-[#111] rounded font-mono-tech text-xs focus:outline-none"
                       />
                     </div>
                     <div>
-                      <label className="block font-mono-tech text-xs font-bold mb-1">YOUR EMAIL</label>
+                      <label className="block font-mono-tech text-xs font-bold mb-1">{t.contact.form.email}</label>
                       <input
                         type="email"
                         required
-                        placeholder="hello@example.com"
+                        placeholder={t.contact.form.emailPlaceholder}
                         className="w-full px-3.5 py-2.5 bg-[#f6f5f0] dark:bg-neutral-800 border-2 border-[#111] rounded font-mono-tech text-xs focus:outline-none"
                       />
                     </div>
                     <div>
-                      <label className="block font-mono-tech text-xs font-bold mb-1">PROJECT DETAILS</label>
+                      <label className="block font-mono-tech text-xs font-bold mb-1">{t.contact.form.message}</label>
                       <textarea
                         rows={3}
                         required
-                        placeholder="Let's build something awesome together..."
+                        placeholder={t.contact.form.messagePlaceholder}
                         className="w-full px-3.5 py-2.5 bg-[#f6f5f0] dark:bg-neutral-800 border-2 border-[#111] rounded font-mono-tech text-xs focus:outline-none"
                       />
                     </div>
@@ -1477,7 +1523,7 @@ export default function Portfolio() {
                       className="w-full py-3 bg-[#2563eb] text-white font-mono-tech font-extrabold text-xs tracking-wider rounded border-2 border-[#111] neo-shadow neo-btn-grand flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <Send className="w-3.5 h-3.5" />
-                      <span>SEND MESSAGE</span>
+                      <span>{t.contact.form.send}</span>
                     </button>
                   </form>
                 )}
@@ -1494,7 +1540,7 @@ export default function Portfolio() {
           <div className="flex items-center gap-4 flex-wrap">
             <span className="inline-flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              Interactive Canvas • Tahan Klik Kiri untuk Invert Lens • Klik stiker untuk inspeksi
+              {t.footer.canvasHint}
             </span>
           </div>
           <div className="flex items-center gap-4">
@@ -1503,7 +1549,7 @@ export default function Portfolio() {
               className="inline-flex items-center gap-1.5 hover:text-[#111] dark:hover:text-white transition-colors cursor-pointer"
             >
               <RotateCcw className="w-3 h-3" />
-              <span>Replay Intro</span>
+              <span>{t.footer.replayIntro}</span>
             </button>
           </div>
         </footer>
@@ -1514,6 +1560,7 @@ export default function Portfolio() {
         <WhatsAppWidget 
           phoneNumber={data.profile.whatsapp} 
           name={data.profile.fullName} 
+          lang={lang}
         />
       )}
 

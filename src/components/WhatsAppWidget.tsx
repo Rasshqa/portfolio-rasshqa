@@ -2,27 +2,24 @@
 
 import React, { useState } from 'react';
 import { MessageSquare, X, Send, Sparkles, ChevronDown, Check } from 'lucide-react';
+import { Language, translations } from '@/lib/translations';
 
 interface WhatsAppWidgetProps {
   phoneNumber: string;
   name: string;
+  lang?: Language;
 }
 
-export default function WhatsAppWidget({ phoneNumber, name }: WhatsAppWidgetProps) {
+export default function WhatsAppWidget({ phoneNumber, name, lang = 'id' }: WhatsAppWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const t = translations[lang].whatsapp;
   const [customMsg, setCustomMsg] = useState('');
-  const [selectedTopic, setSelectedTopic] = useState('Proyek Web');
+  const [selectedTopic, setSelectedTopic] = useState(t.topics[0].id);
 
   const cleanNumber = phoneNumber.replace(/[^0-9]/g, '');
 
-  const quickTemplates = [
-    { id: 'Proyek Web', text: `Halo ${name}, saya tertarik untuk diskusi proyek web / aplikasi full stack.` },
-    { id: 'Freelance', text: `Halo ${name}, mau tanya ketersediaan untuk kolaborasi freelance / pekerjaan.` },
-    { id: 'Konsultasi', text: `Halo ${name}, mau konsultasi seputar arsitektur tech stack Next.js & backend.` },
-  ];
-
   const handleSend = (textToSend?: string) => {
-    const text = textToSend || customMsg || quickTemplates[0].text;
+    const text = textToSend || customMsg || t.topics[0].text;
     const url = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
@@ -46,7 +43,7 @@ export default function WhatsAppWidget({ phoneNumber, name }: WhatsAppWidgetProp
                   {name}
                 </h3>
                 <p className="text-[10px] font-bold opacity-80">
-                  Online • Biasanya balas cepat
+                  {t.headerStatus}
                 </p>
               </div>
             </div>
@@ -66,19 +63,19 @@ export default function WhatsAppWidget({ phoneNumber, name }: WhatsAppWidgetProp
             <div className="p-3 bg-white dark:bg-neutral-800 border-2 border-[#111] rounded-xl neo-shadow-sm text-xs leading-relaxed">
               <p className="font-bold flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 mb-1">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Mari Terhubung Langsung!</span>
+                <span>{t.bubbleTitle}</span>
               </p>
               <p className="text-neutral-700 dark:text-neutral-300">
-                Ada ide proyek, penawaran kerja sama, atau ingin berdiskusi teknologi? Pilih topik cepat atau ketik pesanmu:
+                {t.bubbleDesc}
               </p>
             </div>
 
             {/* Quick Templates */}
             <div className="space-y-1.5">
               <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider">
-                Pilih Topik Diskusi:
+                {t.topicLabel}
               </p>
-              {quickTemplates.map((item) => (
+              {t.topics.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => {
@@ -91,7 +88,7 @@ export default function WhatsAppWidget({ phoneNumber, name }: WhatsAppWidgetProp
                       : 'bg-white dark:bg-neutral-800 border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-[#111]'
                   }`}
                 >
-                  <span className="truncate">{item.id}</span>
+                  <span className="truncate">{item.label}</span>
                   {selectedTopic === item.id && <Check className="w-3.5 h-3.5 text-emerald-600" />}
                 </button>
               ))}
@@ -103,7 +100,7 @@ export default function WhatsAppWidget({ phoneNumber, name }: WhatsAppWidgetProp
                 rows={2}
                 value={customMsg}
                 onChange={(e) => setCustomMsg(e.target.value)}
-                placeholder={quickTemplates[0].text}
+                placeholder={t.topics[0].text}
                 className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border-2 border-[#111] rounded-lg text-xs font-mono-tech focus:outline-none"
               />
 
@@ -112,7 +109,7 @@ export default function WhatsAppWidget({ phoneNumber, name }: WhatsAppWidgetProp
                 className="w-full py-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-[#111] font-extrabold text-xs tracking-wider rounded-lg border-2 border-[#111] neo-shadow neo-btn flex items-center justify-center gap-2 cursor-pointer transition-transform"
               >
                 <Send className="w-3.5 h-3.5" />
-                <span>KIRIM KE WHATSAPP</span>
+                <span>{t.sendButton}</span>
               </button>
             </div>
           </div>
@@ -138,7 +135,7 @@ export default function WhatsAppWidget({ phoneNumber, name }: WhatsAppWidgetProp
           </svg>
 
           <span className="font-extrabold text-xs hidden sm:inline-block">
-            {isOpen ? 'Tutup Chat' : 'Chat WhatsApp'}
+            {isOpen ? (lang === 'en' ? 'Close' : 'Tutup') : (lang === 'en' ? 'Chat WhatsApp' : 'Chat WhatsApp')}
           </span>
         </button>
       </div>
