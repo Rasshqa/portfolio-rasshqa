@@ -5,11 +5,9 @@ import {
   Home, 
   Sparkles, 
   Menu, 
-  MessageCircle, 
   Mail, 
   Heart, 
   ArrowUpRight, 
-  Download, 
   Sun, 
   Moon, 
   ExternalLink, 
@@ -18,16 +16,10 @@ import {
   RotateCcw,
   ChevronLeft,
   ChevronRight,
-  Shield,
-  Layers,
   Code2,
-  Terminal,
-  Cpu,
-  Award,
-  BookOpen
+  Award
 } from 'lucide-react';
 import { PortfolioData, initialPortfolioData } from '@/lib/data';
-import AdminModal from './AdminModal';
 import WhatsAppWidget from './WhatsAppWidget';
 
 interface InspectableBoxProps {
@@ -71,7 +63,7 @@ const InspectableBox: React.FC<InspectableBoxProps> = ({
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!defaultDraggable) return;
-    e.stopPropagation();
+    // Don't stop propagation completely so global hold detection can still track if needed
     setIsDragging(true);
     dragStartRef.current = {
       x: e.clientX - pos.x,
@@ -143,7 +135,7 @@ const InspectableBox: React.FC<InspectableBoxProps> = ({
 };
 
 const RainbowLogoSVG = ({ isDark }: { isDark: boolean }) => (
-  <svg width="38" height="28" viewBox="0 0 42 30" fill="none" className="transition-transform duration-300 hover:scale-110">
+  <svg width="38" height="28" viewBox="0 0 42 30" fill="none" className="transition-transform duration-300 hover:scale-115">
     <path d="M3 27C3 14 11 4 21 4C31 4 39 14 39 27" stroke={isDark ? "#f6f5f0" : "#111"} strokeWidth="2.8" strokeLinecap="round"/>
     <path d="M8 27C8 17 13.5 9 21 9C28.5 9 34 17 34 27" stroke={isDark ? "#38bdf8" : "#111"} strokeWidth="2.5" strokeLinecap="round"/>
     <path d="M13 27C13 20 16.5 14 21 14C25.5 14 29 20 29 27" stroke={isDark ? "#facc15" : "#111"} strokeWidth="2.2" strokeLinecap="round"/>
@@ -164,11 +156,11 @@ const CrownSVG = () => (
   </svg>
 );
 
-/* Portrait Component with dark tape, real photo support, or high-contrast SVG styling */
+/* Portrait Component with dark tape, real photo support, and high-contrast SVG styling */
 const StylizedPortrait = ({ isInverted, photoUrl, onClick }: { isInverted: boolean; photoUrl?: string; onClick?: () => void }) => (
   <div 
     onClick={onClick}
-    className="relative w-[300px] sm:w-[370px] md:w-[410px] h-[350px] sm:h-[420px] md:h-[450px] select-none cursor-pointer group"
+    className="relative w-[300px] sm:w-[370px] md:w-[410px] h-[350px] sm:h-[420px] md:h-[450px] select-none cursor-pointer group neo-card-grand"
   >
     {/* Dark Tape at top right */}
     <div className="absolute -top-3 right-12 w-24 h-8 bg-[#1e242b] rotate-[22deg] z-20 opacity-95 shadow-sm" />
@@ -214,76 +206,76 @@ const StylizedPortrait = ({ isInverted, photoUrl, onClick }: { isInverted: boole
             strokeLinejoin="round"
           />
 
-        {/* Hoodie Body */}
-        <path 
-          d="M76 412 L84 332 C86 302 106 284 144 272 L165 256 L255 256 L278 272 C316 284 338 305 344 340 L352 412 Z" 
-          fill="#141414"
-        />
+          {/* Hoodie Body */}
+          <path 
+            d="M76 412 L84 332 C86 302 106 284 144 272 L165 256 L255 256 L278 272 C316 284 338 305 344 340 L352 412 Z" 
+            fill="#141414"
+          />
 
-        {/* Hoodie Details */}
-        <path 
-          d="M142 272 C145 305 175 322 212 322 C248 322 272 302 278 272 L262 245 L158 245 Z" 
-          fill="#1f1f1f"
-          stroke="#0a0a0a"
-          strokeWidth="3"
-        />
-        <path d="M112 285 L125 412 L152 412 L140 274 Z" fill="#262626" />
-        <path d="M306 285 L292 412 L265 412 L278 274 Z" fill="#262626" />
+          {/* Hoodie Details */}
+          <path 
+            d="M142 272 C145 305 175 322 212 322 C248 322 272 302 278 272 L262 245 L158 245 Z" 
+            fill="#1f1f1f"
+            stroke="#0a0a0a"
+            strokeWidth="3"
+          />
+          <path d="M112 285 L125 412 L152 412 L140 274 Z" fill="#262626" />
+          <path d="M306 285 L292 412 L265 412 L278 274 Z" fill="#262626" />
 
-        {/* Hoodie Drawstrings */}
-        <path d="M188 308 C186 340 185 365 188 392" stroke="#f5f5f5" strokeWidth="4.5" strokeLinecap="round" />
-        <path d="M232 308 C234 335 232 355 230 380" stroke="#f5f5f5" strokeWidth="4.5" strokeLinecap="round" />
+          {/* Hoodie Drawstrings */}
+          <path d="M188 308 C186 340 185 365 188 392" stroke="#f5f5f5" strokeWidth="4.5" strokeLinecap="round" />
+          <path d="M232 308 C234 335 232 355 230 380" stroke="#f5f5f5" strokeWidth="4.5" strokeLinecap="round" />
 
-        {/* Chest Patch with Tech Glyph */}
-        <g transform="translate(245, 362) rotate(-8)">
-          <rect x="0" y="0" width="22" height="16" rx="2" fill="#111" stroke="#eee" strokeWidth="1.5"/>
-          <path d="M5 12 L11 4 L17 12 Z" fill="#eee" />
-        </g>
+          {/* Chest Patch with Tech Glyph */}
+          <g transform="translate(245, 362) rotate(-8)">
+            <rect x="0" y="0" width="22" height="16" rx="2" fill="#111" stroke="#eee" strokeWidth="1.5"/>
+            <path d="M5 12 L11 4 L17 12 Z" fill="#eee" />
+          </g>
 
-        {/* Neck */}
-        <path d="M174 210 L174 268 C174 285 244 285 244 268 L244 210 Z" fill="#d4d4d4" />
-        <path d="M174 215 C190 238 228 242 244 225 L244 210 L174 210 Z" fill="#262626" />
+          {/* Neck */}
+          <path d="M174 210 L174 268 C174 285 244 285 244 268 L244 210 Z" fill="#d4d4d4" />
+          <path d="M174 215 C190 238 228 242 244 225 L244 210 L174 210 Z" fill="#262626" />
 
-        {/* Ears */}
-        <ellipse cx="152" cy="176" rx="12" ry="18" transform="rotate(-10 152 176)" fill="#d4d4d4" stroke="#171717" strokeWidth="2.5" />
-        <ellipse cx="268" cy="174" rx="11" ry="17" transform="rotate(12 268 174)" fill="#bdbdbd" stroke="#171717" strokeWidth="2.5" />
+          {/* Ears */}
+          <ellipse cx="152" cy="176" rx="12" ry="18" transform="rotate(-10 152 176)" fill="#d4d4d4" stroke="#171717" strokeWidth="2.5" />
+          <ellipse cx="268" cy="174" rx="11" ry="17" transform="rotate(12 268 174)" fill="#bdbdbd" stroke="#171717" strokeWidth="2.5" />
 
-        {/* Face */}
-        <path 
-          d="M156 125 C156 95 264 95 264 125 L262 178 C260 208 238 232 210 232 C182 232 160 208 158 178 Z" 
-          fill="#e5e5e5" 
-          stroke="#171717" 
-          strokeWidth="3"
-        />
+          {/* Face */}
+          <path 
+            d="M156 125 C156 95 264 95 264 125 L262 178 C260 208 238 232 210 232 C182 232 160 208 158 178 Z" 
+            fill="#e5e5e5" 
+            stroke="#171717" 
+            strokeWidth="3"
+          />
 
-        <path 
-          d="M235 160 C238 188 225 215 198 226 C225 230 255 208 260 178 L262 140 Z" 
-          fill="#a3a3a3" 
-        />
+          <path 
+            d="M235 160 C238 188 225 215 198 226 C225 230 255 208 260 178 L262 140 Z" 
+            fill="#a3a3a3" 
+          />
 
-        <path d="M210 156 L205 182 L218 184" stroke="#171717" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-        <path d="M194 202 C204 207 218 206 226 200" stroke="#171717" strokeWidth="3" strokeLinecap="round" fill="none" />
+          <path d="M210 156 L205 182 L218 184" stroke="#171717" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <path d="M194 202 C204 207 218 206 226 200" stroke="#171717" strokeWidth="3" strokeLinecap="round" fill="none" />
 
-        {/* Retro Sunglasses */}
-        <g transform="rotate(-3 210 155)">
-          <rect x="156" y="138" width="48" height="33" rx="8" fill="#0a0a0a" stroke="#171717" strokeWidth="3" />
-          <rect x="216" y="138" width="48" height="33" rx="8" fill="#0a0a0a" stroke="#171717" strokeWidth="3" />
-          <path d="M204 148 Q210 143 216 148" stroke="#171717" strokeWidth="4.5" fill="none" />
-          <path d="M164 144 L176 144 L168 164 L160 164 Z" fill="#ffffff" opacity="0.22" />
-          <path d="M224 144 L236 144 L228 164 L220 164 Z" fill="#ffffff" opacity="0.22" />
-        </g>
+          {/* Retro Sunglasses */}
+          <g transform="rotate(-3 210 155)">
+            <rect x="156" y="138" width="48" height="33" rx="8" fill="#0a0a0a" stroke="#171717" strokeWidth="3" />
+            <rect x="216" y="138" width="48" height="33" rx="8" fill="#0a0a0a" stroke="#171717" strokeWidth="3" />
+            <path d="M204 148 Q210 143 216 148" stroke="#171717" strokeWidth="4.5" fill="none" />
+            <path d="M164 144 L176 144 L168 164 L160 164 Z" fill="#ffffff" opacity="0.22" />
+            <path d="M224 144 L236 144 L228 164 L220 164 Z" fill="#ffffff" opacity="0.22" />
+          </g>
 
-        {/* Hair */}
-        <path 
-          d="M145 155 C128 140 125 108 142 88 C148 64 180 48 214 52 C252 46 286 68 294 98 C306 118 298 148 276 158 C276 135 268 122 252 118 C245 132 228 138 215 130 C202 142 182 142 172 128 C160 135 152 145 145 155 Z" 
-          fill="#141414" 
-        />
-        <path d="M162 115 Q178 142 198 132 Q188 115 212 135 Q232 140 246 122" stroke="#141414" strokeWidth="10" strokeLinecap="round" fill="none" />
-        <path d="M165 82 Q195 68 228 78" stroke="#404040" strokeWidth="3" strokeLinecap="round" fill="none" />
-        <path d="M150 105 Q175 95 202 102" stroke="#333333" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-      </svg>
-    )}
-  </div>
+          {/* Hair */}
+          <path 
+            d="M145 155 C128 140 125 108 142 88 C148 64 180 48 214 52 C252 46 286 68 294 98 C306 118 298 148 276 158 C276 135 268 122 252 118 C245 132 228 138 215 130 C202 142 182 142 172 128 C160 135 152 145 145 155 Z" 
+            fill="#141414" 
+          />
+          <path d="M162 115 Q178 142 198 132 Q188 115 212 135 Q232 140 246 122" stroke="#141414" strokeWidth="10" strokeLinecap="round" fill="none" />
+          <path d="M165 82 Q195 68 228 78" stroke="#404040" strokeWidth="3" strokeLinecap="round" fill="none" />
+          <path d="M150 105 Q175 95 202 102" stroke="#333333" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+        </svg>
+      )}
+    </div>
 
     {/* Bottom Torn Paper Edge */}
     <div className="absolute bottom-2 left-6 right-6 h-5 bg-white z-20 flex items-center overflow-hidden shadow-sm">
@@ -295,33 +287,33 @@ const StylizedPortrait = ({ isInverted, photoUrl, onClick }: { isInverted: boole
 );
 
 export default function Portfolio() {
-  // Data State with initial seed
   const [data, setData] = useState<PortfolioData>(initialPortfolioData);
-  const [isNeonConnected, setIsNeonConnected] = useState(false);
-  const [isAdminOpen, setIsAdminOpen] = useState(false);
 
   // Intro Sequence State: 'hey' -> 'welcome' -> 'burst' -> 'ready'
   const [introStep, setIntroStep] = useState<'hey' | 'welcome' | 'burst' | 'ready'>('hey');
   const [activeTab, setActiveTab] = useState<'HOME' | 'ABOUT' | 'WORKS' | 'BLOG' | 'CONTACT'>('HOME');
   const [isDark, setIsDark] = useState(false);
-  const [ripple, setRipple] = useState<{ x: number; y: number; targetDark: boolean } | null>(null);
+  
+  // Spread Theme Transition State
+  const [themeSpread, setThemeSpread] = useState<{ active: boolean; targetDark: boolean } | null>(null);
+
   const [isPortraitInverted, setIsPortraitInverted] = useState(false);
   const [showAvatarToast, setShowAvatarToast] = useState(false);
   const [contactSent, setContactSent] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  // Slide Sub-navigation States (NO SCROLL!)
-  const [aboutSlide, setAboutSlide] = useState<number>(0); // 0: Profile, 1: About Me, 2: Tech Stack
-  const [worksPage, setWorksPage] = useState<number>(0);   // 4 projects per page
-  const [blogSlide, setBlogSlide] = useState<number>(0);   // 0: Prestasi, 1: Sertifikat, 2: Artikel
+  // Slide Sub-navigation States
+  const [aboutSlide, setAboutSlide] = useState<number>(0);
+  const [worksPage, setWorksPage] = useState<number>(0);
+  const [blogSlide, setBlogSlide] = useState<number>(0);
 
-  // Custom Cursor & Invert Lens on Hold
+  // Custom Cursor & Hold Invert Lens
   const [mousePos, setMousePos] = useState({ x: 520, y: 360 });
   const [cursorRingPos, setCursorRingPos] = useState({ x: 520, y: 360 });
   const [isHoveringInteractive, setIsHoveringInteractive] = useState(false);
+  
   const [isHoldingClick, setIsHoldingClick] = useState(false);
   const [lensRadius, setLensRadius] = useState(0);
-  const holdTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Fetch live CMS data from API on mount
   useEffect(() => {
@@ -331,7 +323,6 @@ export default function Portfolio() {
       .then(res => {
         if (res.success && res.data) {
           setData(res.data);
-          setIsNeonConnected(res.isNeonConnected);
         }
       })
       .catch(err => console.warn('Could not load dynamic CMS data:', err));
@@ -349,14 +340,16 @@ export default function Portfolio() {
     };
   }, []);
 
+  // Replay intro AND redirect to HOME
   const replayIntro = () => {
+    setActiveTab('HOME');
     setIntroStep('hey');
     setTimeout(() => setIntroStep('welcome'), 900);
     setTimeout(() => setIntroStep('burst'), 1750);
     setTimeout(() => setIntroStep('ready'), 2150);
   };
 
-  // Mouse move and interactive element detection
+  // Track mouse coordinates
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       setMousePos({ x: e.clientX, y: e.clientY });
@@ -371,7 +364,7 @@ export default function Portfolio() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // Cursor follow smoothing
+  // Smooth follower cursor
   useEffect(() => {
     let animationFrameId: number;
     const followMouse = () => {
@@ -385,39 +378,41 @@ export default function Portfolio() {
     return () => cancelAnimationFrame(animationFrameId);
   }, [mousePos]);
 
-  // HOLD LEFT CLICK INVERT RADIUS EFFECT
+  // RELIABLE HOLD-TO-INVERT LENS (Pointerdown & Pointerup)
   useEffect(() => {
-    const handleMouseDown = (e: MouseEvent) => {
-      if (e.button !== 0) return; // left click only
+    const handlePointerDown = (e: PointerEvent) => {
+      if (e.button !== 0) return; // Left button only
       const target = e.target as HTMLElement | null;
-      // Do not trigger lens on interactive controls
+      // Do not block normal button / input interactions
       if (target && (target.closest('button') || target.closest('a') || target.closest('input') || target.closest('textarea'))) {
         return;
       }
       setIsHoldingClick(true);
     };
 
-    const handleMouseUp = () => {
+    const handlePointerUp = () => {
       setIsHoldingClick(false);
     };
 
-    window.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
     return () => {
-      window.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
     };
   }, []);
 
-  // Animate lens radius expanding and shrinking
+  // Smooth lens bloom interpolation
   useEffect(() => {
     let frameId: number;
-    const targetRadius = isHoldingClick ? 160 : 0;
+    const targetRadius = isHoldingClick ? 165 : 0;
     const step = () => {
       setLensRadius((prev) => {
         const diff = targetRadius - prev;
-        if (Math.abs(diff) < 1) return targetRadius;
-        return prev + diff * 0.24;
+        if (Math.abs(diff) < 0.8) return targetRadius;
+        return prev + diff * 0.26;
       });
       frameId = requestAnimationFrame(step);
     };
@@ -425,20 +420,20 @@ export default function Portfolio() {
     return () => cancelAnimationFrame(frameId);
   }, [isHoldingClick]);
 
-  // Enhanced Theme Transition with multi-wave ripple
-  const handleThemeToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
-    setRipple({ x, y, targetDark: !isDark });
+  // TOP-RIGHT SPREAD THEME TRANSITION
+  const handleThemeToggle = () => {
+    const nextDark = !isDark;
+    setThemeSpread({ active: true, targetDark: nextDark });
 
+    // Smoothly apply theme mid-spread
     setTimeout(() => {
-      setIsDark((prev) => !prev);
-    }, 280);
+      setIsDark(nextDark);
+    }, 380);
 
+    // Clean up spread overlay after animation completes
     setTimeout(() => {
-      setRipple(null);
-    }, 750);
+      setThemeSpread(null);
+    }, 850);
   };
 
   const handleAvatarClick = () => {
@@ -446,34 +441,14 @@ export default function Portfolio() {
     setTimeout(() => setShowAvatarToast(false), 2600);
   };
 
-  // Direct navigate to Tech Stack slide on About page
   const navigateToTechStack = () => {
     setActiveTab('ABOUT');
     setAboutSlide(2);
   };
 
-  // Save data via Admin modal
-  const handleSavePortfolioData = async (newData: PortfolioData) => {
-    try {
-      const res = await fetch('/api/portfolio', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin: '020709', data: newData })
-      });
-      const json = await res.json();
-      if (json.success) {
-        setData(newData);
-        setIsNeonConnected(json.isNeonConnected);
-      }
-      return json;
-    } catch (err: any) {
-      return { success: false, message: err?.message || 'Gagal menyimpan ke server.' };
-    }
-  };
-
   const isReady = introStep === 'ready';
 
-  // Works Pagination (4 items per page)
+  // Works Pagination
   const projectsPerPage = 4;
   const totalWorksPages = Math.ceil(data.projects.length / projectsPerPage);
   const currentProjects = data.projects.slice(
@@ -484,32 +459,20 @@ export default function Portfolio() {
   return (
     <div className={`${isDark ? 'dark' : ''} relative min-h-screen select-none overflow-x-hidden`}>
       
-      {/* MULTI-WAVE THEME RIPPLE OVERLAY */}
-      {ripple && (
-        <>
-          {/* Accent leading shockwave */}
-          <div
-            className="fixed inset-0 pointer-events-none z-50 overflow-hidden"
-            style={{
-              background: ripple.targetDark ? '#38bdf8' : '#2563eb',
-              clipPath: `circle(160% at ${ripple.x}px ${ripple.y}px)`,
-              transition: 'clip-path 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-              opacity: 0.85
-            }}
-          />
-          {/* Main canvas backdrop wave */}
-          <div
-            className="fixed inset-0 pointer-events-none z-50 overflow-hidden"
-            style={{
-              background: ripple.targetDark ? '#18191c' : '#f6f5f0',
-              clipPath: `circle(150% at ${ripple.x}px ${ripple.y}px)`,
-              transition: 'clip-path 0.75s cubic-bezier(0.16, 1, 0.3, 1)',
-            }}
-          />
-        </>
+      {/* SPREAD FROM TOP-RIGHT THEME TRANSITION OVERLAY */}
+      {themeSpread && (
+        <div
+          className="fixed inset-0 pointer-events-none z-[120] animate-theme-spread overflow-hidden"
+          style={{
+            backgroundColor: themeSpread.targetDark ? '#18191c' : '#f6f5f0',
+            boxShadow: themeSpread.targetDark 
+              ? '0 0 60px 20px rgba(56, 189, 248, 0.4)' 
+              : '0 0 60px 20px rgba(37, 99, 235, 0.3)'
+          }}
+        />
       )}
 
-      {/* HOLD-TO-INVERT CIRCULAR LENS OVERLAY */}
+      {/* WORKING INVERT LENS WITH BACKDROP FILTER */}
       {lensRadius > 4 && (
         <div
           className="fixed pointer-events-none z-[110]"
@@ -519,34 +482,34 @@ export default function Portfolio() {
             transform: 'translate(-50%, -50%)',
           }}
         >
-          {/* Physical Difference Invert Lens */}
+          {/* Glass Lens with backdrop-filter: invert */}
           <div
-            className="invert-lens-overlay rounded-full shadow-[0_0_25px_rgba(255,255,255,0.7)]"
+            className="invert-lens-glass rounded-full"
             style={{
               width: lensRadius * 2,
               height: lensRadius * 2,
             }}
           />
 
-          {/* Futuristic HUD Measuring Ring & Crosshair */}
+          {/* HUD Target Ring */}
           <div
-            className="absolute inset-0 rounded-full border border-dashed border-white pointer-events-none flex items-center justify-center animate-pulse"
+            className="absolute inset-0 rounded-full border border-dashed border-cyan-400 pointer-events-none flex items-center justify-center animate-spin"
             style={{
-              width: lensRadius * 2 + 16,
-              height: lensRadius * 2 + 16,
-              margin: -8
+              width: lensRadius * 2 + 18,
+              height: lensRadius * 2 + 18,
+              margin: -9,
+              animationDuration: '14s'
             }}
           >
-            {/* Crosshair markers */}
-            <span className="absolute -top-1 w-2 h-0.5 bg-white" />
-            <span className="absolute -bottom-1 w-2 h-0.5 bg-white" />
-            <span className="absolute -left-1 w-0.5 h-2 bg-white" />
-            <span className="absolute -right-1 w-0.5 h-2 bg-white" />
+            <span className="absolute -top-1 w-2.5 h-0.5 bg-cyan-400" />
+            <span className="absolute -bottom-1 w-2.5 h-0.5 bg-cyan-400" />
+            <span className="absolute -left-1 w-0.5 h-2.5 bg-cyan-400" />
+            <span className="absolute -right-1 w-0.5 h-2.5 bg-cyan-400" />
+          </div>
 
-            {/* Invert HUD Tag */}
-            <div className="absolute -top-6 px-2 py-0.5 bg-black/90 text-white text-[9px] font-mono-tech font-bold rounded border border-white/50 tracking-wider">
-              INVERT LENS [{Math.round(lensRadius * 2)}px]
-            </div>
+          {/* Tag */}
+          <div className="absolute -top-7 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-[#111] text-cyan-300 text-[10px] font-mono-tech font-extrabold rounded border border-cyan-400 shadow-md whitespace-nowrap">
+            INVERT LENS [{Math.round(lensRadius * 2)}px]
           </div>
         </div>
       )}
@@ -559,7 +522,6 @@ export default function Portfolio() {
             transform: `translate3d(${cursorRingPos.x}px, ${cursorRingPos.y}px, 0)`,
           }}
         >
-          {/* Black Dot or Outlined Circle on Hover */}
           <div
             className={`-translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-150 ${
               isHoveringInteractive
@@ -569,7 +531,6 @@ export default function Portfolio() {
                 : 'w-3 h-3 bg-[#111] dark:bg-white'
             }`}
           />
-          {/* "YOU" Pill Tag */}
           <div className="ml-2.5 mt-1 px-2 py-0.5 bg-[#111] dark:bg-white text-white dark:text-[#111] text-[10px] font-mono-tech font-extrabold rounded-full shadow-md tracking-wider">
             {isHoldingClick ? 'INVERTING' : 'YOU'}
           </div>
@@ -583,10 +544,10 @@ export default function Portfolio() {
         <header className="w-full max-w-[1400px] mx-auto px-4 sm:px-8 pt-4 pb-2 flex items-center justify-between z-40">
           {/* Left Nav Group */}
           <div className="flex items-center gap-2 sm:gap-5 flex-wrap">
-            {/* Rainbow Logo */}
+            {/* Rainbow Logo: Clicking resets to HOME and replays intro */}
             <button 
               onClick={replayIntro}
-              title="Replay Intro Animation"
+              title="Kembali ke Home &amp; Putar Ulang Animasi"
               className="mr-2 focus:outline-none group relative cursor-pointer"
             >
               <RainbowLogoSVG isDark={isDark} />
@@ -610,7 +571,6 @@ export default function Portfolio() {
                     isActive ? 'text-[#111]' : 'text-[#111] dark:text-[#f3f4f6] hover:opacity-75'
                   }`}
                 >
-                  {/* Cyan Paint Brush Background for Active Tab */}
                   {isActive && (
                     <span className="absolute inset-0 bg-[#38bdf8] clip-brush-nav -z-10 transform -rotate-1 scale-105 shadow-sm" />
                   )}
@@ -621,23 +581,14 @@ export default function Portfolio() {
             })}
           </div>
 
-          {/* Right Controls: Admin Button, Theme Switcher, Avatar, Let's Talk */}
-          <div className="flex items-center gap-2.5 sm:gap-3.5">
-            {/* Admin Panel Gear Button */}
-            <button
-              onClick={() => setIsAdminOpen(true)}
-              title="Buka Panel Admin CMS (Neon DB)"
-              className="px-2.5 py-1.5 bg-white dark:bg-neutral-800 border-2 border-[#111] dark:border-neutral-400 rounded text-[11px] font-mono-tech font-bold neo-shadow neo-btn flex items-center gap-1.5 cursor-pointer"
-            >
-              <Shield className="w-3.5 h-3.5 text-[#2563eb]" />
-              <span className="hidden md:inline">Admin CMS</span>
-            </button>
-
-            {/* Sun / Moon Pill Toggle */}
+          {/* Right Controls: Theme Switcher, Avatar, Let's Talk */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Sun / Moon Pill Toggle with Top-Right Spread */}
             <button
               onClick={handleThemeToggle}
               aria-label="Toggle Dark Mode"
-              className="w-11 h-6 rounded-full bg-neutral-200 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 p-0.5 flex items-center transition-colors relative cursor-pointer"
+              title="Ganti Tema (Spread dari atas kanan)"
+              className="w-12 h-6 rounded-full bg-neutral-200 dark:bg-neutral-800 border-2 border-[#111] dark:border-neutral-700 p-0.5 flex items-center transition-colors relative cursor-pointer neo-shadow-sm neo-btn"
             >
               <div
                 className={`w-4 h-4 rounded-full bg-white dark:bg-neutral-900 shadow flex items-center justify-center transition-transform duration-300 ${
@@ -652,7 +603,7 @@ export default function Portfolio() {
               </div>
             </button>
 
-            {/* Mini Avatar with "Have a nice day!" Toast */}
+            {/* Mini Avatar with Toast */}
             <div className="relative">
               <button
                 onClick={handleAvatarClick}
@@ -676,10 +627,10 @@ export default function Portfolio() {
               )}
             </div>
 
-            {/* LET'S TALK Hand-drawn Border Button */}
+            {/* LET'S TALK Button */}
             <button
               onClick={() => setActiveTab('CONTACT')}
-              className="hidden sm:flex items-center gap-2 px-3.5 py-2 bg-white dark:bg-[#23252a] text-[#111] dark:text-white text-xs font-mono-tech font-extrabold tracking-wider border-2 border-[#111] dark:border-neutral-300 rounded-[4px] neo-shadow hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer"
+              className="hidden sm:flex items-center gap-2 px-3.5 py-2 bg-white dark:bg-[#23252a] text-[#111] dark:text-white text-xs font-mono-tech font-extrabold tracking-wider border-2 border-[#111] dark:border-neutral-300 rounded-[4px] neo-shadow neo-btn-grand cursor-pointer"
             >
               <Heart className="w-3.5 h-3.5 fill-current" />
               <span>LET&apos;S TALK</span>
@@ -719,8 +670,10 @@ export default function Portfolio() {
           </div>
         )}
 
-        {/* MAIN BODY AREA */}
-        <main className="flex-1 w-full max-w-[1380px] mx-auto px-4 sm:px-10 py-6 flex items-center justify-center relative">
+        {/* MAIN BODY AREA (Strictly hidden during intro sequence so no emblem leaks!) */}
+        <main className={`flex-1 w-full max-w-[1380px] mx-auto px-4 sm:px-10 py-6 flex items-center justify-center relative transition-opacity duration-500 ${
+          isReady ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}>
           
           {/* TAB: HOME */}
           {activeTab === 'HOME' && (
@@ -745,7 +698,7 @@ export default function Portfolio() {
                   delay={180}
                   isReady={isReady}
                 >
-                  <div className="w-32 h-24 bg-[#a7f3d0] text-[#111] p-3 -rotate-12 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-xl leading-tight font-bold">
+                  <div className="w-32 h-24 bg-[#a7f3d0] text-[#111] p-3 -rotate-12 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-xl leading-tight font-bold neo-sticker-grand">
                     <span>FULL STACK</span>
                     <span>DEVELOPER</span>
                     <div className="w-12 h-0.5 bg-[#111]/40 mt-1 rounded-full" />
@@ -764,7 +717,7 @@ export default function Portfolio() {
                 </svg>
               </div>
 
-              {/* Bottom-left Yellow Sticky Note: "Clean Code = High Scalability" */}
+              {/* Bottom-left Yellow Sticky Note */}
               <div className="hidden xl:block absolute bottom-8 -left-4 z-20">
                 <InspectableBox
                   dimensions="132 × 128"
@@ -774,7 +727,7 @@ export default function Portfolio() {
                   delay={260}
                   isReady={isReady}
                 >
-                  <div className="w-32 h-32 bg-[#fde047] text-[#111] p-3 rotate-6 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-lg leading-tight font-bold">
+                  <div className="w-32 h-32 bg-[#fde047] text-[#111] p-3 rotate-6 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-lg leading-tight font-bold neo-sticker-grand">
                     <span>Clean</span>
                     <span>Code</span>
                     <span>=</span>
@@ -805,8 +758,7 @@ export default function Portfolio() {
                 </InspectableBox>
 
                 {/* Giant "RASHQA ANDREAN" Heading with Yellow Crown */}
-                <div className="relative mt-1 mb-6">
-                  {/* Floating Crown on top-right of 'A' */}
+                <div className="relative mt-1 mb-5">
                   <div 
                     className={`absolute -top-10 right-2 sm:right-6 z-20 rotate-12 pointer-events-none transition-all duration-500 ${
                       isReady ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
@@ -830,12 +782,16 @@ export default function Portfolio() {
                   </InspectableBox>
                 </div>
 
-                {/* Subtitle / Role Tag */}
-                <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 bg-[#38bdf8] text-[#111] font-mono-tech font-extrabold text-xs rounded border-2 border-[#111] neo-shadow-sm">
+                {/* Subtitle / Role Tag (Safely guarded by isReady) */}
+                <div 
+                  className={`mb-4 inline-flex items-center gap-2 px-3 py-1 bg-[#38bdf8] text-[#111] font-mono-tech font-extrabold text-xs rounded border-2 border-[#111] neo-shadow-sm transition-opacity duration-300 ${
+                    isReady ? 'opacity-100 animate-pop-in' : 'opacity-0 pointer-events-none'
+                  }`}
+                >
                   <span>⚡ {data.profile.role}</span>
                 </div>
 
-                {/* Bio Paragraph with Top & Bottom Divider Lines */}
+                {/* Bio Paragraph */}
                 <InspectableBox
                   dimensions="460 × 96"
                   color="#10b981"
@@ -851,7 +807,7 @@ export default function Portfolio() {
                   </div>
                 </InspectableBox>
 
-                {/* Action Buttons: VIEW MY WORK & EXPLORE STACKS */}
+                {/* Action Buttons: VIEW MY WORK & TECH STACKS */}
                 <div className="flex flex-wrap items-center gap-4">
                   <InspectableBox
                     dimensions="186 × 48"
@@ -862,7 +818,7 @@ export default function Portfolio() {
                   >
                     <button
                       onClick={() => setActiveTab('WORKS')}
-                      className="px-6 py-3.5 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-mono-tech font-extrabold text-xs tracking-wider rounded-md border-2 border-[#111] neo-shadow flex items-center gap-3 transition-transform active:translate-y-0.5 cursor-pointer neo-btn"
+                      className="px-6 py-3.5 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-mono-tech font-extrabold text-xs tracking-wider rounded-md border-2 border-[#111] neo-shadow neo-btn-grand flex items-center gap-3 transition-transform cursor-pointer"
                     >
                       <span className="w-5 h-5 rounded bg-white text-[#111] flex items-center justify-center">
                         <ArrowUpRight className="w-3.5 h-3.5 stroke-[3]" />
@@ -880,7 +836,7 @@ export default function Portfolio() {
                   >
                     <button
                       onClick={navigateToTechStack}
-                      className="px-6 py-3.5 bg-white dark:bg-[#23252a] hover:bg-neutral-100 dark:hover:bg-neutral-800 text-[#111] dark:text-white font-mono-tech font-extrabold text-xs tracking-wider rounded-md border-2 border-[#111] dark:border-neutral-400 neo-shadow flex items-center gap-2.5 transition-transform active:translate-y-0.5 cursor-pointer neo-btn"
+                      className="px-6 py-3.5 bg-white dark:bg-[#23252a] hover:bg-neutral-100 dark:hover:bg-neutral-800 text-[#111] dark:text-white font-mono-tech font-extrabold text-xs tracking-wider rounded-md border-2 border-[#111] dark:border-neutral-400 neo-shadow neo-btn-grand flex items-center gap-2.5 transition-transform cursor-pointer"
                     >
                       <Code2 className="w-4 h-4 text-[#2563eb] stroke-[2.5]" />
                       <span>TECH STACKS</span>
@@ -889,10 +845,10 @@ export default function Portfolio() {
                 </div>
               </div>
 
-              {/* RIGHT COLUMN: Portrait + Interactive Browser Window Card + Stickers */}
+              {/* RIGHT COLUMN: Portrait + Browser Window Card + Stickers */}
               <div className="w-full lg:w-[48%] flex items-center justify-center relative min-h-[460px]">
                 
-                {/* Mini Retro Browser Window Card (Next.js, Laravel, Golang, Python) -> Click goes to Tech Stack */}
+                {/* Mini Retro Browser Window Card (Tech Stack Preview -> Click goes to Tech Stack) */}
                 <div className="absolute -top-6 left-2 sm:left-4 z-30">
                   <InspectableBox
                     dimensions="190 × 140"
@@ -905,7 +861,7 @@ export default function Portfolio() {
                     <div 
                       onClick={navigateToTechStack}
                       title="Klik untuk lihat detail Tech Stack di tab About"
-                      className="w-44 sm:w-48 bg-white dark:bg-[#23252a] border-2 border-[#111] rounded-xl p-3 -rotate-6 neo-shadow hover:scale-105 transition-all cursor-pointer"
+                      className="w-44 sm:w-48 bg-white dark:bg-[#23252a] border-2 border-[#111] rounded-xl p-3 -rotate-6 neo-shadow neo-card-grand cursor-pointer"
                     >
                       {/* Window Header */}
                       <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-neutral-200 dark:border-neutral-700">
@@ -963,7 +919,7 @@ export default function Portfolio() {
                   </svg>
                 </div>
 
-                {/* Center Stylized Portrait with Orange Bounding Box & Click-to-Invert */}
+                {/* Center Portrait with Orange Bounding Box & Click-to-Invert */}
                 <InspectableBox
                   dimensions="400 × 407"
                   color="#f97316"
@@ -988,7 +944,7 @@ export default function Portfolio() {
                     delay={300}
                     isReady={isReady}
                   >
-                    <div className="relative w-28 h-28 flex items-center justify-center rotate-12">
+                    <div className="relative w-28 h-28 flex items-center justify-center rotate-12 neo-sticker-grand">
                       <svg viewBox="0 0 120 120" className="w-full h-full fill-[#f472b6] drop-shadow">
                         <polygon points="60,2 73,18 93,9 96,30 116,33 107,52 120,68 103,80 106,101 86,102 77,120 60,108 43,120 34,102 14,101 17,80 0,68 13,52 4,33 24,30 27,9 47,18" />
                       </svg>
@@ -1001,7 +957,7 @@ export default function Portfolio() {
                   </InspectableBox>
                 </div>
 
-                {/* Top-right Lime Green Sticky Note: "Design. Code. Ship" */}
+                {/* Top-right Lime Green Sticky Note */}
                 <div className="hidden sm:block absolute -top-8 -right-4 z-20">
                   <InspectableBox
                     dimensions="112 × 110"
@@ -1011,7 +967,7 @@ export default function Portfolio() {
                     delay={250}
                     isReady={isReady}
                   >
-                    <div className="w-28 h-28 bg-[#bef264] text-[#111] p-3 rotate-6 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-xl leading-tight font-bold">
+                    <div className="w-28 h-28 bg-[#bef264] text-[#111] p-3 rotate-6 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-xl leading-tight font-bold neo-sticker-grand">
                       <span>Design.</span>
                       <span>Code.</span>
                       <span>Ship</span>
@@ -1029,7 +985,7 @@ export default function Portfolio() {
                     delay={320}
                     isReady={isReady}
                   >
-                    <div className="px-5 py-3.5 bg-white dark:bg-[#23252a] text-[#111] dark:text-white border-2 border-[#111] dark:border-white rounded-full -rotate-6 shadow-sm flex flex-col items-center justify-center text-center font-hand text-lg leading-none font-bold">
+                    <div className="px-5 py-3.5 bg-white dark:bg-[#23252a] text-[#111] dark:text-white border-2 border-[#111] dark:border-white rounded-full -rotate-6 shadow-sm flex flex-col items-center justify-center text-center font-hand text-lg leading-none font-bold neo-sticker-grand">
                       <span>creativity</span>
                       <span className="text-xs my-0.5">+</span>
                       <span>technology</span>
@@ -1058,7 +1014,7 @@ export default function Portfolio() {
                   >
                     <div 
                       onClick={() => setActiveTab('CONTACT')}
-                      className="w-28 h-28 rounded-full bg-white dark:bg-[#23252a] text-[#111] dark:text-white border-2 border-[#111] dark:border-white p-3 -rotate-6 shadow-md flex flex-col items-center justify-center text-center font-hand text-lg leading-tight font-bold cursor-pointer hover:scale-105 transition-transform"
+                      className="w-28 h-28 rounded-full bg-white dark:bg-[#23252a] text-[#111] dark:text-white border-2 border-[#111] dark:border-white p-3 -rotate-6 shadow-md flex flex-col items-center justify-center text-center font-hand text-lg leading-tight font-bold cursor-pointer neo-sticker-grand"
                     >
                       <span>Let&apos;s</span>
                       <span>Create</span>
@@ -1112,17 +1068,17 @@ export default function Portfolio() {
                   {aboutSlide === 0 && (
                     <div className="space-y-6 animate-slide-right">
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div className="p-4 bg-[#bae6fd] text-[#111] rounded-xl border-2 border-[#111] neo-shadow">
+                        <div className="p-4 bg-[#bae6fd] text-[#111] rounded-xl border-2 border-[#111] neo-shadow neo-card-grand">
                           <span className="text-[10px] font-mono-tech font-extrabold uppercase">Full Name</span>
                           <h3 className="font-display font-extrabold text-base sm:text-lg mt-0.5">{data.profile.fullName}</h3>
                           <p className="text-xs font-mono-tech mt-1 text-neutral-700">{data.profile.role}</p>
                         </div>
-                        <div className="p-4 bg-[#a7f3d0] text-[#111] rounded-xl border-2 border-[#111] neo-shadow">
+                        <div className="p-4 bg-[#a7f3d0] text-[#111] rounded-xl border-2 border-[#111] neo-shadow neo-card-grand">
                           <span className="text-[10px] font-mono-tech font-extrabold uppercase">Experience</span>
                           <h3 className="font-display font-extrabold text-xl sm:text-2xl mt-0.5">{data.profile.stats.experience}</h3>
                           <p className="text-xs font-mono-tech mt-1 text-neutral-700">{data.profile.stats.projects} Proyek Terselesaikan</p>
                         </div>
-                        <div className="p-4 bg-[#fde047] text-[#111] rounded-xl border-2 border-[#111] neo-shadow">
+                        <div className="p-4 bg-[#fde047] text-[#111] rounded-xl border-2 border-[#111] neo-shadow neo-card-grand">
                           <span className="text-[10px] font-mono-tech font-extrabold uppercase">Core Domains</span>
                           <h3 className="font-display font-extrabold text-base sm:text-lg mt-0.5">Full Stack &amp; Cloud</h3>
                           <p className="text-xs font-mono-tech mt-1 text-neutral-700">Golang • Next.js • Laravel</p>
@@ -1157,7 +1113,7 @@ export default function Portfolio() {
 
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         {data.aboutStory.pillars.map((pillar) => (
-                          <div key={pillar.title} className={`${pillar.bg} text-[#111] p-4 rounded-xl border-2 border-[#111] neo-shadow`}>
+                          <div key={pillar.title} className={`${pillar.bg} text-[#111] p-4 rounded-xl border-2 border-[#111] neo-shadow neo-card-grand`}>
                             <h3 className="font-display font-extrabold text-base mb-1.5">{pillar.title}</h3>
                             <p className="font-mono-tech text-xs leading-relaxed opacity-90">{pillar.desc}</p>
                           </div>
@@ -1181,7 +1137,7 @@ export default function Portfolio() {
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {data.techStacks.map((group) => (
-                          <div key={group.category} className="p-4 bg-white dark:bg-neutral-800/80 border-2 border-[#111] rounded-xl neo-shadow">
+                          <div key={group.category} className="p-4 bg-white dark:bg-neutral-800/80 border-2 border-[#111] rounded-xl neo-shadow neo-card-grand">
                             <div className="flex items-center gap-2 mb-3 pb-2 border-b border-neutral-200 dark:border-neutral-700">
                               <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: group.color }} />
                               <h4 className="font-display font-extrabold text-xs uppercase tracking-wider">{group.category}</h4>
@@ -1217,7 +1173,7 @@ export default function Portfolio() {
                   <button
                     onClick={() => setAboutSlide(prev => Math.max(0, prev - 1))}
                     disabled={aboutSlide === 0}
-                    className="px-4 py-2 bg-white dark:bg-neutral-800 border-2 border-[#111] rounded font-mono-tech font-bold text-xs neo-shadow neo-btn disabled:opacity-40 flex items-center gap-1.5 cursor-pointer"
+                    className="px-4 py-2 bg-white dark:bg-neutral-800 border-2 border-[#111] rounded font-mono-tech font-bold text-xs neo-shadow neo-btn-grand disabled:opacity-40 flex items-center gap-1.5 cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     <span>SEBELUMNYA</span>
@@ -1230,7 +1186,7 @@ export default function Portfolio() {
                   <button
                     onClick={() => setAboutSlide(prev => Math.min(2, prev + 1))}
                     disabled={aboutSlide === 2}
-                    className="px-4 py-2 bg-[#2563eb] text-white border-2 border-[#111] rounded font-mono-tech font-extrabold text-xs neo-shadow neo-btn disabled:opacity-40 flex items-center gap-1.5 cursor-pointer"
+                    className="px-4 py-2 bg-[#2563eb] text-white border-2 border-[#111] rounded font-mono-tech font-extrabold text-xs neo-shadow neo-btn-grand disabled:opacity-40 flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>SELANJUTNYA</span>
                     <ChevronRight className="w-4 h-4" />
@@ -1257,7 +1213,7 @@ export default function Portfolio() {
                   <button
                     onClick={() => setWorksPage(prev => Math.max(0, prev - 1))}
                     disabled={worksPage === 0}
-                    className="px-3.5 py-2 bg-white dark:bg-[#23252a] border-2 border-[#111] font-mono-tech font-bold text-xs rounded neo-shadow disabled:opacity-40 flex items-center gap-1 cursor-pointer"
+                    className="px-3.5 py-2 bg-white dark:bg-[#23252a] border-2 border-[#111] font-mono-tech font-bold text-xs rounded neo-shadow neo-btn-grand disabled:opacity-40 flex items-center gap-1 cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     <span>PREV</span>
@@ -1265,7 +1221,7 @@ export default function Portfolio() {
                   <button
                     onClick={() => setWorksPage(prev => Math.min(totalWorksPages - 1, prev + 1))}
                     disabled={worksPage >= totalWorksPages - 1}
-                    className="px-3.5 py-2 bg-[#2563eb] text-white border-2 border-[#111] font-mono-tech font-extrabold text-xs rounded neo-shadow disabled:opacity-40 flex items-center gap-1 cursor-pointer"
+                    className="px-3.5 py-2 bg-[#2563eb] text-white border-2 border-[#111] font-mono-tech font-extrabold text-xs rounded neo-shadow neo-btn-grand disabled:opacity-40 flex items-center gap-1 cursor-pointer"
                   >
                     <span>NEXT SLIDE</span>
                     <ChevronRight className="w-4 h-4" />
@@ -1283,7 +1239,7 @@ export default function Portfolio() {
                     badgePosition="bottom"
                     delay={idx * 70}
                   >
-                    <div className="bg-white dark:bg-[#23252a] border-2 border-[#111] dark:border-neutral-400 rounded-xl p-5 sm:p-6 neo-shadow flex flex-col justify-between h-full hover:translate-x-[1px] hover:-translate-y-[1px] transition-transform">
+                    <div className="bg-white dark:bg-[#23252a] border-2 border-[#111] dark:border-neutral-400 rounded-xl p-5 sm:p-6 neo-shadow neo-card-grand flex flex-col justify-between h-full">
                       <div>
                         <div className="flex items-center justify-between mb-2">
                           <span 
@@ -1332,7 +1288,7 @@ export default function Portfolio() {
             </div>
           )}
 
-          {/* TAB: ACHIEVEMENTS & CERTIFICATES (SLIDE VIEW - NO SCROLL) */}
+          {/* TAB: ACHIEVEMENTS & CERTIFICATES */}
           {activeTab === 'BLOG' && (
             <div className="w-full max-w-4xl py-4 animate-pop-in">
               <div className="bg-white dark:bg-[#23252a] border-2 border-[#111] dark:border-neutral-400 rounded-2xl p-6 sm:p-8 neo-shadow-lg min-h-[520px] flex flex-col justify-between">
@@ -1367,7 +1323,7 @@ export default function Portfolio() {
                     </div>
                   </div>
 
-                  {/* Filtered Achievements based on Slide Category */}
+                  {/* Filtered Achievements */}
                   <div className="space-y-3.5 animate-slide-right">
                     {data.achievements
                       .filter((item) => {
@@ -1378,7 +1334,7 @@ export default function Portfolio() {
                       .map((item) => (
                         <div
                           key={item.id}
-                          className="bg-white dark:bg-neutral-800/90 border-2 border-[#111] rounded-xl p-4 sm:p-5 neo-shadow hover:-translate-y-0.5 transition-transform flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                          className="bg-white dark:bg-neutral-800/90 border-2 border-[#111] rounded-xl p-4 sm:p-5 neo-shadow neo-card-grand flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                         >
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
@@ -1415,7 +1371,7 @@ export default function Portfolio() {
                   <button
                     onClick={() => setBlogSlide(prev => Math.max(0, prev - 1))}
                     disabled={blogSlide === 0}
-                    className="px-4 py-2 bg-white dark:bg-neutral-800 border-2 border-[#111] rounded font-mono-tech font-bold text-xs neo-shadow neo-btn disabled:opacity-40 flex items-center gap-1.5 cursor-pointer"
+                    className="px-4 py-2 bg-white dark:bg-neutral-800 border-2 border-[#111] rounded font-mono-tech font-bold text-xs neo-shadow neo-btn-grand disabled:opacity-40 flex items-center gap-1.5 cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     <span>PREV</span>
@@ -1428,7 +1384,7 @@ export default function Portfolio() {
                   <button
                     onClick={() => setBlogSlide(prev => Math.min(2, prev + 1))}
                     disabled={blogSlide === 2}
-                    className="px-4 py-2 bg-[#2563eb] text-white border-2 border-[#111] rounded font-mono-tech font-extrabold text-xs neo-shadow neo-btn disabled:opacity-40 flex items-center gap-1.5 cursor-pointer"
+                    className="px-4 py-2 bg-[#2563eb] text-white border-2 border-[#111] rounded font-mono-tech font-extrabold text-xs neo-shadow neo-btn-grand disabled:opacity-40 flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>NEXT</span>
                     <ChevronRight className="w-4 h-4" />
@@ -1454,7 +1410,7 @@ export default function Portfolio() {
                     <p className="font-mono-tech text-xs">Thanks for reaching out, Rashqa will get back to you shortly.</p>
                     <button
                       onClick={() => setContactSent(false)}
-                      className="px-4 py-2 bg-white border-2 border-[#111] font-mono-tech font-bold text-xs rounded neo-shadow cursor-pointer"
+                      className="px-4 py-2 bg-white border-2 border-[#111] font-mono-tech font-bold text-xs rounded neo-shadow neo-btn-grand cursor-pointer"
                     >
                       SEND ANOTHER
                     </button>
@@ -1496,7 +1452,7 @@ export default function Portfolio() {
                     </div>
                     <button
                       type="submit"
-                      className="w-full py-3 bg-[#2563eb] text-white font-mono-tech font-extrabold text-xs tracking-wider rounded border-2 border-[#111] neo-shadow flex items-center justify-center gap-2 cursor-pointer neo-btn"
+                      className="w-full py-3 bg-[#2563eb] text-white font-mono-tech font-extrabold text-xs tracking-wider rounded border-2 border-[#111] neo-shadow neo-btn-grand flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <Send className="w-3.5 h-3.5" />
                       <span>SEND MESSAGE</span>
@@ -1509,22 +1465,15 @@ export default function Portfolio() {
 
         </main>
 
-        {/* Subtle Bottom Helper Bar */}
+        {/* Subtle Bottom Helper Bar (No Admin CMS button here!) */}
         <footer className="w-full max-w-[1400px] mx-auto px-6 py-3 flex items-center justify-between text-[11px] font-mono-tech text-neutral-500 z-20">
           <div className="flex items-center gap-4 flex-wrap">
             <span className="inline-flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              Interactive Canvas • Hold Left-Click for Invert Lens • Click stickers to inspect
+              Interactive Canvas • Tahan Klik Kiri untuk Invert Lens • Klik stiker untuk inspeksi
             </span>
           </div>
           <div className="flex items-center gap-4">
-            <button
-              onClick={() => setIsAdminOpen(true)}
-              className="inline-flex items-center gap-1 hover:text-[#2563eb] transition-colors cursor-pointer"
-            >
-              <Shield className="w-3 h-3" />
-              <span>Admin CMS</span>
-            </button>
             <button
               onClick={replayIntro}
               className="inline-flex items-center gap-1.5 hover:text-[#111] dark:hover:text-white transition-colors cursor-pointer"
@@ -1540,15 +1489,6 @@ export default function Portfolio() {
       <WhatsAppWidget 
         phoneNumber={data.profile.whatsapp} 
         name={data.profile.fullName} 
-      />
-
-      {/* Admin Panel Modal */}
-      <AdminModal
-        isOpen={isAdminOpen}
-        onClose={() => setIsAdminOpen(false)}
-        data={data}
-        onSave={handleSavePortfolioData}
-        isNeonConnected={isNeonConnected}
       />
 
     </div>
