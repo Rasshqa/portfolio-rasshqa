@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Aditya Kenzo — Creative Front-End & UI/UX Designer",
-  description: "Creative Front-End Developer & UI/UX Designer portfolio with interactive canvas and neo-brutalist aesthetics.",
+  title: "Rashqa Andrean Fitrah Sulaeman — Full Stack Developer",
+  description: "Portfolio of Rashqa Andrean Fitrah Sulaeman - Full Stack Developer specializing in Next.js, Laravel, Golang, Vue JS, Python, and cloud systems.",
 };
 
 export default function RootLayout({

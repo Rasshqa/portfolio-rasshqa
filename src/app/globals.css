@@ -38,6 +38,13 @@ body {
   box-shadow: 4px 4px 0px 0px #000000;
 }
 
+.neo-shadow-sm {
+  box-shadow: 2px 2px 0px 0px #111111;
+}
+.dark .neo-shadow-sm {
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
 .neo-shadow-lg {
   box-shadow: 6px 6px 0px 0px #111111;
 }
@@ -47,6 +54,27 @@ body {
 
 .neo-shadow-blue {
   box-shadow: 4px 4px 0px 0px #1d4ed8;
+}
+
+.neo-shadow-emerald {
+  box-shadow: 4px 4px 0px 0px #059669;
+}
+
+.neo-shadow-pink {
+  box-shadow: 4px 4px 0px 0px #db2777;
+}
+
+.neo-shadow-yellow {
+  box-shadow: 4px 4px 0px 0px #ca8a04;
+}
+
+/* Tactile button press */
+.neo-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px #111111;
+}
+.dark .neo-btn:active {
+  box-shadow: 2px 2px 0px 0px #000000;
 }
 
 /* Subtle floating animations for stickers */
@@ -61,18 +89,47 @@ body {
   100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(28px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-28px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
 @keyframes burstLine {
   0% { stroke-dashoffset: 30; opacity: 1; }
   100% { stroke-dashoffset: -30; opacity: 0; }
 }
 
+@keyframes radarSweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .animate-pop-in {
-  animation: popIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: popIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-slide-right {
+  animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-left {
+  animation: slideInLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Rough paint brush clip path for active nav item & photo backdrop */
 .clip-brush-nav {
   clip-path: polygon(3% 6%, 96% 2%, 100% 25%, 97% 88%, 92% 98%, 5% 95%, 1% 75%, 4% 30%);
+}
+
+/* Invert Lens difference styling */
+.invert-lens-overlay {
+  mix-blend-mode: difference;
+  background-color: #ffffff;
 }
 
 /* Custom Scrollbar */
