@@ -1,26 +1,88 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-display: 'Syne', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-hand: 'Caveat', cursive;
+  --background: #f6f5f0;
+  --foreground: #111111;
 }
 
 body {
-  background: var(--background);
+  font-family: var(--font-mono);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono-tech {
+  font-family: var(--font-mono);
+}
+
+.font-hand {
+  font-family: var(--font-hand);
+}
+
+/* Neo-brutalist hard shadows */
+.neo-shadow {
+  box-shadow: 4px 4px 0px 0px #111111;
+}
+.dark .neo-shadow {
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.neo-shadow-lg {
+  box-shadow: 6px 6px 0px 0px #111111;
+}
+.dark .neo-shadow-lg {
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+
+.neo-shadow-blue {
+  box-shadow: 4px 4px 0px 0px #1d4ed8;
+}
+
+/* Subtle floating animations for stickers */
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px) rotate(var(--tw-rotate, 0deg)); }
+  50% { transform: translateY(-6px) rotate(var(--tw-rotate, 0deg)); }
+}
+
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.6) translateY(20px); }
+  70% { transform: scale(1.05) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes burstLine {
+  0% { stroke-dashoffset: 30; opacity: 1; }
+  100% { stroke-dashoffset: -30; opacity: 0; }
+}
+
+.animate-pop-in {
+  animation: popIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Rough paint brush clip path for active nav item & photo backdrop */
+.clip-brush-nav {
+  clip-path: polygon(3% 6%, 96% 2%, 100% 25%, 97% 88%, 92% 98%, 5% 95%, 1% 75%, 4% 30%);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f6f5f0;
+}
+::-webkit-scrollbar-thumb {
+  background: #111;
+  border-radius: 4px;
 }
