@@ -35,7 +35,10 @@ export default function AdminModal({
       setAuthError('Masukkan PIN Admin.');
       return;
     }
-    // Simple client check or verify against server
+    if (pinInput.trim() !== '020709') {
+      setAuthError('PIN Admin salah. Silakan coba lagi.');
+      return;
+    }
     setIsAuthenticated(true);
     setAuthError('');
   };
@@ -99,7 +102,7 @@ export default function AdminModal({
             </div>
             <h3 className="font-display font-extrabold text-2xl mb-2">Kunci Akses Admin</h3>
             <p className="font-mono-tech text-xs text-neutral-600 dark:text-neutral-400 max-w-md mb-6">
-              Masukkan Master PIN untuk mengakses panel pengaturan data. (Default PIN: <code className="bg-neutral-200 dark:bg-neutral-800 px-1.5 py-0.5 rounded font-bold">rashqa2026</code>)
+              Masukkan Master PIN untuk mengakses panel pengaturan data. (PIN: <code className="bg-neutral-200 dark:bg-neutral-800 px-1.5 py-0.5 rounded font-bold">020709</code>)
             </p>
 
             <form onSubmit={handleLogin} className="w-full max-w-xs space-y-4">
@@ -241,6 +244,61 @@ export default function AdminModal({
                         className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border-2 border-[#111] rounded text-xs font-mono-tech focus:outline-none"
                       />
                     </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-mono-tech font-bold mb-1">LinkedIn URL</label>
+                      <input
+                        type="text"
+                        value={formData.profile.linkedin}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          profile: { ...formData.profile, linkedin: e.target.value }
+                        })}
+                        className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border-2 border-[#111] rounded text-xs font-mono-tech focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-mono-tech font-bold mb-1">Instagram URL / Username</label>
+                      <input
+                        type="text"
+                        value={formData.profile.instagram}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          profile: { ...formData.profile, instagram: e.target.value }
+                        })}
+                        className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border-2 border-[#111] rounded text-xs font-mono-tech focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-mono-tech font-bold mb-1">TikTok URL / Username</label>
+                      <input
+                        type="text"
+                        value={formData.profile.tiktok}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          profile: { ...formData.profile, tiktok: e.target.value }
+                        })}
+                        className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border-2 border-[#111] rounded text-xs font-mono-tech focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-mono-tech font-bold mb-1">
+                      Foto Asli Profil (Opsional - URL atau path /rashqa.jpg di folder public)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.profile.photoUrl || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        profile: { ...formData.profile, photoUrl: e.target.value }
+                      })}
+                      placeholder="Contoh: /rashqa.jpg atau https://... (kosongkan untuk tetap pakai ilustrasi anime/vektor)"
+                      className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border-2 border-[#111] rounded text-xs font-mono-tech focus:outline-none"
+                    />
                   </div>
 
                   <div>

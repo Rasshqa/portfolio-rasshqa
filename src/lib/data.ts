@@ -33,6 +33,9 @@ export interface PortfolioData {
     whatsapp: string;
     github: string;
     linkedin: string;
+    instagram: string;
+    tiktok: string;
+    photoUrl?: string;
     stats: {
       experience: string;
       projects: string;
@@ -64,9 +67,12 @@ export const initialPortfolioData: PortfolioData = {
     bio: "I turn ideas into clean, robust & modern web experiences. Specializing in high-performance backends with Golang & Laravel, coupled with fluid Next.js & Vue frontends.",
     location: "Indonesia",
     email: "rashqaandrean@gmail.com",
-    whatsapp: "62895328811198",
+    whatsapp: "6285723894370",
     github: "https://github.com/rasshqa",
-    linkedin: "https://linkedin.com/in/rashqa",
+    linkedin: "https://id.linkedin.com/in/rashqa-andrean-fitrah-sulaeman-58041b366",
+    instagram: "https://instagram.com/rasshqa.tsx",
+    tiktok: "https://tiktok.com/@rasshqa",
+    photoUrl: "",
     stats: {
       experience: "4+ Years",
       projects: "20+ Built",

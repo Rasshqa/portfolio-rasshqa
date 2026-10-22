@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPortfolioData, savePortfolioData } from '@/lib/db';
 import { initialPortfolioData, PortfolioData } from '@/lib/data';
 
-const ADMIN_SECRET_PIN = process.env.ADMIN_SECRET_PIN || 'rashqa2026';
+const ADMIN_SECRET_PIN = process.env.ADMIN_SECRET_PIN || '020709';
 
 export async function GET() {
   try {

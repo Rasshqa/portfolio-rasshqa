@@ -164,8 +164,8 @@ const CrownSVG = () => (
   </svg>
 );
 
-/* Portrait Component with dark tape and high-contrast styling */
-const StylizedPortrait = ({ isInverted, onClick }: { isInverted: boolean; onClick?: () => void }) => (
+/* Portrait Component with dark tape, real photo support, or high-contrast SVG styling */
+const StylizedPortrait = ({ isInverted, photoUrl, onClick }: { isInverted: boolean; photoUrl?: string; onClick?: () => void }) => (
   <div 
     onClick={onClick}
     className="relative w-[300px] sm:w-[370px] md:w-[410px] h-[350px] sm:h-[420px] md:h-[450px] select-none cursor-pointer group"
@@ -188,21 +188,31 @@ const StylizedPortrait = ({ isInverted, onClick }: { isInverted: boolean; onClic
       <path d="M180 42 L245 34 L230 58 Z" fill="#2563EB" />
     </svg>
 
-    {/* White Paper Cutout + High-Contrast Character Portrait */}
+    {/* White Paper Cutout + Character Portrait or Real Photo */}
     <div 
       className={`relative z-10 w-full h-full flex items-end justify-center overflow-hidden transition-all duration-300 ${
         isInverted ? 'invert contrast-125' : ''
       }`}
     >
-      <svg viewBox="0 0 400 440" className="w-full h-full">
-        {/* Paper Cutout Outline */}
-        <path 
-          d="M65 415 L72 325 C74 295 95 275 135 262 L152 248 L152 218 C134 205 126 185 128 164 C118 148 118 115 132 95 C140 62 175 42 215 44 C258 42 292 65 302 102 C312 125 305 155 292 172 C292 192 282 212 266 222 L266 250 L288 262 C328 274 348 298 354 335 L364 415 Z" 
-          fill="#FFFFFF"
-          stroke="#FFFFFF"
-          strokeWidth="18"
-          strokeLinejoin="round"
-        />
+      {photoUrl ? (
+        <div className="relative w-[85%] h-[88%] rounded-2xl border-4 border-white neo-shadow overflow-hidden bg-neutral-900 mb-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={photoUrl}
+            alt="Rashqa Andrean"
+            className="w-full h-full object-cover grayscale contrast-125 hover:grayscale-0 transition-all duration-300"
+          />
+        </div>
+      ) : (
+        <svg viewBox="0 0 400 440" className="w-full h-full">
+          {/* Paper Cutout Outline */}
+          <path 
+            d="M65 415 L72 325 C74 295 95 275 135 262 L152 248 L152 218 C134 205 126 185 128 164 C118 148 118 115 132 95 C140 62 175 42 215 44 C258 42 292 65 302 102 C312 125 305 155 292 172 C292 192 282 212 266 222 L266 250 L288 262 C328 274 348 298 354 335 L364 415 Z" 
+            fill="#FFFFFF"
+            stroke="#FFFFFF"
+            strokeWidth="18"
+            strokeLinejoin="round"
+          />
 
         {/* Hoodie Body */}
         <path 
@@ -272,7 +282,8 @@ const StylizedPortrait = ({ isInverted, onClick }: { isInverted: boolean; onClic
         <path d="M165 82 Q195 68 228 78" stroke="#404040" strokeWidth="3" strokeLinecap="round" fill="none" />
         <path d="M150 105 Q175 95 202 102" stroke="#333333" strokeWidth="2.5" strokeLinecap="round" fill="none" />
       </svg>
-    </div>
+    )}
+  </div>
 
     {/* Bottom Torn Paper Edge */}
     <div className="absolute bottom-2 left-6 right-6 h-5 bg-white z-20 flex items-center overflow-hidden shadow-sm">
@@ -447,7 +458,7 @@ export default function Portfolio() {
       const res = await fetch('/api/portfolio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin: 'rashqa2026', data: newData })
+        body: JSON.stringify({ pin: '020709', data: newData })
       });
       const json = await res.json();
       if (json.success) {
@@ -962,6 +973,7 @@ export default function Portfolio() {
                 >
                   <StylizedPortrait 
                     isInverted={isPortraitInverted} 
+                    photoUrl={data.profile.photoUrl}
                     onClick={() => setIsPortraitInverted(!isPortraitInverted)} 
                   />
                 </InspectableBox>
@@ -1126,8 +1138,11 @@ export default function Portfolio() {
                         </p>
                         <div className="mt-4 flex flex-wrap gap-2 text-xs font-mono-tech">
                           <span className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold">📍 {data.profile.location}</span>
-                          <span className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold">✉ {data.profile.email}</span>
-                          <span className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold">🐙 github.com/rasshqa</span>
+                          <a href={`mailto:${data.profile.email}`} className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold hover:bg-[#38bdf8] hover:text-[#111] transition-colors">✉ {data.profile.email}</a>
+                          <a href={data.profile.github} target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold hover:bg-[#a7f3d0] hover:text-[#111] transition-colors">🐙 GitHub</a>
+                          <a href={data.profile.linkedin} target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold hover:bg-[#38bdf8] hover:text-[#111] transition-colors">💼 LinkedIn</a>
+                          <a href={data.profile.instagram} target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold hover:bg-[#f472b6] hover:text-[#111] transition-colors">📸 @rasshqa.tsx</a>
+                          <a href={data.profile.tiktok} target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold hover:bg-[#fde047] hover:text-[#111] transition-colors">🎵 @rasshqa</a>
                         </div>
                       </div>
                     </div>
