@@ -135,23 +135,45 @@ body {
   100% { stroke-dashoffset: -30; opacity: 0; }
 }
 
-/* Spread from top right theme transition */
-@keyframes spreadFromTopRight {
+/* View Transition circular theme spread (Top-Right Origin) */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 9999;
+  animation: circularThemeSpread 0.75s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+
+@keyframes circularThemeSpread {
   0% {
-    clip-path: circle(0% at calc(100% - 60px) 30px);
-    opacity: 0.92;
-  }
-  60% {
-    opacity: 1;
+    clip-path: circle(0px at var(--spread-x, calc(100% - 60px)) var(--spread-y, 35px));
   }
   100% {
-    clip-path: circle(180% at calc(100% - 60px) 30px);
+    clip-path: circle(160vmax at var(--spread-x, calc(100% - 60px)) var(--spread-y, 35px));
+  }
+}
+
+/* Fallback theme spread animation */
+@keyframes spreadFromTopRight {
+  0% {
+    clip-path: circle(0% at var(--spread-x, calc(100% - 60px)) var(--spread-y, 35px));
+    opacity: 0.95;
+  }
+  100% {
+    clip-path: circle(180% at var(--spread-x, calc(100% - 60px)) var(--spread-y, 35px));
     opacity: 1;
   }
 }
 
 .animate-theme-spread {
-  animation: spreadFromTopRight 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: spreadFromTopRight 0.75s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
 }
 
 .animate-pop-in {
@@ -171,12 +193,20 @@ body {
   clip-path: polygon(3% 6%, 96% 2%, 100% 25%, 97% 88%, 92% 98%, 5% 95%, 1% 75%, 4% 30%);
 }
 
-/* Invert Lens difference & backdrop-filter styling */
+/* Invert Lens: exact match to Figma inspection box in uploaded_media_1 */
 .invert-lens-glass {
-  backdrop-filter: invert(100%) contrast(115%);
-  -webkit-backdrop-filter: invert(100%) contrast(115%);
-  background-color: rgba(255, 255, 255, 0.04);
-  box-shadow: 0 0 0 2px #38bdf8, 0 0 30px rgba(56, 189, 248, 0.6);
+  backdrop-filter: invert(100%) contrast(110%);
+  -webkit-backdrop-filter: invert(100%) contrast(110%);
+  background-color: transparent;
+}
+
+/* Prevent unwanted browser ghost drags on interactive elements */
+* {
+  -webkit-user-drag: none;
+}
+img, svg {
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 /* Custom Scrollbar */

@@ -378,16 +378,27 @@ export default function Portfolio() {
     return () => cancelAnimationFrame(animationFrameId);
   }, [mousePos]);
 
-  // RELIABLE HOLD-TO-INVERT LENS (Pointerdown & Pointerup)
+  // RELIABLE HOLD-TO-INVERT LENS (Exact match to Image 1)
   useEffect(() => {
     const handlePointerDown = (e: PointerEvent) => {
       if (e.button !== 0) return; // Left button only
       const target = e.target as HTMLElement | null;
-      // Do not block normal button / input interactions
+      // Do not block normal button / input / link interactions
       if (target && (target.closest('button') || target.closest('a') || target.closest('input') || target.closest('textarea'))) {
         return;
       }
+      e.preventDefault();
+      setMousePos({ x: e.clientX, y: e.clientY });
       setIsHoldingClick(true);
+    };
+
+    const handlePointerMove = (e: PointerEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+      if (e.buttons === 1) {
+        setIsHoldingClick(true);
+      } else if (e.buttons === 0 && isHoldingClick) {
+        setIsHoldingClick(false);
+      }
     };
 
     const handlePointerUp = () => {
@@ -395,45 +406,44 @@ export default function Portfolio() {
     };
 
     window.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('pointerup', handlePointerUp);
     window.addEventListener('pointercancel', handlePointerUp);
+    window.addEventListener('blur', handlePointerUp);
     return () => {
       window.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
       window.removeEventListener('pointercancel', handlePointerUp);
+      window.removeEventListener('blur', handlePointerUp);
     };
-  }, []);
-
-  // Smooth lens bloom interpolation
-  useEffect(() => {
-    let frameId: number;
-    const targetRadius = isHoldingClick ? 165 : 0;
-    const step = () => {
-      setLensRadius((prev) => {
-        const diff = targetRadius - prev;
-        if (Math.abs(diff) < 0.8) return targetRadius;
-        return prev + diff * 0.26;
-      });
-      frameId = requestAnimationFrame(step);
-    };
-    frameId = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(frameId);
   }, [isHoldingClick]);
 
   // TOP-RIGHT SPREAD THEME TRANSITION
-  const handleThemeToggle = () => {
+  const handleThemeToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
     const nextDark = !isDark;
-    setThemeSpread({ active: true, targetDark: nextDark });
+    const rect = e.currentTarget.getBoundingClientRect();
+    const originX = rect.left + rect.width / 2;
+    const originY = rect.top + rect.height / 2;
 
-    // Smoothly apply theme mid-spread
-    setTimeout(() => {
-      setIsDark(nextDark);
-    }, 380);
+    if (typeof document !== 'undefined') {
+      document.documentElement.style.setProperty('--spread-x', `${originX}px`);
+      document.documentElement.style.setProperty('--spread-y', `${originY}px`);
+    }
 
-    // Clean up spread overlay after animation completes
-    setTimeout(() => {
-      setThemeSpread(null);
-    }, 850);
+    if (typeof document !== 'undefined' && 'startViewTransition' in document) {
+      (document as any).startViewTransition(() => {
+        setIsDark(nextDark);
+      });
+    } else {
+      setThemeSpread({ active: true, targetDark: nextDark });
+      setTimeout(() => {
+        setIsDark(nextDark);
+      }, 300);
+      setTimeout(() => {
+        setThemeSpread(null);
+      }, 750);
+    }
   };
 
   const handleAvatarClick = () => {
@@ -459,60 +469,41 @@ export default function Portfolio() {
   return (
     <div className={`${isDark ? 'dark' : ''} relative min-h-screen select-none overflow-x-hidden`}>
       
-      {/* SPREAD FROM TOP-RIGHT THEME TRANSITION OVERLAY */}
+      {/* SPREAD FROM TOP-RIGHT THEME TRANSITION OVERLAY (Fallback for non-viewTransition) */}
       {themeSpread && (
         <div
           className="fixed inset-0 pointer-events-none z-[120] animate-theme-spread overflow-hidden"
           style={{
             backgroundColor: themeSpread.targetDark ? '#18191c' : '#f6f5f0',
             boxShadow: themeSpread.targetDark 
-              ? '0 0 60px 20px rgba(56, 189, 248, 0.4)' 
-              : '0 0 60px 20px rgba(37, 99, 235, 0.3)'
+              ? '0 0 80px 30px rgba(56, 189, 248, 0.45)' 
+              : '0 0 80px 30px rgba(37, 99, 235, 0.35)'
           }}
         />
       )}
 
-      {/* WORKING INVERT LENS WITH BACKDROP FILTER */}
-      {lensRadius > 4 && (
-        <div
-          className="fixed pointer-events-none z-[110]"
-          style={{
-            left: mousePos.x,
-            top: mousePos.y,
-            transform: 'translate(-50%, -50%)',
-          }}
-        >
-          {/* Glass Lens with backdrop-filter: invert */}
-          <div
-            className="invert-lens-glass rounded-full"
-            style={{
-              width: lensRadius * 2,
-              height: lensRadius * 2,
-            }}
-          />
+      {/* WORKING INVERT LENS: ROUNDED RECTANGLE FIGMA INSPECTION BOX (EXACT MATCH TO IMAGE 1) */}
+      <div
+        className={`fixed pointer-events-none z-[110] transition-all duration-150 ease-out ${
+          isHoldingClick ? 'scale-100 opacity-100' : 'scale-90 opacity-0 pointer-events-none'
+        }`}
+        style={{
+          left: mousePos.x,
+          top: mousePos.y,
+          transform: 'translate(-50%, -50%)',
+          width: 270,
+          height: 270,
+        }}
+      >
+        {/* Rounded rectangle with backdrop-filter: invert(100%) */}
+        <div className="w-full h-full rounded-[28px] border-2 border-black dark:border-white/90 invert-lens-glass overflow-hidden shadow-sm" />
 
-          {/* HUD Target Ring */}
-          <div
-            className="absolute inset-0 rounded-full border border-dashed border-cyan-400 pointer-events-none flex items-center justify-center animate-spin"
-            style={{
-              width: lensRadius * 2 + 18,
-              height: lensRadius * 2 + 18,
-              margin: -9,
-              animationDuration: '14s'
-            }}
-          >
-            <span className="absolute -top-1 w-2.5 h-0.5 bg-cyan-400" />
-            <span className="absolute -bottom-1 w-2.5 h-0.5 bg-cyan-400" />
-            <span className="absolute -left-1 w-0.5 h-2.5 bg-cyan-400" />
-            <span className="absolute -right-1 w-0.5 h-2.5 bg-cyan-400" />
-          </div>
-
-          {/* Tag */}
-          <div className="absolute -top-7 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-[#111] text-cyan-300 text-[10px] font-mono-tech font-extrabold rounded border border-cyan-400 shadow-md whitespace-nowrap">
-            INVERT LENS [{Math.round(lensRadius * 2)}px]
-          </div>
-        </div>
-      )}
+        {/* 4 Corner Circular Dots matching Figma inspection box */}
+        <span className="absolute -top-1.5 -left-1.5 w-3 h-3 bg-black dark:bg-white rounded-full border border-white dark:border-black pointer-events-none" />
+        <span className="absolute -top-1.5 -right-1.5 w-3 h-3 bg-black dark:bg-white rounded-full border border-white dark:border-black pointer-events-none" />
+        <span className="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-black dark:bg-white rounded-full border border-white dark:border-black pointer-events-none" />
+        <span className="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-black dark:bg-white rounded-full border border-white dark:border-black pointer-events-none" />
+      </div>
 
       {/* Custom Follower Cursor ("YOU") */}
       {mounted && (
@@ -541,13 +532,15 @@ export default function Portfolio() {
       <div className="min-h-screen bg-[#f6f5f0] dark:bg-[#18191c] text-[#111111] dark:text-[#f6f5f0] transition-colors duration-300 flex flex-col justify-between relative">
         
         {/* TOP NAVBAR */}
-        <header className="w-full max-w-[1400px] mx-auto px-4 sm:px-8 pt-4 pb-2 flex items-center justify-between z-40">
+        <header className={`w-full max-w-[1400px] mx-auto px-4 sm:px-8 pt-4 pb-2 flex items-center justify-between z-40 transition-opacity duration-500 ${
+          isReady ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}>
           {/* Left Nav Group */}
           <div className="flex items-center gap-2 sm:gap-5 flex-wrap">
             {/* Rainbow Logo: Clicking resets to HOME and replays intro */}
             <button 
               onClick={replayIntro}
-              title="Kembali ke Home &amp; Putar Ulang Animasi"
+              title="Kembali ke Home & Putar Ulang Animasi"
               className="mr-2 focus:outline-none group relative cursor-pointer"
             >
               <RainbowLogoSVG isDark={isDark} />
@@ -727,12 +720,11 @@ export default function Portfolio() {
                   delay={260}
                   isReady={isReady}
                 >
-                  <div className="w-32 h-32 bg-[#fde047] text-[#111] p-3 rotate-6 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-lg leading-tight font-bold neo-sticker-grand">
-                    <span>Clean</span>
-                    <span>Code</span>
-                    <span>=</span>
-                    <span>High</span>
-                    <span>Scalability</span>
+                  <div className="w-32 h-32 bg-[#fde047] text-[#111] p-3 rotate-6 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-xl leading-tight font-bold neo-sticker-grand">
+                    <span>Good</span>
+                    <span>Design</span>
+                    <span>Better</span>
+                    <span>Experience</span>
                   </div>
                 </InspectableBox>
               </div>
@@ -757,14 +749,27 @@ export default function Portfolio() {
                   </div>
                 </InspectableBox>
 
-                {/* Giant "RASHQA ANDREAN" Heading with Yellow Crown */}
+                {/* Giant "RASHQA ANDREAN" Heading with Yellow Crown & Doodles */}
                 <div className="relative mt-1 mb-5">
+                  {/* Floating Yellow Crown */}
                   <div 
                     className={`absolute -top-10 right-2 sm:right-6 z-20 rotate-12 pointer-events-none transition-all duration-500 ${
                       isReady ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
                     }`}
                   >
                     <CrownSVG />
+                  </div>
+
+                  {/* Curved Arrow Doodle Pointing to Name (Matching Image 0) */}
+                  <div 
+                    className={`hidden sm:block absolute -right-12 top-10 pointer-events-none text-[#111] dark:text-white transition-opacity duration-700 ${
+                      isReady ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  >
+                    <svg width="46" height="46" viewBox="0 0 46 46" fill="none">
+                      <path d="M8 6 C 28 10, 38 22, 26 38" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />
+                      <path d="M18 34 L 26 38 L 32 30" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                   </div>
 
                   <InspectableBox
@@ -779,6 +784,14 @@ export default function Portfolio() {
                       <br />
                       ANDREAN
                     </h1>
+
+                    {/* Doodle underline below name (Matching Image 0) */}
+                    <div className="w-40 sm:w-48 h-3.5 pl-2 mt-2">
+                      <svg viewBox="0 0 180 14" className="w-full h-full fill-none text-[#111] dark:text-white">
+                        <path d="M4 8 Q 90 12, 170 5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                        <circle cx="174" cy="5" r="2.5" fill="currentColor" />
+                      </svg>
+                    </div>
                   </InspectableBox>
                 </div>
 
@@ -1021,6 +1034,15 @@ export default function Portfolio() {
                       <span>Together</span>
                     </div>
                   </InspectableBox>
+                </div>
+
+                {/* Bottom-center slash doodle matching Image 0 */}
+                <div 
+                  className={`hidden sm:block absolute bottom-4 -left-12 pointer-events-none text-2xl font-hand font-extrabold text-[#111] dark:text-white transition-opacity duration-700 ${
+                    isReady ? 'opacity-100' : 'opacity-0'
+                  }`}
+                >
+                  /
                 </div>
 
               </div>
@@ -1465,8 +1487,10 @@ export default function Portfolio() {
 
         </main>
 
-        {/* Subtle Bottom Helper Bar (No Admin CMS button here!) */}
-        <footer className="w-full max-w-[1400px] mx-auto px-6 py-3 flex items-center justify-between text-[11px] font-mono-tech text-neutral-500 z-20">
+        {/* Subtle Bottom Helper Bar */}
+        <footer className={`w-full max-w-[1400px] mx-auto px-6 py-3 flex items-center justify-between text-[11px] font-mono-tech text-neutral-500 z-20 transition-opacity duration-500 ${
+          isReady ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}>
           <div className="flex items-center gap-4 flex-wrap">
             <span className="inline-flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
@@ -1485,11 +1509,13 @@ export default function Portfolio() {
         </footer>
       </div>
 
-      {/* Floating Minimizeable WhatsApp Widget */}
-      <WhatsAppWidget 
-        phoneNumber={data.profile.whatsapp} 
-        name={data.profile.fullName} 
-      />
+      {/* Floating Minimizeable WhatsApp Widget (Visible only after intro finishes) */}
+      {isReady && (
+        <WhatsAppWidget 
+          phoneNumber={data.profile.whatsapp} 
+          name={data.profile.fullName} 
+        />
+      )}
 
     </div>
   );
