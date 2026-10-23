@@ -152,7 +152,7 @@ export const translations: Record<Language, Translations> = {
       talk: "LET'S TALK",
       themeTitle: 'Toggle Theme (Circular Spread from Top Right)',
       langTitle: 'Switch Language (EN / ID)',
-      avatarToast: 'Have a productive day! 🚀'
+      avatarToast: 'Have a productive day!'
     },
     intro: {
       hey: 'Hey there',
@@ -160,7 +160,7 @@ export const translations: Record<Language, Translations> = {
     },
     hero: {
       greeting: "Hey, I'm",
-      roleTag: '⚡ FULL STACK DEVELOPER',
+      roleTag: 'FULL STACK DEVELOPER',
       bio: 'I turn ideas into clean, robust & modern web experiences. Specializing in high-performance backends with Golang & Laravel, coupled with fluid Next.js & Vue frontends.',
       viewWork: 'VIEW MY WORK',
       techStacks: 'TECH STACKS',
@@ -185,9 +185,9 @@ export const translations: Record<Language, Translations> = {
         tech: '03. TECH STACK & EXPERTISE'
       },
       slideTabs: {
-        profile: '1. Profile',
-        story: '2. Story',
-        tech: '3. Stacks'
+        profile: 'Profile',
+        story: 'Story',
+        tech: 'Stacks'
       },
       profile: {
         fullName: 'FULL NAME',
@@ -322,7 +322,7 @@ export const translations: Record<Language, Translations> = {
       talk: 'HUBUNGI SAYA',
       themeTitle: 'Ganti Tema (Spread Melingkar dari Kanan Atas)',
       langTitle: 'Ganti Bahasa (EN / ID)',
-      avatarToast: 'Semoga harimu menyenangkan & produktif! 🚀'
+      avatarToast: 'Semoga harimu menyenangkan & produktif!'
     },
     intro: {
       hey: 'Halo di sana',
@@ -330,7 +330,7 @@ export const translations: Record<Language, Translations> = {
     },
     hero: {
       greeting: 'Halo, Saya',
-      roleTag: '⚡ FULL STACK DEVELOPER',
+      roleTag: 'FULL STACK DEVELOPER',
       bio: 'Saya mengubah ide menjadi pengalaman web modern, tangguh, dan bersih. Berspesialisasi dalam backend performa tinggi dengan Golang & Laravel, dipadukan antarmuka Next.js & Vue yang luwes.',
       viewWork: 'LIHAT KARYA SAYA',
       techStacks: 'TEKNOLOGI SAYA',
@@ -355,9 +355,9 @@ export const translations: Record<Language, Translations> = {
         tech: '03. KEAHLIAN & TEKNOLOGI'
       },
       slideTabs: {
-        profile: '1. Profil',
-        story: '2. Cerita',
-        tech: '3. Stacks'
+        profile: 'Profil',
+        story: 'Cerita',
+        tech: 'Stacks'
       },
       profile: {
         fullName: 'NAMA LENGKAP',

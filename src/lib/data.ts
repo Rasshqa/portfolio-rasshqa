@@ -112,9 +112,9 @@ export const initialPortfolioData: PortfolioData = {
       skills: [
         { name: "Next.js (App Router)", level: "Advanced", icon: "▲" },
         { name: "Vue.js / Nuxt", level: "Advanced", icon: "V" },
-        { name: "React 19", level: "Advanced", icon: "⚛" },
+        { name: "React 19", level: "Advanced", icon: "RE" },
         { name: "TypeScript", level: "Proficient", icon: "TS" },
-        { name: "Tailwind CSS v4", level: "Expert", icon: "≈" }
+        { name: "Tailwind CSS v4", level: "Expert", icon: "TW" }
       ]
     },
     {
@@ -132,11 +132,11 @@ export const initialPortfolioData: PortfolioData = {
       category: "Databases & DevOps",
       color: "#f472b6",
       skills: [
-        { name: "Neon (Serverless Postgres)", level: "Advanced", icon: "🐘" },
+        { name: "Neon (Serverless Postgres)", level: "Advanced", icon: "PG" },
         { name: "MySQL / MariaDB", level: "Advanced", icon: "SQL" },
         { name: "Redis Caching", level: "Proficient", icon: "RD" },
-        { name: "Docker & Compose", level: "Proficient", icon: "🐳" },
-        { name: "Git & CI/CD Pipelines", level: "Advanced", icon: "🐙" }
+        { name: "Docker & Compose", level: "Proficient", icon: "DK" },
+        { name: "Git & CI/CD Pipelines", level: "Advanced", icon: "GIT" }
       ]
     }
   ],

@@ -17,7 +17,18 @@ import {
   ChevronLeft,
   ChevronRight,
   Code2,
-  Award
+  Award,
+  MapPin,
+  Music2,
+  Zap,
+  Database,
+  Box,
+  GitBranch,
+  Server,
+  Terminal,
+  Cpu,
+  Palette,
+  FileCode
 } from 'lucide-react';
 import { PortfolioData, initialPortfolioData } from '@/lib/data';
 import { Language, translations } from '@/lib/translations';
@@ -156,6 +167,55 @@ const CrownSVG = () => (
     <path d="M10 48H60" stroke="#EAB308" strokeWidth="3" strokeLinecap="round"/>
   </svg>
 );
+
+/* Real Brand SVG Icons replacing all emojis */
+const GitHubIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+  </svg>
+);
+
+const LinkedInIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.63 1.63 0 1 0 0-3.26 1.63 1.63 0 0 0 0 3.26m1.4 9.74v-8.37H5.06v8.37h2.8z" />
+  </svg>
+);
+
+const InstagramIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+  </svg>
+);
+
+const TikTokIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.89 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.36 0 .7.07 1.01.2V9.45a6.34 6.34 0 0 0-1.01-.08 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V9.06a8.28 8.28 0 0 0 4.76 1.51V7.12a4.84 4.84 0 0 1-1-.43z" />
+  </svg>
+);
+
+/* Clean Icon Mapper for Tech Stack items (zero emojis) */
+const renderTechSkillIcon = (name: string, iconKey: string) => {
+  const lower = name.toLowerCase();
+  if (lower.includes('next')) return <Cpu className="w-3 h-3 text-[#38bdf8]" />;
+  if (lower.includes('vue')) return <span className="font-mono-tech font-extrabold text-[10px] text-[#42b883]">V</span>;
+  if (lower.includes('react')) return <Code2 className="w-3 h-3 text-[#61dafb]" />;
+  if (lower.includes('typescript')) return <span className="font-mono-tech font-extrabold text-[9px] text-[#3178c6]">TS</span>;
+  if (lower.includes('tailwind')) return <Palette className="w-3 h-3 text-[#38bdf8]" />;
+  if (lower.includes('golang') || lower.includes('go')) return <Zap className="w-3 h-3 text-[#00add8] fill-[#00add8]" />;
+  if (lower.includes('laravel')) return <Server className="w-3 h-3 text-[#f43f5e]" />;
+  if (lower.includes('python')) return <Terminal className="w-3 h-3 text-[#eab308]" />;
+  if (lower.includes('node') || lower.includes('express')) return <span className="font-mono-tech font-extrabold text-[9px] text-[#22c55e]">JS</span>;
+  if (lower.includes('api') || lower.includes('rest')) return <FileCode className="w-3 h-3 text-sky-400" />;
+  if (lower.includes('postgres') || lower.includes('neon') || lower.includes('mysql') || lower.includes('database')) {
+    return <Database className="w-3 h-3 text-[#38bdf8]" />;
+  }
+  if (lower.includes('redis')) return <Server className="w-3 h-3 text-[#ef4444]" />;
+  if (lower.includes('docker')) return <Box className="w-3 h-3 text-[#0db7ed]" />;
+  if (lower.includes('git') || lower.includes('ci/cd')) return <GitBranch className="w-3 h-3 text-[#f97316]" />;
+  return <span className="font-mono-tech font-extrabold text-[9px]">{iconKey}</span>;
+};
 
 /* Portrait Component with dark tape, real photo support, and high-contrast SVG styling */
 const StylizedPortrait = ({ isInverted, photoUrl, onClick }: { isInverted: boolean; photoUrl?: string; onClick?: () => void }) => (
@@ -330,6 +390,14 @@ export default function Portfolio() {
   const [worksPage, setWorksPage] = useState<number>(0);
   const [blogSlide, setBlogSlide] = useState<number>(0);
 
+  // Works Pagination
+  const projectsPerPage = 4;
+  const totalWorksPages = Math.ceil(data.projects.length / projectsPerPage);
+  const currentProjects = data.projects.slice(
+    worksPage * projectsPerPage,
+    (worksPage + 1) * projectsPerPage
+  );
+
   // Custom Cursor & Hold Invert Lens
   const [mousePos, setMousePos] = useState({ x: 520, y: 360 });
   const [cursorRingPos, setCursorRingPos] = useState({ x: 520, y: 360 });
@@ -401,27 +469,108 @@ export default function Portfolio() {
     return () => cancelAnimationFrame(animationFrameId);
   }, [mousePos]);
 
-  // RELIABLE HOLD-TO-INVERT LENS (Exact match to Image 1)
+  // SCROLL WHEEL TO NAVIGATE TABS (HOME -> ABOUT -> WORKS -> BLOG -> CONTACT)
+  const isScrollingRef = useRef(false);
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (introStep !== 'ready') return;
+      const target = e.target as HTMLElement | null;
+      if (target && (target.closest('input') || target.closest('textarea') || target.closest('form') || target.closest('select'))) {
+        return;
+      }
+      if (Math.abs(e.deltaY) < 30) return;
+      if (isScrollingRef.current) return;
+
+      isScrollingRef.current = true;
+      setTimeout(() => {
+        isScrollingRef.current = false;
+      }, 550);
+
+      const tabList: Array<'HOME' | 'ABOUT' | 'WORKS' | 'BLOG' | 'CONTACT'> = [
+        'HOME',
+        'ABOUT',
+        'WORKS',
+        'BLOG',
+        'CONTACT'
+      ];
+
+      setActiveTab((current) => {
+        const idx = tabList.indexOf(current);
+        if (e.deltaY > 0) {
+          return tabList[Math.min(tabList.length - 1, idx + 1)];
+        } else {
+          return tabList[Math.max(0, idx - 1)];
+        }
+      });
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    return () => window.removeEventListener('wheel', handleWheel);
+  }, [introStep]);
+
+  // KEYBOARD ARROW NAVIGATION FOR SLIDES AND TABS
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (introStep !== 'ready') return;
+      const activeEl = document.activeElement;
+      if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || (activeEl as HTMLElement).isContentEditable)) {
+        return;
+      }
+
+      const tabList: Array<'HOME' | 'ABOUT' | 'WORKS' | 'BLOG' | 'CONTACT'> = [
+        'HOME',
+        'ABOUT',
+        'WORKS',
+        'BLOG',
+        'CONTACT'
+      ];
+
+      if (e.key === 'ArrowRight') {
+        if (activeTab === 'ABOUT') {
+          setAboutSlide(prev => Math.min(2, prev + 1));
+        } else if (activeTab === 'WORKS') {
+          setWorksPage(prev => Math.min(totalWorksPages - 1, prev + 1));
+        } else if (activeTab === 'BLOG') {
+          setBlogSlide(prev => Math.min(2, prev + 1));
+        } else {
+          setActiveTab(curr => tabList[Math.min(tabList.length - 1, tabList.indexOf(curr) + 1)]);
+        }
+      } else if (e.key === 'ArrowLeft') {
+        if (activeTab === 'ABOUT') {
+          setAboutSlide(prev => Math.max(0, prev - 1));
+        } else if (activeTab === 'WORKS') {
+          setWorksPage(prev => Math.max(0, prev - 1));
+        } else if (activeTab === 'BLOG') {
+          setBlogSlide(prev => Math.max(0, prev - 1));
+        } else {
+          setActiveTab(curr => tabList[Math.max(0, tabList.indexOf(curr) - 1)]);
+        }
+      } else if (e.key === 'ArrowDown') {
+        setActiveTab(curr => tabList[Math.min(tabList.length - 1, tabList.indexOf(curr) + 1)]);
+      } else if (e.key === 'ArrowUp') {
+        setActiveTab(curr => tabList[Math.max(0, tabList.indexOf(curr) - 1)]);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [introStep, activeTab, totalWorksPages]);
+
+  // RELIABLE HOLD-TO-INVERT LENS (Exact match to Image 1 & Opposite-Mode Inversion)
   useEffect(() => {
     const handlePointerDown = (e: PointerEvent) => {
       if (e.button !== 0) return; // Left button only
       const target = e.target as HTMLElement | null;
       // Do not block normal button / input / link interactions
-      if (target && (target.closest('button') || target.closest('a') || target.closest('input') || target.closest('textarea'))) {
+      if (target && (target.closest('button') || target.closest('a') || target.closest('input') || target.closest('textarea') || target.closest('select'))) {
         return;
       }
-      e.preventDefault();
       setMousePos({ x: e.clientX, y: e.clientY });
       setIsHoldingClick(true);
     };
 
     const handlePointerMove = (e: PointerEvent) => {
       setMousePos({ x: e.clientX, y: e.clientY });
-      if (e.buttons === 1) {
-        setIsHoldingClick(true);
-      } else if (e.buttons === 0 && isHoldingClick) {
-        setIsHoldingClick(false);
-      }
     };
 
     const handlePointerUp = () => {
@@ -440,7 +589,7 @@ export default function Portfolio() {
       window.removeEventListener('pointercancel', handlePointerUp);
       window.removeEventListener('blur', handlePointerUp);
     };
-  }, [isHoldingClick]);
+  }, []);
 
   // TOP-RIGHT SPREAD THEME TRANSITION
   const handleThemeToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -481,14 +630,6 @@ export default function Portfolio() {
 
   const isReady = introStep === 'ready';
 
-  // Works Pagination
-  const projectsPerPage = 4;
-  const totalWorksPages = Math.ceil(data.projects.length / projectsPerPage);
-  const currentProjects = data.projects.slice(
-    worksPage * projectsPerPage,
-    (worksPage + 1) * projectsPerPage
-  );
-
   return (
     <div className={`${isDark ? 'dark' : ''} relative min-h-screen select-none overflow-x-hidden`}>
       
@@ -505,28 +646,47 @@ export default function Portfolio() {
         />
       )}
 
-      {/* WORKING INVERT LENS: ROUNDED RECTANGLE FIGMA INSPECTION BOX (EXACT MATCH TO IMAGE 1) */}
-      <div
-        className={`fixed pointer-events-none z-[110] transition-all duration-150 ease-out ${
-          isHoldingClick ? 'scale-100 opacity-100' : 'scale-90 opacity-0 pointer-events-none'
-        }`}
-        style={{
-          left: mousePos.x,
-          top: mousePos.y,
-          transform: 'translate(-50%, -50%)',
-          width: 270,
-          height: 270,
-        }}
-      >
-        {/* Rounded rectangle with backdrop-filter: invert(100%) */}
-        <div className="w-full h-full rounded-[28px] border-2 border-black dark:border-white/90 invert-lens-glass overflow-hidden shadow-sm" />
+      {/* WORKING INVERT LENS: INVERTS ANY ELEMENT UNDERNEATH TO OPPOSITE MODE */}
+      {isHoldingClick && (
+        <>
+          {/* Difference Blending Inversion Core: turns Light mode to Dark mode, and Dark mode to Light mode */}
+          <div
+            className="fixed pointer-events-none z-[110] rounded-[28px] overflow-hidden"
+            style={{
+              left: mousePos.x - 135,
+              top: mousePos.y - 135,
+              width: 270,
+              height: 270,
+              backgroundColor: '#ffffff',
+              mixBlendMode: 'difference',
+            }}
+          />
 
-        {/* 4 Corner Circular Dots matching Figma inspection box */}
-        <span className="absolute -top-1.5 -left-1.5 w-3 h-3 bg-black dark:bg-white rounded-full border border-white dark:border-black pointer-events-none" />
-        <span className="absolute -top-1.5 -right-1.5 w-3 h-3 bg-black dark:bg-white rounded-full border border-white dark:border-black pointer-events-none" />
-        <span className="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-black dark:bg-white rounded-full border border-white dark:border-black pointer-events-none" />
-        <span className="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-black dark:bg-white rounded-full border border-white dark:border-black pointer-events-none" />
-      </div>
+          {/* Figma-Style Inspection Frame with 4 Corner Circular Dots */}
+          <div
+            className="fixed pointer-events-none z-[115]"
+            style={{
+              left: mousePos.x - 135,
+              top: mousePos.y - 135,
+              width: 270,
+              height: 270,
+            }}
+          >
+            <div className="w-full h-full rounded-[28px] border-2 border-black dark:border-white shadow-[0_0_25px_rgba(0,0,0,0.35)]" />
+
+            {/* 4 Corner Circular Dots matching Figma inspection box */}
+            <span className="absolute -top-1.5 -left-1.5 w-3 h-3 bg-black dark:bg-white rounded-full border border-white dark:border-black pointer-events-none" />
+            <span className="absolute -top-1.5 -right-1.5 w-3 h-3 bg-black dark:bg-white rounded-full border border-white dark:border-black pointer-events-none" />
+            <span className="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-black dark:bg-white rounded-full border border-white dark:border-black pointer-events-none" />
+            <span className="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-black dark:bg-white rounded-full border border-white dark:border-black pointer-events-none" />
+
+            {/* Mode Indicator Badge */}
+            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-black dark:bg-white text-white dark:text-black text-[9px] font-mono-tech font-extrabold rounded shadow tracking-wider uppercase whitespace-nowrap">
+              {isDark ? 'INVERTING TO LIGHT' : 'INVERTING TO DARK'}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Custom Follower Cursor ("YOU") */}
       {mounted && (
@@ -653,8 +813,9 @@ export default function Portfolio() {
               </button>
 
               {showAvatarToast && (
-                <div className="absolute right-0 top-12 z-50 bg-[#2563eb] text-white text-xs font-mono-tech font-bold px-3.5 py-2 rounded-lg border-2 border-[#111] neo-shadow whitespace-nowrap animate-pop-in">
-                  {t.nav.avatarToast}
+                <div className="absolute right-0 top-12 z-50 bg-[#2563eb] text-white text-xs font-mono-tech font-bold px-3.5 py-2 rounded-lg border-2 border-[#111] neo-shadow whitespace-nowrap animate-pop-in flex items-center gap-1.5">
+                  <span>{t.nav.avatarToast}</span>
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
                 </div>
               )}
             </div>
@@ -835,10 +996,11 @@ export default function Portfolio() {
 
                 {/* Subtitle / Role Tag (Safely guarded by isReady) */}
                 <div 
-                  className={`mb-3.5 inline-flex items-center gap-2 px-3 py-1 bg-[#38bdf8] text-[#111] font-mono-tech font-extrabold text-xs rounded border-2 border-[#111] neo-shadow-sm transition-opacity duration-300 ${
+                  className={`mb-3.5 inline-flex items-center gap-1.5 px-3 py-1 bg-[#38bdf8] text-[#111] font-mono-tech font-extrabold text-xs rounded border-2 border-[#111] neo-shadow-sm transition-opacity duration-300 ${
                     isReady ? 'opacity-100 animate-pop-in' : 'opacity-0 pointer-events-none'
                   }`}
                 >
+                  <Zap className="w-3.5 h-3.5 fill-[#111] stroke-[#111]" />
                   <span>{t.hero.roleTag}</span>
                 </div>
 
@@ -1155,12 +1317,30 @@ export default function Portfolio() {
                             : 'Berfokus pada pembuatan produk digital yang tahan uji (robust), performa tinggi, dan memiliki interaktivitas visual tingkat tinggi. Berpengalaman dari database modeling hingga frontend micro-interactions.'}
                         </p>
                         <div className="mt-4 flex flex-wrap gap-2 text-xs font-mono-tech">
-                          <span className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold">📍 {data.profile.location}</span>
-                          <a href={`mailto:${data.profile.email}`} className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold hover:bg-[#38bdf8] hover:text-[#111] transition-colors">✉ {data.profile.email}</a>
-                          <a href={data.profile.github} target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold hover:bg-[#a7f3d0] hover:text-[#111] transition-colors">🐙 GitHub</a>
-                          <a href={data.profile.linkedin} target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold hover:bg-[#38bdf8] hover:text-[#111] transition-colors">💼 LinkedIn</a>
-                          <a href={data.profile.instagram} target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold hover:bg-[#f472b6] hover:text-[#111] transition-colors">📸 @rasshqa.tsx</a>
-                          <a href={data.profile.tiktok} target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold hover:bg-[#fde047] hover:text-[#111] transition-colors">🎵 @rasshqa</a>
+                          <span className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold flex items-center gap-1.5">
+                            <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                            <span>{data.profile.location}</span>
+                          </span>
+                          <a href={`mailto:${data.profile.email}`} className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold hover:bg-[#38bdf8] hover:text-[#111] transition-colors flex items-center gap-1.5">
+                            <Mail className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                            <span>{data.profile.email}</span>
+                          </a>
+                          <a href={data.profile.github} target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold hover:bg-[#a7f3d0] hover:text-[#111] transition-colors flex items-center gap-1.5">
+                            <GitHubIcon className="w-3.5 h-3.5 shrink-0" />
+                            <span>GitHub</span>
+                          </a>
+                          <a href={data.profile.linkedin} target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold hover:bg-[#38bdf8] hover:text-[#111] transition-colors flex items-center gap-1.5">
+                            <LinkedInIcon className="w-3.5 h-3.5 text-[#0a66c2] shrink-0" />
+                            <span>LinkedIn</span>
+                          </a>
+                          <a href={data.profile.instagram} target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold hover:bg-[#f472b6] hover:text-[#111] transition-colors flex items-center gap-1.5">
+                            <InstagramIcon className="w-3.5 h-3.5 text-[#e4405f] shrink-0" />
+                            <span>@rasshqa.tsx</span>
+                          </a>
+                          <a href={data.profile.tiktok} target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 bg-white dark:bg-neutral-700 border border-[#111] rounded font-bold hover:bg-[#fde047] hover:text-[#111] transition-colors flex items-center gap-1.5">
+                            <TikTokIcon className="w-3.5 h-3.5 shrink-0" />
+                            <span>@rasshqa</span>
+                          </a>
                         </div>
                       </div>
                     </div>
@@ -1215,8 +1395,8 @@ export default function Portfolio() {
                                   className="flex items-center justify-between p-2 bg-[#f6f5f0] dark:bg-neutral-900 rounded border border-neutral-300 dark:border-neutral-700 hover:border-[#111] transition-all"
                                 >
                                   <div className="flex items-center gap-2">
-                                    <span className="w-5 h-5 rounded bg-[#111] text-white text-[9px] flex items-center justify-center font-bold">
-                                      {skill.icon}
+                                    <span className="w-5 h-5 rounded bg-[#111] dark:bg-neutral-800 text-white flex items-center justify-center font-bold">
+                                      {renderTechSkillIcon(skill.name, skill.icon)}
                                     </span>
                                     <span className="font-mono-tech font-bold text-xs">{skill.name}</span>
                                   </div>
@@ -1323,8 +1503,9 @@ export default function Portfolio() {
                           {proj.desc}
                         </p>
 
-                        <div className="inline-block px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 text-[10px] font-mono-tech font-bold text-neutral-600 dark:text-neutral-400 rounded border border-neutral-300 dark:border-neutral-700">
-                          ⚡ {proj.metrics}
+                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 text-[10px] font-mono-tech font-bold text-neutral-600 dark:text-neutral-400 rounded border border-neutral-300 dark:border-neutral-700">
+                          <Zap className="w-3 h-3 text-amber-500 fill-amber-500 shrink-0" />
+                          <span>{proj.metrics}</span>
                         </div>
                       </div>
 

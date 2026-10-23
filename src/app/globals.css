@@ -3,15 +3,12 @@
 @variant dark (&:where(.dark, .dark *));
 
 :root {
-  --font-display: 'Syne', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --font-hand: 'Caveat', cursive;
   --background: #f6f5f0;
   --foreground: #111111;
 }
 
 body {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   background-color: var(--background);
   color: var(--foreground);
   overflow-x: hidden;
@@ -19,15 +16,15 @@ body {
 }
 
 .font-display {
-  font-family: var(--font-display);
+  font-family: var(--font-display), 'Syne', sans-serif;
 }
 
 .font-mono-tech {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
 }
 
 .font-hand {
-  font-family: var(--font-hand);
+  font-family: var(--font-hand), 'Caveat', cursive;
 }
 
 /* Neo-brutalist hard shadows */
