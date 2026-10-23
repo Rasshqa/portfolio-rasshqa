@@ -230,6 +230,49 @@ body {
   clip-path: polygon(3% 6%, 96% 2%, 100% 25%, 97% 88%, 92% 98%, 5% 95%, 1% 75%, 4% 30%);
 }
 
+/* Invert Lens expanding animation */
+@keyframes lensExpand {
+  0% {
+    transform: scale(0.12);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  80% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes lensShockwave {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.9;
+  }
+  60% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+.animate-lens-expand {
+  animation: lensExpand 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  transform-origin: center center;
+}
+
+.animate-lens-shockwave {
+  animation: lensShockwave 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  transform-origin: center center;
+}
+
 /* Invert Lens: exact match to Figma inspection box in uploaded_media_1 */
 .invert-lens-glass {
   backdrop-filter: invert(100%) contrast(110%);

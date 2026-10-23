@@ -1083,42 +1083,58 @@ export default function Portfolio() {
         />
       )}
 
-      {/* WORKING INVERT LENS: INVERTS ANY ELEMENT UNDERNEATH TO OPPOSITE MODE */}
+      {/* WORKING INVERT LENS: INVERTS ANY ELEMENT UNDERNEATH TO OPPOSITE MODE WITH EXPANDING ANIMATION */}
       {isHoldingClick && (
         <>
-          {/* Difference Blending Inversion Core: turns Light mode to Dark mode, and Dark mode to Light mode */}
+          {/* Shockwave expanding ring (animasi membesar gelombang luar) */}
           <div
-            className="fixed pointer-events-none z-[110] rounded-[28px] overflow-hidden"
+            className="fixed pointer-events-none z-[109] rounded-[36px] border-2 border-[#2563eb] dark:border-[#38bdf8] animate-lens-shockwave"
             style={{
-              left: mousePos.x - 135,
-              top: mousePos.y - 135,
-              width: 270,
-              height: 270,
+              left: mousePos.x - 145,
+              top: mousePos.y - 145,
+              width: 290,
+              height: 290,
+            }}
+          />
+
+          {/* Difference Blending Inversion Core: expanding pop-in & zoom */}
+          <div
+            className="fixed pointer-events-none z-[110] rounded-[28px] overflow-hidden animate-lens-expand shadow-2xl"
+            style={{
+              left: mousePos.x - 140,
+              top: mousePos.y - 140,
+              width: 280,
+              height: 280,
               backgroundColor: '#ffffff',
               mixBlendMode: 'difference',
             }}
           />
 
-          {/* Figma-Style Inspection Frame with 4 Corner Circular Dots */}
+          {/* Figma-Style Inspection Frame with Corner Handles & Expanding Animation */}
           <div
-            className="fixed pointer-events-none z-[115]"
+            className="fixed pointer-events-none z-[115] animate-lens-expand"
             style={{
-              left: mousePos.x - 135,
-              top: mousePos.y - 135,
-              width: 270,
-              height: 270,
+              left: mousePos.x - 140,
+              top: mousePos.y - 140,
+              width: 280,
+              height: 280,
             }}
           >
-            <div className="w-full h-full rounded-[28px] border-2 border-black dark:border-white shadow-[0_0_25px_rgba(0,0,0,0.35)]" />
+            <div className="w-full h-full rounded-[28px] border-2 border-black dark:border-white shadow-[0_0_35px_rgba(37,99,235,0.35)] dark:shadow-[0_0_35px_rgba(56,189,248,0.45)]" />
 
             {/* 4 Corner Circular Dots matching Figma inspection box */}
-            <span className="absolute -top-1.5 -left-1.5 w-3 h-3 bg-black dark:bg-white rounded-full border border-white dark:border-black pointer-events-none" />
-            <span className="absolute -top-1.5 -right-1.5 w-3 h-3 bg-black dark:bg-white rounded-full border border-white dark:border-black pointer-events-none" />
-            <span className="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-black dark:bg-white rounded-full border border-white dark:border-black pointer-events-none" />
-            <span className="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-black dark:bg-white rounded-full border border-white dark:border-black pointer-events-none" />
+            <span className="absolute -top-1.5 -left-1.5 w-3.5 h-3.5 bg-black dark:bg-white rounded-full border-2 border-white dark:border-black pointer-events-none shadow-sm" />
+            <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-black dark:bg-white rounded-full border-2 border-white dark:border-black pointer-events-none shadow-sm" />
+            <span className="absolute -bottom-1.5 -left-1.5 w-3.5 h-3.5 bg-black dark:bg-white rounded-full border-2 border-white dark:border-black pointer-events-none shadow-sm" />
+            <span className="absolute -bottom-1.5 -right-1.5 w-3.5 h-3.5 bg-black dark:bg-white rounded-full border-2 border-white dark:border-black pointer-events-none shadow-sm" />
+
+            {/* Dimension Pill (Figma style) */}
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-[#2563eb] text-white text-[9px] font-mono-tech font-extrabold rounded border border-[#111] shadow whitespace-nowrap">
+              280 × 280 px
+            </div>
 
             {/* Mode Indicator Badge */}
-            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-black dark:bg-white text-white dark:text-black text-[9px] font-mono-tech font-extrabold rounded shadow tracking-wider uppercase whitespace-nowrap">
+            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-black dark:bg-white text-white dark:text-black text-[9px] font-mono-tech font-extrabold rounded shadow tracking-wider uppercase whitespace-nowrap border border-white dark:border-black">
               {isDark ? 'INVERTING TO LIGHT' : 'INVERTING TO DARK'}
             </div>
           </div>
