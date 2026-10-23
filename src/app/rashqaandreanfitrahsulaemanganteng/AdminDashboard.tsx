@@ -104,9 +104,12 @@ export default function AdminDashboard() {
       const json = await res.json();
       if (json.success && json.url) {
         onUrlReceived(json.url);
+        const optText = json.isWebp 
+          ? ` • WebP terkompresi ${json.savings ? `(-${json.savings})` : ''}` 
+          : '';
         setStatusMessage({
           type: 'success',
-          text: `Gambar berhasil diunggah (${json.provider === 's3' ? 'AWS S3' : 'Lokal /uploads'})!`
+          text: `Gambar berhasil diunggah (${json.provider === 's3' ? 'AWS S3' : 'Lokal /uploads'}${optText})!`
         });
       } else {
         setStatusMessage({ type: 'error', text: json.message || 'Gagal mengunggah gambar.' });

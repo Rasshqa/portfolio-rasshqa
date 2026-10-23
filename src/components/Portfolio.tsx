@@ -393,7 +393,7 @@ const ImagePreviewModal: React.FC<{
 
   return (
     <div 
-      className="fixed inset-0 z-[150] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm animate-pop-in select-none"
+      className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm animate-pop-in select-none"
       onClick={onClose}
     >
       <div 
@@ -438,6 +438,17 @@ const ImagePreviewModal: React.FC<{
             <Eye className="w-3 h-3 text-[#38bdf8]" />
             <span>HQ Preview</span>
           </div>
+
+          <a
+            href={data.imageUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute top-2 right-2 px-2.5 py-1 bg-black/75 hover:bg-black text-white text-[10px] font-mono-tech font-bold rounded border border-white/30 backdrop-blur-sm flex items-center gap-1.5 transition-colors cursor-pointer"
+            title="Buka gambar ukuran penuh di tab baru"
+          >
+            <ExternalLink className="w-3 h-3 text-[#38bdf8]" />
+            <span>{lang === 'en' ? 'Open Full' : 'Buka Asli'}</span>
+          </a>
         </div>
 
         {/* Modal Info & Footer */}
@@ -682,8 +693,8 @@ export default function Portfolio() {
   const [activeTab, setActiveTab] = useState<'HOME' | 'ABOUT' | 'WORKS' | 'BLOG' | 'CONTACT'>('HOME');
   const [isDark, setIsDark] = useState(false);
   
-  // Language State: 'id' (Bahasa Indonesia) or 'en' (English)
-  const [lang, setLang] = useState<Language>('id');
+  // Language State: 'en' (English default) or 'id' (Bahasa Indonesia)
+  const [lang, setLang] = useState<Language>('en');
 
   useEffect(() => {
     try {
@@ -2718,19 +2729,19 @@ export default function Portfolio() {
         />
       )}
 
-      {/* Full-view Neo-Brutalist Lightbox / Preview Modal */}
-      <ImagePreviewModal
-        data={activePreview}
-        onClose={() => setActivePreview(null)}
-        lang={lang}
-      />
-
       {/* Project Detail Modal */}
       <ProjectDetailModal
         project={activeProjectDetail}
         onClose={() => setActiveProjectDetail(null)}
         lang={lang}
         onEnlargeImage={(preview) => setActivePreview(preview)}
+      />
+
+      {/* Full-view Neo-Brutalist Lightbox / Preview Modal (z-[200] above all modals) */}
+      <ImagePreviewModal
+        data={activePreview}
+        onClose={() => setActivePreview(null)}
+        lang={lang}
       />
 
     </div>
