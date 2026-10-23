@@ -5,6 +5,7 @@ export interface ProjectItem {
   desc: string;
   metrics: string;
   accent: string;
+  imageUrl?: string;
   liveUrl?: string;
   githubUrl?: string;
 }
@@ -18,6 +19,7 @@ export interface AchievementItem {
   description: string;
   badge: string;
   accent: string;
+  imageUrl?: string;
 }
 
 export interface PortfolioData {
@@ -148,6 +150,7 @@ export const initialPortfolioData: PortfolioData = {
       desc: "Platform pemesanan kuliner end-to-end dengan pemantauan pesanan real-time, invoice instan, dan integrasi payment gateway otomatis.",
       metrics: "10K+ Monthly Req • Sub-second Response",
       accent: "#38bdf8",
+      imageUrl: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&q=80",
       liveUrl: "https://github.com/rasshqa/TastyFood",
       githubUrl: "https://github.com/rasshqa/TastyFood"
     },
@@ -158,6 +161,7 @@ export const initialPortfolioData: PortfolioData = {
       desc: "Sistem reservasi tiket acara berkecepatan tinggi dengan concurrent locking seats, QR scanner gate, dan reporting analytics.",
       metrics: "Sub-40ms P99 • High Concurrency",
       accent: "#fde047",
+      imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=900&q=80",
       liveUrl: "https://github.com/rasshqa/Ticketiki",
       githubUrl: "https://github.com/rasshqa/Ticketiki"
     },
@@ -168,6 +172,7 @@ export const initialPortfolioData: PortfolioData = {
       desc: "Visualisator audio interaktif berbasis browser dengan rendering partikel 3D, FFT frequency analysis, dan respon latensi rendah.",
       metrics: "60 FPS Render • Web Audio Hardware Sync",
       accent: "#a7f3d0",
+      imageUrl: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=900&q=80",
       liveUrl: "https://github.com/rasshqa/plasma-audio-visualizer",
       githubUrl: "https://github.com/rasshqa/plasma-audio-visualizer"
     },
@@ -178,6 +183,7 @@ export const initialPortfolioData: PortfolioData = {
       desc: "Agen kecerdasan buatan percakapan kontekstual dengan speech synthesis, vector memory retrieval, dan streaming completions.",
       metrics: "Streaming Tokens • Long-term Vector Memory",
       accent: "#f472b6",
+      imageUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=900&q=80",
       liveUrl: "https://github.com/rasshqa/waifu-ai",
       githubUrl: "https://github.com/rasshqa/waifu-ai"
     },
@@ -188,6 +194,7 @@ export const initialPortfolioData: PortfolioData = {
       desc: "Koleksi komponen UI neo-brutalisme modular yang dapat disesuaikan untuk prototyping cepat dengan aksesibilitas tinggi.",
       metrics: "Zero CSS Runtime • 100% Type-safe",
       accent: "#fb923c",
+      imageUrl: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=900&q=80",
       liveUrl: "https://github.com/rasshqa/OpenDots",
       githubUrl: "https://github.com/rasshqa/OpenDots"
     },
@@ -198,6 +205,7 @@ export const initialPortfolioData: PortfolioData = {
       desc: "Portal seleksi dan pendaftaran kepemimpinan siswa dengan alur verifikasi berkas multi-tahap dan dashboard scoring juri.",
       metrics: "500+ Pendaftar • Automated Verification",
       accent: "#c084fc",
+      imageUrl: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=900&q=80",
       liveUrl: "https://github.com/rasshqa/ldks-registration",
       githubUrl: "https://github.com/rasshqa/ldks-registration"
     },
@@ -208,6 +216,7 @@ export const initialPortfolioData: PortfolioData = {
       desc: "Reverse proxy load-balancer untuk aneka AI models dengan failover otomatis, rate limiter token, dan caching respons.",
       metrics: "Zero Memory Overhead • In-memory Cache",
       accent: "#4ade80",
+      imageUrl: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=900&q=80",
       liveUrl: "https://github.com/rasshqa/freellmapi",
       githubUrl: "https://github.com/rasshqa/freellmapi"
     },
@@ -218,6 +227,7 @@ export const initialPortfolioData: PortfolioData = {
       desc: "Portfolio interaktif dengan dynamic inspectable box, invert lens hold, slide system, dan integrasi database serverless Neon.",
       metrics: "Next.js 16 App Router • React 19",
       accent: "#60a5fa",
+      imageUrl: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=900&q=80",
       liveUrl: "https://github.com/rasshqa/portfolio-rasshqa",
       githubUrl: "https://github.com/rasshqa/portfolio-rasshqa"
     }
@@ -231,7 +241,8 @@ export const initialPortfolioData: PortfolioData = {
       category: "PRESTASI",
       description: "Merancang dan membangun arsitektur aplikasi web full stack berkinerja tinggi dalam kompetisi hackathon nasional.",
       badge: "CHAMPION",
-      accent: "#fde047"
+      accent: "#fde047",
+      imageUrl: "https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=900&q=80"
     },
     {
       id: "ach-2",
@@ -241,7 +252,8 @@ export const initialPortfolioData: PortfolioData = {
       category: "SERTIFIKAT",
       description: "Sertifikasi keahlian arsitektur web modern, Next.js, API security, dan deployment arsitektur cloud skalabel.",
       badge: "CERTIFIED",
-      accent: "#38bdf8"
+      accent: "#38bdf8",
+      imageUrl: "https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=900&q=80"
     },
     {
       id: "ach-3",
@@ -251,7 +263,8 @@ export const initialPortfolioData: PortfolioData = {
       category: "SERTIFIKAT",
       description: "Verifikasi kompetensi pemrograman Go, goroutines concurrency, microservices, dan relational database tuning.",
       badge: "ADVANCED",
-      accent: "#a7f3d0"
+      accent: "#a7f3d0",
+      imageUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=900&q=80"
     },
     {
       id: "ach-4",
@@ -261,7 +274,8 @@ export const initialPortfolioData: PortfolioData = {
       category: "PRESTASI",
       description: "Apresiasi atas kontribusi pembuatan modul dan library open source yang digunakan oleh komunitas pengembang lokal.",
       badge: "AWARDS",
-      accent: "#f472b6"
+      accent: "#f472b6",
+      imageUrl: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=900&q=80"
     },
     {
       id: "ach-5",
@@ -271,7 +285,8 @@ export const initialPortfolioData: PortfolioData = {
       category: "ARTIKEL",
       description: "Panduan mendalam mengenai komunikasi gRPC/REST antara backend Go yang cepat dengan Next.js App Router.",
       badge: "PUBLISHED",
-      accent: "#c084fc"
+      accent: "#c084fc",
+      imageUrl: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=80"
     },
     {
       id: "ach-6",
@@ -281,7 +296,8 @@ export const initialPortfolioData: PortfolioData = {
       category: "ARTIKEL",
       description: "Eksplorasi strategi branching, connection pooling, dan cold-start optimization pada arsitektur Lakebase Postgres.",
       badge: "PUBLISHED",
-      accent: "#fb923c"
+      accent: "#fb923c",
+      imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=900&q=80"
     }
   ]
 };

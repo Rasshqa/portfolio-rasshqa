@@ -25,7 +25,7 @@ export default function WhatsAppWidget({ phoneNumber, name, lang = 'id' }: Whats
   };
 
   return (
-    <div className="fixed bottom-5 right-5 z-[90] font-mono-tech select-none">
+    <div className="fixed bottom-20 md:bottom-5 right-4 sm:right-5 z-[90] font-mono-tech select-none">
       {/* Expanded Chat Box Popup */}
       {isOpen && (
         <div className="mb-3 w-[310px] sm:w-[350px] bg-white dark:bg-[#1f2127] text-[#111] dark:text-white border-2 border-[#111] dark:border-neutral-400 rounded-2xl neo-shadow-lg overflow-hidden animate-pop-in">

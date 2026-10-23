@@ -28,7 +28,10 @@ import {
   Terminal,
   Cpu,
   Palette,
-  FileCode
+  FileCode,
+  Eye,
+  X,
+  Maximize2
 } from 'lucide-react';
 import { PortfolioData, initialPortfolioData } from '@/lib/data';
 import { Language, translations } from '@/lib/translations';
@@ -221,7 +224,7 @@ const renderTechSkillIcon = (name: string, iconKey: string) => {
 const StylizedPortrait = ({ isInverted, photoUrl, onClick }: { isInverted: boolean; photoUrl?: string; onClick?: () => void }) => (
   <div 
     onClick={onClick}
-    className="relative w-[300px] sm:w-[370px] md:w-[410px] h-[350px] sm:h-[420px] md:h-[450px] select-none cursor-pointer group neo-card-grand"
+    className="relative w-[270px] sm:w-[350px] md:w-[410px] h-[310px] sm:h-[400px] md:h-[450px] max-w-full select-none cursor-pointer group neo-card-grand"
   >
     {/* Dark Tape at top right */}
     <div className="absolute -top-3 right-12 w-24 h-8 bg-[#1e242b] rotate-[22deg] z-20 opacity-95 shadow-sm" />
@@ -347,6 +350,150 @@ const StylizedPortrait = ({ isInverted, photoUrl, onClick }: { isInverted: boole
   </div>
 );
 
+interface PreviewModalData {
+  title: string;
+  categoryOrTag: string;
+  desc: string;
+  imageUrl: string;
+  accent?: string;
+  badge?: string;
+  metrics?: string;
+  issuer?: string;
+  year?: string;
+  liveUrl?: string;
+  githubUrl?: string;
+}
+
+const ImagePreviewModal: React.FC<{
+  data: PreviewModalData | null;
+  onClose: () => void;
+  lang: Language;
+}> = ({ data, onClose, lang }) => {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (data) {
+      window.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'auto';
+    };
+  }, [data, onClose]);
+
+  if (!data) return null;
+
+  return (
+    <div 
+      className="fixed inset-0 z-[150] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm animate-pop-in select-none"
+      onClick={onClose}
+    >
+      <div 
+        className="relative w-full max-w-3xl bg-white dark:bg-[#1a1b1f] text-[#111] dark:text-white border-2 sm:border-3 border-[#111] dark:border-neutral-300 rounded-2xl neo-shadow-lg overflow-hidden flex flex-col max-h-[92vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Modal Header */}
+        <div className="p-3.5 sm:p-4 bg-neutral-100 dark:bg-neutral-800 border-b-2 border-[#111] dark:border-neutral-700 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <span 
+              className="px-2.5 py-0.5 rounded text-[10px] sm:text-xs font-mono-tech font-extrabold text-[#111] border border-[#111] shrink-0"
+              style={{ backgroundColor: data.accent || '#38bdf8' }}
+            >
+              {data.badge || data.categoryOrTag}
+            </span>
+            <h3 className="font-display font-extrabold text-sm sm:text-lg truncate">
+              {data.title}
+            </h3>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-lg bg-white dark:bg-neutral-700 border-2 border-[#111] flex items-center justify-center neo-shadow-sm neo-btn cursor-pointer shrink-0"
+            title="Tutup (ESC)"
+          >
+            <X className="w-4 h-4 stroke-[2.5]" />
+          </button>
+        </div>
+
+        {/* Modal Image Box */}
+        <div className="relative w-full bg-neutral-900 border-b-2 border-[#111] dark:border-neutral-700 max-h-[50vh] sm:max-h-[55vh] flex items-center justify-center overflow-hidden group">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={data.imageUrl}
+            alt={data.title}
+            className="w-full h-auto max-h-[50vh] sm:max-h-[55vh] object-contain transition-transform duration-300"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=900&q=80';
+            }}
+          />
+          <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-[10px] font-mono-tech font-bold rounded border border-white/30 backdrop-blur-sm flex items-center gap-1 pointer-events-none">
+            <Eye className="w-3 h-3 text-[#38bdf8]" />
+            <span>HQ Preview</span>
+          </div>
+        </div>
+
+        {/* Modal Info & Footer */}
+        <div className="p-4 sm:p-5 overflow-y-auto space-y-3 bg-[#f6f5f0] dark:bg-[#121316]">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono-tech font-bold text-neutral-600 dark:text-neutral-400">
+            {data.issuer && (
+              <span>
+                {data.year ? `${data.year} • ` : ''}{data.issuer}
+              </span>
+            )}
+            {data.metrics && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 rounded border border-[#111]">
+                <Zap className="w-3 h-3 text-amber-500 fill-amber-500" />
+                <span>{data.metrics}</span>
+              </span>
+            )}
+          </div>
+
+          <p className="font-mono-tech text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">
+            {data.desc}
+          </p>
+
+          {/* Action buttons */}
+          <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-neutral-300 dark:border-neutral-700">
+            <div className="flex items-center gap-2">
+              {data.liveUrl && (
+                <a
+                  href={data.liveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-1.5 bg-[#2563eb] text-white text-xs font-mono-tech font-extrabold rounded-md border-2 border-[#111] neo-shadow neo-btn flex items-center gap-1.5"
+                >
+                  <span>{lang === 'en' ? 'Live Demo' : 'Lihat Demo'}</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
+              {data.githubUrl && (
+                <a
+                  href={data.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-1.5 bg-white dark:bg-neutral-800 text-[#111] dark:text-white text-xs font-mono-tech font-extrabold rounded-md border-2 border-[#111] neo-shadow-sm neo-btn flex items-center gap-1.5"
+                >
+                  <span>GitHub</span>
+                  <ArrowUpRight className="w-3.5 h-3.5" />
+                </a>
+              )}
+            </div>
+
+            <button
+              onClick={onClose}
+              className="px-4 py-1.5 bg-neutral-200 dark:bg-neutral-800 text-[#111] dark:text-white text-xs font-mono-tech font-bold rounded border border-[#111] hover:bg-neutral-300 cursor-pointer ml-auto"
+            >
+              {lang === 'en' ? 'Close Preview' : 'Tutup Preview'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function Portfolio() {
   const [data, setData] = useState<PortfolioData>(initialPortfolioData);
 
@@ -384,6 +531,7 @@ export default function Portfolio() {
   const [showAvatarToast, setShowAvatarToast] = useState(false);
   const [contactSent, setContactSent] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [activePreview, setActivePreview] = useState<PreviewModalData | null>(null);
 
   // Slide Sub-navigation States
   const [aboutSlide, setAboutSlide] = useState<number>(0);
@@ -729,32 +877,34 @@ export default function Portfolio() {
               <RainbowLogoSVG isDark={isDark} />
             </button>
 
-            {/* Nav Items */}
-            {[
-              { id: 'HOME' as const, label: t.nav.home, icon: Home },
-              { id: 'ABOUT' as const, label: t.nav.about, icon: Sparkles },
-              { id: 'WORKS' as const, label: t.nav.works, icon: Menu },
-              { id: 'BLOG' as const, label: t.nav.achievements, icon: Award },
-              { id: 'CONTACT' as const, label: t.nav.contact, icon: Mail },
-            ].map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`relative px-3.5 py-2 text-xs font-mono-tech font-extrabold tracking-wider flex items-center gap-2 transition-transform duration-150 hover:-translate-y-0.5 cursor-pointer ${
-                    isActive ? 'text-[#111]' : 'text-[#111] dark:text-[#f3f4f6] hover:opacity-75'
-                  }`}
-                >
-                  {isActive && (
-                    <span className="absolute inset-0 bg-[#38bdf8] clip-brush-nav -z-10 transform -rotate-1 scale-105 shadow-sm" />
-                  )}
-                  <Icon className="w-3.5 h-3.5 stroke-[2.5]" />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
+            {/* Desktop Nav Items */}
+            <div className="hidden md:flex items-center gap-1.5 lg:gap-3">
+              {[
+                { id: 'HOME' as const, label: t.nav.home, icon: Home },
+                { id: 'ABOUT' as const, label: t.nav.about, icon: Sparkles },
+                { id: 'WORKS' as const, label: t.nav.works, icon: Menu },
+                { id: 'BLOG' as const, label: t.nav.achievements, icon: Award },
+                { id: 'CONTACT' as const, label: t.nav.contact, icon: Mail },
+              ].map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveTab(item.id)}
+                    className={`relative px-3.5 py-2 text-xs font-mono-tech font-extrabold tracking-wider flex items-center gap-2 transition-transform duration-150 hover:-translate-y-0.5 cursor-pointer ${
+                      isActive ? 'text-[#111]' : 'text-[#111] dark:text-[#f3f4f6] hover:opacity-75'
+                    }`}
+                  >
+                    {isActive && (
+                      <span className="absolute inset-0 bg-[#38bdf8] clip-brush-nav -z-10 transform -rotate-1 scale-105 shadow-sm" />
+                    )}
+                    <Icon className="w-3.5 h-3.5 stroke-[2.5]" />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Right Controls: Language Switcher, Theme Switcher, Avatar, Let's Talk */}
@@ -864,7 +1014,7 @@ export default function Portfolio() {
         )}
 
         {/* MAIN BODY AREA (Strictly hidden during intro sequence so no emblem leaks!) */}
-        <main className={`flex-1 w-full max-w-[1400px] mx-auto px-4 sm:px-8 xl:px-12 py-3 sm:py-6 flex items-center justify-center relative transition-opacity duration-500 ${
+        <main className={`flex-1 w-full max-w-[1400px] mx-auto px-4 sm:px-8 xl:px-12 py-3 sm:py-6 pb-24 md:pb-6 flex items-center justify-center relative transition-opacity duration-500 ${
           isReady ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}>
           
@@ -881,7 +1031,7 @@ export default function Portfolio() {
                 +
               </div>
 
-              {/* Left Mint Green Sticker: "FULL STACK DEVELOPER" (Spaced safely outside the headline) */}
+              {/* Left Mint Green Sticker: "FULL STACK DEVELOPER" with Gentle Float */}
               <div className="hidden xl:block absolute top-24 -left-2 xl:-left-6 2xl:-left-10 z-20">
                 <InspectableBox
                   dimensions="120 × 96"
@@ -891,7 +1041,7 @@ export default function Portfolio() {
                   delay={180}
                   isReady={isReady}
                 >
-                  <div className="w-28 h-22 sm:w-30 sm:h-24 bg-[#a7f3d0] text-[#111] p-2.5 -rotate-12 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-lg sm:text-xl leading-tight font-bold neo-sticker-grand">
+                  <div className="w-28 h-22 sm:w-30 sm:h-24 bg-[#a7f3d0] text-[#111] p-2.5 -rotate-12 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-lg sm:text-xl leading-tight font-bold neo-sticker-grand animate-float-gentle">
                     <span>{t.hero.stickers.fullstackLine1}</span>
                     <span>{t.hero.stickers.fullstackLine2}</span>
                     <div className="w-10 h-0.5 bg-[#111]/40 mt-1 rounded-full" />
@@ -899,10 +1049,10 @@ export default function Portfolio() {
                 </InspectableBox>
               </div>
 
-              {/* Left Blue Zigzag 'W' Doodle (Positioned in open whitespace) */}
+              {/* Left Blue Zigzag 'W' Doodle with Bobbing Float */}
               <div 
                 className={`hidden xl:block absolute top-[280px] left-2 xl:left-4 z-10 transition-opacity duration-700 ${
-                  isReady ? 'opacity-100' : 'opacity-0'
+                  isReady ? 'opacity-100 animate-float-bob' : 'opacity-0'
                 }`}
               >
                 <svg width="34" height="24" viewBox="0 0 34 24" fill="none">
@@ -910,7 +1060,7 @@ export default function Portfolio() {
                 </svg>
               </div>
 
-              {/* Bottom-left Yellow Sticky Note (Clear of action buttons) */}
+              {/* Bottom-left Yellow Sticky Note with Delayed Float */}
               <div className="hidden xl:block absolute bottom-4 -left-2 xl:-left-6 2xl:-left-8 z-20">
                 <InspectableBox
                   dimensions="120 × 120"
@@ -920,7 +1070,7 @@ export default function Portfolio() {
                   delay={260}
                   isReady={isReady}
                 >
-                  <div className="w-28 h-28 sm:w-30 sm:h-30 bg-[#fde047] text-[#111] p-2.5 rotate-6 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-base sm:text-lg leading-tight font-bold neo-sticker-grand">
+                  <div className="w-28 h-28 sm:w-30 sm:h-30 bg-[#fde047] text-[#111] p-2.5 rotate-6 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-base sm:text-lg leading-tight font-bold neo-sticker-grand animate-float-delayed">
                     {t.hero.stickers.goodDesign.map((line, idx) => (
                       <span key={idx}>{line}</span>
                     ))}
@@ -949,11 +1099,11 @@ export default function Portfolio() {
                 </InspectableBox>
 
                 {/* Giant "RASHQA ANDREAN" Heading with Yellow Crown & Doodles */}
-                <div className="relative mt-1 mb-4">
-                  {/* Floating Yellow Crown (Anchored over center of name) */}
+                <div className="relative mt-1 mb-4 w-full">
+                  {/* Floating Yellow Crown (Anchored over center of name with gentle bob) */}
                   <div 
-                    className={`absolute -top-9 sm:-top-10 right-20 sm:right-28 xl:right-36 z-20 rotate-12 pointer-events-none transition-all duration-500 ${
-                      isReady ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+                    className={`absolute -top-9 sm:-top-10 right-16 sm:right-28 xl:right-36 z-20 rotate-12 pointer-events-none transition-all duration-500 ${
+                      isReady ? 'opacity-100 scale-100 animate-float-bob' : 'opacity-0 scale-50'
                     }`}
                   >
                     <CrownSVG />
@@ -977,15 +1127,16 @@ export default function Portfolio() {
                     badgePosition="bottom"
                     delay={120}
                     isReady={isReady}
+                    className="w-full"
                   >
-                    <h1 className="font-display font-extrabold text-5xl sm:text-6xl lg:text-[62px] xl:text-[72px] 2xl:text-[78px] leading-[0.92] tracking-tight uppercase px-1">
+                    <h1 className="font-display font-extrabold text-4xl sm:text-6xl lg:text-[62px] xl:text-[72px] 2xl:text-[78px] leading-[0.92] tracking-tight uppercase px-1 text-[#111111] dark:text-white">
                       {data.profile.nickName}
                       <br />
                       ANDREAN
                     </h1>
 
                     {/* Doodle underline below name (Matching Image 0) */}
-                    <div className="w-40 sm:w-48 h-3.5 pl-2 mt-2">
+                    <div className="w-36 sm:w-48 h-3.5 pl-2 mt-2">
                       <svg viewBox="0 0 180 14" className="w-full h-full fill-none text-[#111] dark:text-white">
                         <path d="M4 8 Q 90 12, 170 5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
                         <circle cx="174" cy="5" r="2.5" fill="currentColor" />
@@ -1056,13 +1207,36 @@ export default function Portfolio() {
                     </button>
                   </InspectableBox>
                 </div>
+
+                {/* Mobile Friendly Interactive Sticker Bar (< 1280px) */}
+                <div className="flex xl:hidden flex-wrap items-center gap-2.5 mt-5 pt-3 border-t border-dashed border-neutral-300 dark:border-neutral-700">
+                  <div 
+                    onClick={() => setActiveTab('ABOUT')}
+                    className="px-2.5 py-1.5 bg-[#a7f3d0] text-[#111] border-2 border-[#111] rounded-md text-xs font-hand font-bold -rotate-3 neo-shadow-sm neo-btn animate-float-gentle cursor-pointer"
+                  >
+                    {t.hero.stickers.fullstackLine1} {t.hero.stickers.fullstackLine2}
+                  </div>
+                  <div 
+                    onClick={navigateToTechStack}
+                    className="px-2.5 py-1.5 bg-white dark:bg-[#23252a] text-[#111] dark:text-white border-2 border-[#111] rounded-md text-xs font-mono-tech font-bold rotate-2 neo-shadow-sm neo-btn animate-float-sway cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Code2 className="w-3.5 h-3.5 text-[#38bdf8]" />
+                    <span>STACK.TS →</span>
+                  </div>
+                  <div 
+                    onClick={() => setActiveTab('CONTACT')}
+                    className="px-2.5 py-1.5 bg-[#fde047] text-[#111] border-2 border-[#111] rounded-md text-xs font-hand font-bold -rotate-2 neo-shadow-sm neo-btn animate-float-delayed cursor-pointer"
+                  >
+                    {t.hero.stickers.createTogether.join(' ')}
+                  </div>
+                </div>
               </div>
 
               {/* RIGHT COLUMN: Portrait + Browser Window Card + Stickers */}
               <div className="w-full lg:w-[48%] xl:w-[48%] flex items-center justify-center relative min-h-[460px]">
                 
-                {/* Mini Retro Browser Window Card (Positioned gracefully above the blue brush without covering face) */}
-                <div className="absolute -top-12 sm:-top-14 lg:-top-16 left-[-10px] sm:left-[-14px] lg:left-[-8px] xl:left-[-16px] z-30">
+                {/* Mini Retro Browser Window Card (Positioned gracefully above the blue brush without covering face on desktop, replaced by sticker shelf on mobile) */}
+                <div className="hidden lg:block absolute -top-10 sm:-top-14 lg:-top-16 left-0 sm:left-[-10px] lg:left-[-8px] xl:left-[-16px] z-30">
                   <InspectableBox
                     dimensions="172 × 126"
                     color="#0ea5e9"
@@ -1074,7 +1248,7 @@ export default function Portfolio() {
                     <div 
                       onClick={navigateToTechStack}
                       title="Klik untuk lihat detail Tech Stack di tab About"
-                      className="w-40 sm:w-42 bg-white dark:bg-[#23252a] border-2 border-[#111] rounded-xl p-2.5 -rotate-6 neo-shadow neo-card-grand cursor-pointer"
+                      className="w-40 sm:w-42 bg-white dark:bg-[#23252a] border-2 border-[#111] rounded-xl p-2.5 -rotate-6 neo-shadow neo-card-grand cursor-pointer animate-float-sway"
                     >
                       {/* Window Header */}
                       <div className="flex items-center justify-between pb-1 mb-1.5 border-b border-neutral-200 dark:border-neutral-700">
@@ -1124,7 +1298,7 @@ export default function Portfolio() {
                 {/* Blue 'Z' Doodle above Portrait */}
                 <div 
                   className={`hidden sm:block absolute top-4 left-44 sm:left-48 z-20 transition-opacity duration-700 ${
-                    isReady ? 'opacity-100' : 'opacity-0'
+                    isReady ? 'opacity-100 animate-float-bob' : 'opacity-0'
                   }`}
                 >
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -1147,8 +1321,8 @@ export default function Portfolio() {
                   />
                 </InspectableBox>
 
-                {/* Pink Starburst Sticker: "BUILD COOL THINGS" (Pinned to hoodie chest like Image 0) */}
-                <div className="absolute bottom-12 sm:bottom-16 right-20 sm:right-28 z-30 pointer-events-auto">
+                {/* Pink Starburst Sticker: "BUILD COOL THINGS" with Gentle Float */}
+                <div className="absolute bottom-12 sm:bottom-16 right-14 sm:right-28 z-30 pointer-events-auto">
                   <InspectableBox
                     dimensions="114 × 114"
                     color="#ec4899"
@@ -1157,7 +1331,7 @@ export default function Portfolio() {
                     delay={300}
                     isReady={isReady}
                   >
-                    <div className="relative w-26 h-26 sm:w-28 sm:h-28 flex items-center justify-center rotate-12 neo-sticker-grand">
+                    <div className="relative w-26 h-26 sm:w-28 sm:h-28 flex items-center justify-center rotate-12 neo-sticker-grand animate-float-gentle">
                       <svg viewBox="0 0 120 120" className="w-full h-full fill-[#f472b6] drop-shadow">
                         <polygon points="60,2 73,18 93,9 96,30 116,33 107,52 120,68 103,80 106,101 86,102 77,120 60,108 43,120 34,102 14,101 17,80 0,68 13,52 4,33 24,30 27,9 47,18" />
                       </svg>
@@ -1170,7 +1344,7 @@ export default function Portfolio() {
                   </InspectableBox>
                 </div>
 
-                {/* Top-right Lime Green Sticky Note (Spaced cleanly at top right) */}
+                {/* Top-right Lime Green Sticky Note with Delayed Float */}
                 <div className="hidden sm:block absolute -top-10 sm:-top-12 -right-2 sm:-right-6 z-20">
                   <InspectableBox
                     dimensions="112 × 110"
@@ -1180,7 +1354,7 @@ export default function Portfolio() {
                     delay={250}
                     isReady={isReady}
                   >
-                    <div className="w-26 h-26 sm:w-28 sm:h-28 bg-[#bef264] text-[#111] p-3 rotate-6 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-lg sm:text-xl leading-tight font-bold neo-sticker-grand">
+                    <div className="w-26 h-26 sm:w-28 sm:h-28 bg-[#bef264] text-[#111] p-3 rotate-6 shadow-md border-2 border-[#111] flex flex-col items-center justify-center text-center font-hand text-lg sm:text-xl leading-tight font-bold neo-sticker-grand animate-float-delayed">
                       {t.hero.stickers.designCodeShip.map((line, idx) => (
                         <span key={idx}>{line}</span>
                       ))}
@@ -1188,7 +1362,7 @@ export default function Portfolio() {
                   </InspectableBox>
                 </div>
 
-                {/* Right Oval Badge: "creativity + technology" (Distinct vertical slot) */}
+                {/* Right Oval Badge: "creativity + technology" with Sway Float */}
                 <div className="hidden sm:block absolute top-28 sm:top-32 -right-4 sm:-right-8 z-20">
                   <InspectableBox
                     dimensions="130 × 74"
@@ -1198,7 +1372,7 @@ export default function Portfolio() {
                     delay={320}
                     isReady={isReady}
                   >
-                    <div className="px-4 sm:px-5 py-3 bg-white dark:bg-[#23252a] text-[#111] dark:text-white border-2 border-[#111] dark:border-white rounded-full -rotate-6 shadow-sm flex flex-col items-center justify-center text-center font-hand text-base sm:text-lg leading-none font-bold neo-sticker-grand">
+                    <div className="px-4 sm:px-5 py-3 bg-white dark:bg-[#23252a] text-[#111] dark:text-white border-2 border-[#111] dark:border-white rounded-full -rotate-6 shadow-sm flex flex-col items-center justify-center text-center font-hand text-base sm:text-lg leading-none font-bold neo-sticker-grand animate-float-sway">
                       <span>{t.hero.stickers.creativityTech.line1}</span>
                       <span className="text-xs my-0.5">+</span>
                       <span>{t.hero.stickers.creativityTech.line2}</span>
@@ -1206,16 +1380,16 @@ export default function Portfolio() {
                   </InspectableBox>
                 </div>
 
-                {/* Right Hand-drawn Heart Outline */}
+                {/* Right Hand-drawn Heart Outline with Bobbing Float */}
                 <div 
                   className={`hidden sm:block absolute top-[230px] sm:top-[245px] -right-1 sm:-right-3 transition-opacity duration-700 ${
-                    isReady ? 'opacity-100' : 'opacity-0'
+                    isReady ? 'opacity-100 animate-float-bob' : 'opacity-0'
                   }`}
                 >
                   <Heart className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.2] text-[#111] dark:text-white rotate-12" />
                 </div>
 
-                {/* Bottom-right Circle Badge: "Let's Create Together" (Separated from pink starburst) */}
+                {/* Bottom-right Circle Badge: "Let's Create Together" with Delayed Float */}
                 <div className="hidden sm:block absolute -bottom-6 sm:-bottom-8 -right-2 sm:-right-6 z-20">
                   <InspectableBox
                     dimensions="114 × 114"
@@ -1227,7 +1401,7 @@ export default function Portfolio() {
                   >
                     <div 
                       onClick={() => setActiveTab('CONTACT')}
-                      className="w-26 h-26 sm:w-28 sm:h-28 rounded-full bg-white dark:bg-[#23252a] text-[#111] dark:text-white border-2 border-[#111] dark:border-white p-2.5 -rotate-6 shadow-md flex flex-col items-center justify-center text-center font-hand text-base sm:text-lg leading-tight font-bold cursor-pointer neo-sticker-grand"
+                      className="w-26 h-26 sm:w-28 sm:h-28 rounded-full bg-white dark:bg-[#23252a] text-[#111] dark:text-white border-2 border-[#111] dark:border-white p-2.5 -rotate-6 shadow-md flex flex-col items-center justify-center text-center font-hand text-base sm:text-lg leading-tight font-bold cursor-pointer neo-sticker-grand animate-float-delayed"
                     >
                       {t.hero.stickers.createTogether.map((word, idx) => (
                         <span key={idx}>{word}</span>
@@ -1475,17 +1649,48 @@ export default function Portfolio() {
               </div>
 
               {/* 4 Projects Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                 {currentProjects.map((proj, idx) => (
                   <InspectableBox
                     key={proj.id}
-                    dimensions="480 × 220"
+                    dimensions="480 × 260"
                     color="#2563eb"
                     badgePosition="bottom"
                     delay={idx * 70}
                   >
-                    <div className="bg-white dark:bg-[#23252a] border-2 border-[#111] dark:border-neutral-400 rounded-xl p-5 sm:p-6 neo-shadow neo-card-grand flex flex-col justify-between h-full">
+                    <div className="bg-white dark:bg-[#23252a] border-2 border-[#111] dark:border-neutral-400 rounded-xl p-4 sm:p-5 neo-shadow neo-card-grand flex flex-col justify-between h-full">
                       <div>
+                        {/* Project Image Preview Banner with Zoom Hover */}
+                        <div
+                          onClick={() => setActivePreview({
+                            title: proj.title,
+                            categoryOrTag: proj.tag,
+                            desc: proj.desc,
+                            imageUrl: proj.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&q=80',
+                            accent: proj.accent,
+                            metrics: proj.metrics,
+                            liveUrl: proj.liveUrl,
+                            githubUrl: proj.githubUrl,
+                          })}
+                          className="relative w-full h-36 sm:h-40 rounded-lg border-2 border-[#111] dark:border-neutral-700 overflow-hidden mb-3 bg-neutral-100 dark:bg-neutral-800 group/thumb cursor-pointer select-none"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={proj.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&q=80'}
+                            alt={proj.title}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover/thumb:scale-105"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=900&q=80';
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-[#111]/30 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="px-3 py-1.5 bg-white text-[#111] text-[11px] font-mono-tech font-extrabold rounded-md border-2 border-[#111] neo-shadow-sm flex items-center gap-1.5 transform translate-y-1 group-hover/thumb:translate-y-0 transition-transform">
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>{lang === 'en' ? 'Enlarge Preview' : 'Perbesar Gambar'}</span>
+                            </span>
+                          </div>
+                        </div>
+
                         <div className="flex items-center justify-between mb-2">
                           <span 
                             className="inline-block px-2.5 py-1 text-[10px] font-mono-tech font-extrabold text-[#111] rounded border border-[#111]"
@@ -1498,7 +1703,7 @@ export default function Portfolio() {
                           </span>
                         </div>
 
-                        <h3 className="font-display font-extrabold text-xl sm:text-2xl mb-2">{proj.title}</h3>
+                        <h3 className="font-display font-extrabold text-lg sm:text-xl mb-1.5">{proj.title}</h3>
                         <p className="font-mono-tech text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed mb-3">
                           {proj.desc}
                         </p>
@@ -1509,23 +1714,42 @@ export default function Portfolio() {
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-3 mt-4 border-t border-neutral-200 dark:border-neutral-700">
-                        <a
-                          href={proj.liveUrl || proj.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-mono-tech text-xs font-bold flex items-center gap-1.5 text-[#2563eb] dark:text-[#38bdf8] hover:underline"
+                      <div className="flex items-center justify-between pt-3 mt-3 border-t border-neutral-200 dark:border-neutral-700">
+                        <div className="flex items-center gap-3">
+                          <a
+                            href={proj.liveUrl || proj.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-mono-tech text-xs font-bold flex items-center gap-1.5 text-[#2563eb] dark:text-[#38bdf8] hover:underline"
+                          >
+                            {t.works.viewLive} <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                          <a
+                            href={proj.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-mono-tech text-xs font-bold text-neutral-500 hover:text-[#111] dark:hover:text-white"
+                          >
+                            {t.works.sourceCode} →
+                          </a>
+                        </div>
+
+                        <button
+                          onClick={() => setActivePreview({
+                            title: proj.title,
+                            categoryOrTag: proj.tag,
+                            desc: proj.desc,
+                            imageUrl: proj.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&q=80',
+                            accent: proj.accent,
+                            metrics: proj.metrics,
+                            liveUrl: proj.liveUrl,
+                            githubUrl: proj.githubUrl,
+                          })}
+                          className="p-1.5 bg-neutral-100 dark:bg-neutral-800 text-[#111] dark:text-white rounded border border-[#111] hover:scale-105 transition-transform cursor-pointer"
+                          title="Lihat Gambar Preview"
                         >
-                          {t.works.viewLive} <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                        <a
-                          href={proj.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-mono-tech text-xs font-bold text-neutral-500 hover:text-[#111] dark:hover:text-white"
-                        >
-                          {t.works.sourceCode} →
-                        </a>
+                          <Eye className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
                   </InspectableBox>
@@ -1534,10 +1758,10 @@ export default function Portfolio() {
             </div>
           )}
 
-          {/* TAB: ACHIEVEMENTS & CERTIFICATES */}
+          {/* TAB: ACHIEVEMENTS & CERTIFICATES WITH IMAGE PREVIEWS ACROSS ALL CATEGORIES */}
           {activeTab === 'BLOG' && (
             <div className="w-full max-w-4xl py-4 animate-pop-in">
-              <div className="bg-white dark:bg-[#23252a] border-2 border-[#111] dark:border-neutral-400 rounded-2xl p-6 sm:p-8 neo-shadow-lg min-h-[520px] flex flex-col justify-between">
+              <div className="bg-white dark:bg-[#23252a] border-2 border-[#111] dark:border-neutral-400 rounded-2xl p-5 sm:p-8 neo-shadow-lg min-h-[520px] flex flex-col justify-between">
                 <div>
                   <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b-2 border-neutral-200 dark:border-neutral-700">
                     <div>
@@ -1552,7 +1776,7 @@ export default function Portfolio() {
                     </div>
 
                     {/* Category Tabs */}
-                    <div className="flex items-center gap-1.5 bg-[#f6f5f0] dark:bg-neutral-800 p-1 rounded-lg border border-[#111]">
+                    <div className="flex items-center gap-1.5 bg-[#f6f5f0] dark:bg-neutral-800 p-1 rounded-lg border border-[#111] flex-wrap">
                       {[t.achievements.categories.prestasi, t.achievements.categories.sertifikat, t.achievements.categories.artikel].map((cat, idx) => (
                         <button
                           key={cat}
@@ -1569,8 +1793,8 @@ export default function Portfolio() {
                     </div>
                   </div>
 
-                  {/* Filtered Achievements */}
-                  <div className="space-y-3.5 animate-slide-right">
+                  {/* Filtered Achievements with Rich Image Previews */}
+                  <div className="space-y-4 animate-slide-right">
                     {data.achievements
                       .filter((item) => {
                         if (blogSlide === 0) return item.category === 'PRESTASI';
@@ -1580,32 +1804,92 @@ export default function Portfolio() {
                       .map((item) => (
                         <div
                           key={item.id}
-                          className="bg-white dark:bg-neutral-800/90 border-2 border-[#111] rounded-xl p-4 sm:p-5 neo-shadow neo-card-grand flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                          className="bg-white dark:bg-neutral-800/90 border-2 border-[#111] rounded-xl p-4 sm:p-5 neo-shadow neo-card-grand flex flex-col sm:flex-row items-start sm:items-center gap-4"
                         >
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs font-mono-tech font-bold text-neutral-500">
-                                {item.year} • {item.issuer}
-                              </span>
-                              <span 
-                                className="px-2 py-0.5 rounded text-[10px] font-mono-tech font-extrabold text-[#111] border border-[#111]"
-                                style={{ backgroundColor: item.accent }}
-                              >
-                                {item.badge}
+                          {/* Dedicated Image Preview Thumbnail */}
+                          <div
+                            onClick={() => setActivePreview({
+                              title: item.title,
+                              categoryOrTag: item.category,
+                              desc: item.description,
+                              imageUrl: item.imageUrl || (blogSlide === 0 
+                                ? 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=900&q=80'
+                                : blogSlide === 1 
+                                ? 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=900&q=80'
+                                : 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=80'
+                              ),
+                              accent: item.accent,
+                              badge: item.badge,
+                              issuer: item.issuer,
+                              year: item.year
+                            })}
+                            className="relative w-full sm:w-44 h-36 sm:h-28 shrink-0 rounded-lg border-2 border-[#111] overflow-hidden group/ach cursor-pointer bg-neutral-100 dark:bg-neutral-900 select-none"
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={item.imageUrl || (blogSlide === 0 
+                                ? 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=900&q=80'
+                                : blogSlide === 1 
+                                ? 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=900&q=80'
+                                : 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=80'
+                              )}
+                              alt={item.title}
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover/ach:scale-105"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=900&q=80';
+                              }}
+                            />
+                            <div className="absolute inset-0 bg-[#111]/30 opacity-0 group-hover/ach:opacity-100 transition-opacity flex items-center justify-center">
+                              <span className="px-2.5 py-1 bg-white text-[#111] text-[10px] font-mono-tech font-extrabold rounded border border-[#111] flex items-center gap-1 shadow-sm">
+                                <Eye className="w-3 h-3" />
+                                <span>{lang === 'en' ? 'Preview' : 'Lihat'}</span>
                               </span>
                             </div>
-                            <h3 className="font-display font-extrabold text-lg sm:text-xl text-[#111] dark:text-white">
-                              {item.title}
-                            </h3>
-                            <p className="font-mono-tech text-xs text-neutral-600 dark:text-neutral-300">
-                              {item.description}
-                            </p>
                           </div>
 
-                          <div className="self-start sm:self-center">
-                            <span className="px-3 py-1.5 bg-[#f6f5f0] dark:bg-neutral-900 border border-[#111] rounded font-mono-tech font-bold text-xs flex items-center gap-1.5">
-                              VERIFIED <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                            </span>
+                          {/* Content Details */}
+                          <div className="flex-1 space-y-1.5 w-full">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-mono-tech font-bold text-neutral-500">
+                                  {item.year} • {item.issuer}
+                                </span>
+                                <span 
+                                  className="px-2 py-0.5 rounded text-[10px] font-mono-tech font-extrabold text-[#111] border border-[#111]"
+                                  style={{ backgroundColor: item.accent }}
+                                >
+                                  {item.badge}
+                                </span>
+                              </div>
+
+                              <span className="px-2.5 py-1 bg-[#f6f5f0] dark:bg-neutral-900 border border-[#111] rounded font-mono-tech font-bold text-[11px] flex items-center gap-1">
+                                VERIFIED <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                              </span>
+                            </div>
+
+                            <h3 className="font-display font-extrabold text-base sm:text-lg text-[#111] dark:text-white leading-tight">
+                              {item.title}
+                            </h3>
+                            <p className="font-mono-tech text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                              {item.description}
+                            </p>
+
+                            <button
+                              onClick={() => setActivePreview({
+                                title: item.title,
+                                categoryOrTag: item.category,
+                                desc: item.description,
+                                imageUrl: item.imageUrl || 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=900&q=80',
+                                accent: item.accent,
+                                badge: item.badge,
+                                issuer: item.issuer,
+                                year: item.year
+                              })}
+                              className="inline-flex items-center gap-1 text-[11px] font-mono-tech font-bold text-[#2563eb] dark:text-[#38bdf8] hover:underline pt-1 cursor-pointer"
+                            >
+                              <Eye className="w-3 h-3" />
+                              <span>{lang === 'en' ? 'Inspect Certificate / Preview →' : 'Lihat Dokumen / Sertifikat →'}</span>
+                            </button>
                           </div>
                         </div>
                       ))}
@@ -1613,7 +1897,7 @@ export default function Portfolio() {
                 </div>
 
                 {/* Bottom Slide Switcher */}
-                <div className="pt-6 mt-6 border-t-2 border-neutral-200 dark:border-neutral-700 flex items-center justify-between">
+                <div className="pt-5 mt-5 border-t-2 border-neutral-200 dark:border-neutral-700 flex items-center justify-between">
                   <button
                     onClick={() => setBlogSlide(prev => Math.max(0, prev - 1))}
                     disabled={blogSlide === 0}
@@ -1736,6 +2020,36 @@ export default function Portfolio() {
         </footer>
       </div>
 
+      {/* Mobile Bottom Navigation Bar (< 768px) */}
+      {isReady && (
+        <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#18191c]/95 backdrop-blur-md border-t-2 border-[#111] dark:border-neutral-700 py-1.5 px-3 flex md:hidden items-center justify-around neo-shadow">
+          {[
+            { id: 'HOME' as const, label: t.nav.home, icon: Home },
+            { id: 'ABOUT' as const, label: t.nav.about, icon: Sparkles },
+            { id: 'WORKS' as const, label: t.nav.works, icon: Menu },
+            { id: 'BLOG' as const, label: t.nav.achievements, icon: Award },
+            { id: 'CONTACT' as const, label: t.nav.contact, icon: Mail },
+          ].map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`flex flex-col items-center justify-center min-w-[54px] min-h-[46px] px-2 py-1 rounded-lg transition-all cursor-pointer ${
+                  isActive 
+                    ? 'bg-[#38bdf8] text-[#111] font-extrabold border-2 border-[#111] neo-shadow-sm scale-105'
+                    : 'text-neutral-600 dark:text-neutral-400 font-bold hover:text-[#111] dark:hover:text-white'
+                }`}
+              >
+                <Icon className="w-4 h-4 stroke-[2.5]" />
+                <span className="text-[9px] font-mono-tech mt-0.5 tracking-tight font-extrabold">{item.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+      )}
+
       {/* Floating Minimizeable WhatsApp Widget (Visible only after intro finishes) */}
       {isReady && (
         <WhatsAppWidget 
@@ -1744,6 +2058,13 @@ export default function Portfolio() {
           lang={lang}
         />
       )}
+
+      {/* Full-view Neo-Brutalist Lightbox / Preview Modal */}
+      <ImagePreviewModal
+        data={activePreview}
+        onClose={() => setActivePreview(null)}
+        lang={lang}
+      />
 
     </div>
   );

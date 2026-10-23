@@ -105,10 +105,50 @@ body {
   box-shadow: 6px 6px 0px 0px #111111, 0 0 25px rgba(245, 158, 11, 0.35);
 }
 
-/* Subtle floating animations for stickers */
+/* Subtle floating animations for stickers and interactive hero elements */
 @keyframes floatSlow {
   0%, 100% { transform: translateY(0px) rotate(var(--tw-rotate, 0deg)); }
   50% { transform: translateY(-7px) rotate(var(--tw-rotate, 0deg)); }
+}
+
+@keyframes floatGentle {
+  0%, 100% { transform: translateY(0px) rotate(var(--tw-rotate, 0deg)); }
+  50% { transform: translateY(-9px) rotate(calc(var(--tw-rotate, 0deg) + 1.5deg)); }
+}
+
+@keyframes floatDelayed {
+  0%, 100% { transform: translateY(0px) rotate(var(--tw-rotate, 0deg)); }
+  50% { transform: translateY(8px) rotate(calc(var(--tw-rotate, 0deg) - 1.5deg)); }
+}
+
+@keyframes floatBob {
+  0%, 100% { transform: translateY(0px) rotate(var(--tw-rotate, 0deg)); }
+  50% { transform: translateY(-6px) rotate(var(--tw-rotate, 0deg)); }
+}
+
+@keyframes floatSway {
+  0%, 100% { transform: translateY(0px) translateX(0px) rotate(var(--tw-rotate, 0deg)); }
+  50% { transform: translateY(-7px) translateX(3.5px) rotate(calc(var(--tw-rotate, 0deg) + 2deg)); }
+}
+
+.animate-float-slow {
+  animation: floatSlow 4s ease-in-out infinite;
+}
+
+.animate-float-gentle {
+  animation: floatGentle 4.2s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: floatDelayed 5.2s ease-in-out 0.8s infinite;
+}
+
+.animate-float-bob {
+  animation: floatBob 3.6s ease-in-out 1.2s infinite;
+}
+
+.animate-float-sway {
+  animation: floatSway 4.8s ease-in-out 0.5s infinite;
 }
 
 @keyframes popIn {

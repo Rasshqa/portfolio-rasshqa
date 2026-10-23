@@ -518,6 +518,7 @@ export default function AdminDashboard() {
                           desc: 'Deskripsi singkat fungsionalitas dan arsitektur proyek ini...',
                           metrics: 'High Performance API',
                           accent: '#38bdf8',
+                          imageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&q=80',
                           liveUrl: 'https://github.com/rasshqa',
                           githubUrl: 'https://github.com/rasshqa'
                         };
@@ -636,6 +637,29 @@ export default function AdminDashboard() {
                             />
                           </div>
                         </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold">URL Gambar Preview Proyek (Screenshot / Thumbnail)</label>
+                          <div className="flex gap-2 items-center">
+                            <input
+                              type="text"
+                              placeholder="https://images.unsplash.com/... atau tautan gambar"
+                              value={proj.imageUrl || ''}
+                              onChange={(e) => {
+                                const updated = [...formData.projects];
+                                updated[idx].imageUrl = e.target.value;
+                                setFormData({ ...formData, projects: updated });
+                              }}
+                              className="w-full px-2.5 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs"
+                            />
+                            {proj.imageUrl && (
+                              <div className="w-12 h-9 rounded border border-[#111] overflow-hidden shrink-0 bg-neutral-200">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={proj.imageUrl} alt="preview" className="w-full h-full object-cover" />
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -662,7 +686,8 @@ export default function AdminDashboard() {
                           category: 'PRESTASI',
                           description: 'Keterangan prestasi atau kompetisi...',
                           badge: 'AWARD',
-                          accent: '#fde047'
+                          accent: '#fde047',
+                          imageUrl: 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=900&q=80'
                         };
                         setFormData({ ...formData, achievements: [newAch, ...formData.achievements] });
                       }}
@@ -675,7 +700,7 @@ export default function AdminDashboard() {
 
                   <div className="space-y-4">
                     {formData.achievements.map((item, idx) => (
-                      <div key={item.id} className="p-4 bg-neutral-50 dark:bg-neutral-800 border-2 border-[#111] rounded-xl neo-shadow space-y-2">
+                      <div key={item.id} className="p-4 bg-neutral-50 dark:bg-neutral-800 border-2 border-[#111] rounded-xl neo-shadow space-y-3">
                         <div className="flex items-center justify-between">
                           <select
                             value={item.category}
@@ -734,6 +759,35 @@ export default function AdminDashboard() {
                           </div>
                         </div>
 
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-[11px] font-bold">Badge Text</label>
+                            <input
+                              type="text"
+                              value={item.badge}
+                              onChange={(e) => {
+                                const updated = [...formData.achievements];
+                                updated[idx].badge = e.target.value;
+                                setFormData({ ...formData, achievements: updated });
+                              }}
+                              className="w-full px-2 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs font-bold"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-bold">Warna Aksen Hex (contoh: #fde047)</label>
+                            <input
+                              type="text"
+                              value={item.accent}
+                              onChange={(e) => {
+                                const updated = [...formData.achievements];
+                                updated[idx].accent = e.target.value;
+                                setFormData({ ...formData, achievements: updated });
+                              }}
+                              className="w-full px-2 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs"
+                            />
+                          </div>
+                        </div>
+
                         <div>
                           <label className="block text-[11px] font-bold">Keterangan Deskripsi</label>
                           <textarea
@@ -746,6 +800,29 @@ export default function AdminDashboard() {
                             }}
                             className="w-full px-2 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs"
                           />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold">URL Gambar Preview (Sertifikat / Piagam / Dokumen)</label>
+                          <div className="flex gap-2 items-center">
+                            <input
+                              type="text"
+                              placeholder="https://images.unsplash.com/... atau tautan gambar"
+                              value={item.imageUrl || ''}
+                              onChange={(e) => {
+                                const updated = [...formData.achievements];
+                                updated[idx].imageUrl = e.target.value;
+                                setFormData({ ...formData, achievements: updated });
+                              }}
+                              className="w-full px-2.5 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs"
+                            />
+                            {item.imageUrl && (
+                              <div className="w-12 h-9 rounded border border-[#111] overflow-hidden shrink-0 bg-neutral-200">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={item.imageUrl} alt="preview" className="w-full h-full object-cover" />
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
