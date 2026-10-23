@@ -6,11 +6,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "neon": "neonctl",
+    "db:inspect": "sh -c 'set -a; [ -f .env.local ] && . ./.env.local || [ -f .env ] && . ./.env; neonctl inspect db table-sizes --db-url \"$DATABASE_URL\"'"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1156.0",
+    "@aws-sdk/s3-request-presigner": "^3.1156.0",
     "@neondatabase/serverless": "^1.2.0",
+    "dotenv": "^18.0.9",
     "lucide-react": "^1.61.0",
+    "neonctl": "^8.11.0",
     "next": "16.4.2",
     "react": "19.3.0",
     "react-dom": "19.3.0"

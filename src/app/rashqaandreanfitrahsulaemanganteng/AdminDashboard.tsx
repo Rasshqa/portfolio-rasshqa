@@ -18,7 +18,11 @@ import {
   Award,
   User,
   Sun,
-  Moon
+  Moon,
+  Upload,
+  Mail,
+  RefreshCw,
+  Clock
 } from 'lucide-react';
 import { PortfolioData, initialPortfolioData, ProjectItem, AchievementItem } from '@/lib/data';
 
@@ -28,11 +32,74 @@ export default function AdminDashboard() {
   const [authError, setAuthError] = useState('');
   const [isDark, setIsDark] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<'PROFILE' | 'ABOUT' | 'PROJECTS' | 'ACHIEVEMENTS' | 'TECH'>('PROFILE');
+  const [activeTab, setActiveTab] = useState<'PROFILE' | 'ABOUT' | 'PROJECTS' | 'ACHIEVEMENTS' | 'TECH' | 'MESSAGES'>('PROFILE');
   const [formData, setFormData] = useState<PortfolioData>(initialPortfolioData);
   const [isNeonConnected, setIsNeonConnected] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  const loadMessages = async () => {
+    setIsLoadingMessages(true);
+    try {
+      const res = await fetch(`/api/contact?pin=${pinInput || '020709'}`);
+      const json = await res.json();
+      if (json.success) {
+        setMessages(json.messages || []);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoadingMessages(false);
+    }
+  };
+
+  const handleDeleteMessage = async (id: string) => {
+    if (!confirm('Hapus pesan ini dari Neon Database?')) return;
+    try {
+      await fetch('/api/contact', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: pinInput || '020709', id }),
+      });
+      setMessages(prev => prev.filter(m => m.id !== id));
+      setStatusMessage({ type: 'success', text: 'Pesan berhasil dihapus dari database Neon.' });
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: err?.message || 'Gagal menghapus pesan.' });
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, onUrlReceived: (url: string) => void) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    setStatusMessage(null);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: form,
+      });
+      const json = await res.json();
+      if (json.success && json.url) {
+        onUrlReceived(json.url);
+        setStatusMessage({
+          type: 'success',
+          text: `Gambar berhasil diunggah (${json.provider === 's3' ? 'AWS S3' : 'Lokal /uploads'})!`
+        });
+      } else {
+        setStatusMessage({ type: 'error', text: json.message || 'Gagal mengunggah gambar.' });
+      }
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: err?.message || 'Terjadi kesalahan saat unggah gambar.' });
+    } finally {
+      setIsUploading(false);
+      e.target.value = '';
+    }
+  };
 
   // Load existing data on mount
   useEffect(() => {
@@ -210,13 +277,19 @@ export default function AdminDashboard() {
                 { id: 'PROJECTS', label: '3. Proyek (Works)', icon: Layers },
                 { id: 'ACHIEVEMENTS', label: '4. Prestasi & Sertifikat', icon: Award },
                 { id: 'TECH', label: '5. Tech Stack', icon: Code2 },
+                { id: 'MESSAGES', label: '6. Pesan Masuk (Neon)', icon: Mail },
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id as any)}
+                    onClick={() => {
+                      setActiveTab(tab.id as any);
+                      if (tab.id === 'MESSAGES') {
+                        loadMessages();
+                      }
+                    }}
                     className={`px-4 py-2.5 text-xs font-extrabold rounded-t-xl border-2 border-b-0 border-[#111] transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
                       isActive
                         ? 'bg-[#2563eb] text-white -mb-[2px] shadow'
@@ -299,15 +372,30 @@ export default function AdminDashboard() {
                         <label className="block text-xs font-bold mb-1">
                           Foto Asli Profil (Path di folder public atau URL)
                         </label>
-                        <input
-                          type="text"
-                          value={formData.profile.photoUrl || ''}
-                          onChange={(e) => setFormData({ ...formData, profile: { ...formData.profile, photoUrl: e.target.value } })}
-                          placeholder="Contoh: /rashqa.jpg atau https://..."
-                          className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border-2 border-[#111] rounded-lg text-xs font-bold"
-                        />
+                        <div className="flex gap-2 items-center">
+                          <input
+                            type="text"
+                            value={formData.profile.photoUrl || ''}
+                            onChange={(e) => setFormData({ ...formData, profile: { ...formData.profile, photoUrl: e.target.value } })}
+                            placeholder="Contoh: /rashqa.png atau https://..."
+                            className="flex-1 px-3 py-2 bg-white dark:bg-neutral-900 border-2 border-[#111] rounded-lg text-xs font-bold"
+                          />
+                          <label className="px-3 py-2 bg-[#2563eb] text-white border-2 border-[#111] rounded-lg text-xs font-bold neo-shadow neo-btn-grand cursor-pointer flex items-center gap-1.5 flex-shrink-0">
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>{isUploading ? 'Mengunggah...' : 'Unggah File'}</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              disabled={isUploading}
+                              className="hidden"
+                              onChange={(e) => handleFileUpload(e, (url) => {
+                                setFormData({ ...formData, profile: { ...formData.profile, photoUrl: url } });
+                              })}
+                            />
+                          </label>
+                        </div>
                         <p className="text-[11px] text-neutral-500 mt-1">
-                          Tips: Taruh file fotomu di <code>portfolio-rasshqa/public/rashqa.jpg</code>, lalu ketik <code>/rashqa.jpg</code>. Kosongkan jika ingin memakai karakter anime/vektor retro.
+                          Foto saat ini: <code>/rashqa.png</code>. Kamu juga bisa mengunggah foto baru via tombol Unggah File di atas (otomatis terunggah ke S3/Lokal).
                         </p>
                       </div>
 
@@ -643,15 +731,30 @@ export default function AdminDashboard() {
                           <div className="flex gap-2 items-center">
                             <input
                               type="text"
-                              placeholder="https://images.unsplash.com/... atau tautan gambar"
+                              placeholder="https://... atau /uploads/..."
                               value={proj.imageUrl || ''}
                               onChange={(e) => {
                                 const updated = [...formData.projects];
                                 updated[idx].imageUrl = e.target.value;
                                 setFormData({ ...formData, projects: updated });
                               }}
-                              className="w-full px-2.5 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs"
+                              className="flex-1 px-2.5 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs"
                             />
+                            <label className="px-2.5 py-1.5 bg-[#fde047] text-[#111] border border-[#111] rounded text-xs font-bold neo-shadow cursor-pointer flex items-center gap-1 flex-shrink-0">
+                              <Upload className="w-3 h-3" />
+                              <span>{isUploading ? '...' : 'Unggah'}</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                disabled={isUploading}
+                                className="hidden"
+                                onChange={(e) => handleFileUpload(e, (url) => {
+                                  const updated = [...formData.projects];
+                                  updated[idx].imageUrl = url;
+                                  setFormData({ ...formData, projects: updated });
+                                })}
+                              />
+                            </label>
                             {proj.imageUrl && (
                               <div className="w-12 h-9 rounded border border-[#111] overflow-hidden shrink-0 bg-neutral-200">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -807,15 +910,30 @@ export default function AdminDashboard() {
                           <div className="flex gap-2 items-center">
                             <input
                               type="text"
-                              placeholder="https://images.unsplash.com/... atau tautan gambar"
+                              placeholder="https://... atau /uploads/..."
                               value={item.imageUrl || ''}
                               onChange={(e) => {
                                 const updated = [...formData.achievements];
                                 updated[idx].imageUrl = e.target.value;
                                 setFormData({ ...formData, achievements: updated });
                               }}
-                              className="w-full px-2.5 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs"
+                              className="flex-1 px-2.5 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs"
                             />
+                            <label className="px-2.5 py-1.5 bg-[#a7f3d0] text-[#111] border border-[#111] rounded text-xs font-bold neo-shadow cursor-pointer flex items-center gap-1 flex-shrink-0">
+                              <Upload className="w-3 h-3" />
+                              <span>{isUploading ? '...' : 'Unggah'}</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                disabled={isUploading}
+                                className="hidden"
+                                onChange={(e) => handleFileUpload(e, (url) => {
+                                  const updated = [...formData.achievements];
+                                  updated[idx].imageUrl = url;
+                                  setFormData({ ...formData, achievements: updated });
+                                })}
+                              />
+                            </label>
                             {item.imageUrl && (
                               <div className="w-12 h-9 rounded border border-[#111] overflow-hidden shrink-0 bg-neutral-200">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -858,6 +976,71 @@ export default function AdminDashboard() {
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* TAB 6: VISITOR MESSAGES (NEON DATABASE) */}
+              {activeTab === 'MESSAGES' && (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between pb-2 border-b border-neutral-200 dark:border-neutral-700 flex-wrap gap-3">
+                    <div>
+                      <h3 className="font-display font-extrabold text-xl">Pesan Masuk dari Pengunjung</h3>
+                      <p className="text-xs text-neutral-500">Tersimpan secara realtime di tabel Message Neon Postgres</p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={loadMessages}
+                      disabled={isLoadingMessages}
+                      className="px-3.5 py-2 bg-white dark:bg-neutral-800 border-2 border-[#111] text-xs font-bold rounded-lg neo-shadow flex items-center gap-1.5 cursor-pointer hover:bg-neutral-100"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isLoadingMessages ? 'animate-spin' : ''}`} />
+                      <span>{isLoadingMessages ? 'Memuat...' : 'Segarkan Pesan'}</span>
+                    </button>
+                  </div>
+
+                  {messages.length === 0 ? (
+                    <div className="p-8 text-center border-2 border-dashed border-neutral-300 dark:border-neutral-700 rounded-xl space-y-2">
+                      <Mail className="w-10 h-10 mx-auto text-neutral-400" />
+                      <h4 className="font-display font-bold text-sm">Belum Ada Pesan Masuk</h4>
+                      <p className="text-xs text-neutral-500">
+                        Ketika pengunjung mengisi formulir di tab Contact, pesan akan langsung tersimpan di Neon dan muncul di sini.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {messages.map((msg) => (
+                        <div
+                          key={msg.id}
+                          className="p-4 bg-neutral-50 dark:bg-neutral-800/80 border-2 border-[#111] rounded-xl neo-shadow space-y-2"
+                        >
+                          <div className="flex items-start justify-between flex-wrap gap-2">
+                            <div>
+                              <h4 className="font-display font-extrabold text-sm">{msg.name}</h4>
+                              <p className="text-xs font-mono-tech text-[#2563eb]">{msg.email}</p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className="text-[11px] font-mono-tech text-neutral-500 flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                <span>{new Date(msg.createdAt).toLocaleString('id-ID')}</span>
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteMessage(msg.id)}
+                                className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 rounded border border-transparent hover:border-red-400 cursor-pointer"
+                                title="Hapus pesan ini"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                          <div className="p-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs leading-relaxed font-mono-tech whitespace-pre-wrap">
+                            {msg.message}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 

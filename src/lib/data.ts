@@ -74,7 +74,7 @@ export const initialPortfolioData: PortfolioData = {
     linkedin: "https://id.linkedin.com/in/rashqa-andrean-fitrah-sulaeman-58041b366",
     instagram: "https://instagram.com/rasshqa.tsx",
     tiktok: "https://tiktok.com/@rasshqa",
-    photoUrl: "",
+    photoUrl: "/rashqa.png",
     stats: {
       experience: "4+ Years",
       projects: "20+ Built",

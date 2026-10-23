@@ -251,12 +251,15 @@ const StylizedPortrait = ({ isInverted, photoUrl, onClick }: { isInverted: boole
       }`}
     >
       {photoUrl ? (
-        <div className="relative w-[85%] h-[88%] rounded-2xl border-4 border-white neo-shadow overflow-hidden bg-neutral-900 mb-2">
+        <div className="relative w-full h-full flex items-end justify-center select-none pointer-events-none pb-1">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={photoUrl}
             alt="Rashqa Andrean"
-            className="w-full h-full object-cover grayscale contrast-125 hover:grayscale-0 transition-all duration-300"
+            className="w-auto h-[96%] max-w-[96%] object-contain select-none transition-transform duration-300 group-hover:scale-[1.03] pointer-events-auto"
+            style={{
+              filter: 'drop-shadow(0 0 0 4px #ffffff) drop-shadow(0 12px 20px rgba(0,0,0,0.35))',
+            }}
           />
         </div>
       ) : (
@@ -530,6 +533,10 @@ export default function Portfolio() {
   const [isPortraitInverted, setIsPortraitInverted] = useState(false);
   const [showAvatarToast, setShowAvatarToast] = useState(false);
   const [contactSent, setContactSent] = useState(false);
+  const [contactName, setContactName] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactMessage, setContactMessage] = useState('');
+  const [isSubmittingContact, setIsSubmittingContact] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [activePreview, setActivePreview] = useState<PreviewModalData | null>(null);
 
@@ -952,14 +959,23 @@ export default function Portfolio() {
                 aria-label="Avatar greetings"
                 className="w-9 h-9 rounded-full bg-[#38bdf8] border-2 border-[#111] dark:border-white overflow-hidden flex items-center justify-center shadow-sm hover:scale-105 transition-transform cursor-pointer"
               >
-                <svg viewBox="0 0 40 40" className="w-full h-full">
-                  <circle cx="20" cy="20" r="20" fill="#38bdf8" />
-                  <circle cx="20" cy="16" r="7" fill="#e5e5e5" stroke="#111" strokeWidth="1.5" />
-                  <path d="M13 13 C13 8 27 8 27 13" fill="#111" />
-                  <rect x="14" y="13" width="5" height="3.5" rx="1" fill="#111" />
-                  <rect x="21" y="13" width="5" height="3.5" rx="1" fill="#111" />
-                  <path d="M10 38 C10 28 30 28 30 38" fill="#111" />
-                </svg>
+                {data.profile.photoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={data.profile.photoUrl}
+                    alt={data.profile.nickName}
+                    className="w-full h-full object-cover object-top"
+                  />
+                ) : (
+                  <svg viewBox="0 0 40 40" className="w-full h-full">
+                    <circle cx="20" cy="20" r="20" fill="#38bdf8" />
+                    <circle cx="20" cy="16" r="7" fill="#e5e5e5" stroke="#111" strokeWidth="1.5" />
+                    <path d="M13 13 C13 8 27 8 27 13" fill="#111" />
+                    <rect x="14" y="13" width="5" height="3.5" rx="1" fill="#111" />
+                    <rect x="21" y="13" width="5" height="3.5" rx="1" fill="#111" />
+                    <path d="M10 38 C10 28 30 28 30 38" fill="#111" />
+                  </svg>
+                )}
               </button>
 
               {showAvatarToast && (
@@ -1950,9 +1966,29 @@ export default function Portfolio() {
                   </div>
                 ) : (
                   <form
-                    onSubmit={(e) => {
+                    onSubmit={async (e) => {
                       e.preventDefault();
-                      setContactSent(true);
+                      if (!contactName || !contactEmail || !contactMessage) return;
+                      setIsSubmittingContact(true);
+                      try {
+                        await fetch('/api/contact', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            name: contactName,
+                            email: contactEmail,
+                            message: contactMessage,
+                          }),
+                        });
+                        setContactSent(true);
+                        setContactName('');
+                        setContactEmail('');
+                        setContactMessage('');
+                      } catch {
+                        setContactSent(true);
+                      } finally {
+                        setIsSubmittingContact(false);
+                      }
                     }}
                     className="space-y-4"
                   >
@@ -1961,6 +1997,8 @@ export default function Portfolio() {
                       <input
                         type="text"
                         required
+                        value={contactName}
+                        onChange={(e) => setContactName(e.target.value)}
                         placeholder={t.contact.form.namePlaceholder}
                         className="w-full px-3.5 py-2.5 bg-[#f6f5f0] dark:bg-neutral-800 border-2 border-[#111] rounded font-mono-tech text-xs focus:outline-none"
                       />
@@ -1970,6 +2008,8 @@ export default function Portfolio() {
                       <input
                         type="email"
                         required
+                        value={contactEmail}
+                        onChange={(e) => setContactEmail(e.target.value)}
                         placeholder={t.contact.form.emailPlaceholder}
                         className="w-full px-3.5 py-2.5 bg-[#f6f5f0] dark:bg-neutral-800 border-2 border-[#111] rounded font-mono-tech text-xs focus:outline-none"
                       />
@@ -1979,16 +2019,19 @@ export default function Portfolio() {
                       <textarea
                         rows={3}
                         required
+                        value={contactMessage}
+                        onChange={(e) => setContactMessage(e.target.value)}
                         placeholder={t.contact.form.messagePlaceholder}
                         className="w-full px-3.5 py-2.5 bg-[#f6f5f0] dark:bg-neutral-800 border-2 border-[#111] rounded font-mono-tech text-xs focus:outline-none"
                       />
                     </div>
                     <button
                       type="submit"
-                      className="w-full py-3 bg-[#2563eb] text-white font-mono-tech font-extrabold text-xs tracking-wider rounded border-2 border-[#111] neo-shadow neo-btn-grand flex items-center justify-center gap-2 cursor-pointer"
+                      disabled={isSubmittingContact}
+                      className="w-full py-3 bg-[#2563eb] text-white font-mono-tech font-extrabold text-xs tracking-wider rounded border-2 border-[#111] neo-shadow neo-btn-grand flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                     >
                       <Send className="w-3.5 h-3.5" />
-                      <span>{t.contact.form.send}</span>
+                      <span>{isSubmittingContact ? (lang === 'en' ? 'TRANSMITTING...' : 'MENGIRIM...') : t.contact.form.send}</span>
                     </button>
                   </form>
                 )}
