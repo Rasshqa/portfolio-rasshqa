@@ -694,12 +694,23 @@ export default function Portfolio() {
     } catch {}
   }, []);
 
+  const handleSetLanguage = (newLang: Language) => {
+    setLang(newLang);
+    try {
+      localStorage.setItem('portfolio_lang', newLang);
+    } catch {}
+
+    // Immediately replay the intro animation in the newly selected language!
+    setActiveTab('HOME');
+    setIntroStep('hey');
+    setTimeout(() => setIntroStep('welcome'), 900);
+    setTimeout(() => setIntroStep('burst'), 1750);
+    setTimeout(() => setIntroStep('ready'), 2150);
+  };
+
   const handleLangToggle = () => {
     const nextLang: Language = lang === 'en' ? 'id' : 'en';
-    setLang(nextLang);
-    try {
-      localStorage.setItem('portfolio_lang', nextLang);
-    } catch {}
+    handleSetLanguage(nextLang);
   };
 
   const t = translations[lang];
@@ -1187,21 +1198,36 @@ export default function Portfolio() {
 
           {/* Right Controls: Language Switcher, Theme Switcher, Avatar, Let's Talk */}
           <div className="flex items-center gap-2.5 sm:gap-3.5">
-            {/* Language Switcher Pill (ID / EN) */}
-            <button
-              onClick={handleLangToggle}
-              aria-label="Toggle Language"
+            {/* Language Switcher: Explicit ID and EN Buttons */}
+            <div 
+              className="h-7 p-0.5 bg-white dark:bg-neutral-800 border-2 border-[#111] dark:border-neutral-600 rounded-full flex items-center neo-shadow-sm select-none"
               title={t.nav.langTitle}
-              className="h-7 px-2 bg-white dark:bg-neutral-800 border-2 border-[#111] dark:border-neutral-600 rounded-full flex items-center gap-1 cursor-pointer neo-shadow-sm neo-btn text-[10px] font-mono-tech font-extrabold select-none transition-all"
             >
-              <span className={`px-1.5 py-0.5 rounded-full transition-all ${lang === 'id' ? 'bg-[#2563eb] text-white shadow-xs' : 'text-neutral-500 dark:text-neutral-400'}`}>
+              <button
+                type="button"
+                onClick={() => handleSetLanguage('id')}
+                aria-label="Bahasa Indonesia"
+                className={`px-2 py-0.5 rounded-full text-[10px] font-mono-tech font-extrabold transition-all cursor-pointer ${
+                  lang === 'id'
+                    ? 'bg-[#2563eb] text-white shadow-xs'
+                    : 'text-neutral-500 hover:text-[#111] dark:hover:text-white'
+                }`}
+              >
                 ID
-              </span>
-              <span className="text-neutral-300 dark:text-neutral-600 font-normal">/</span>
-              <span className={`px-1.5 py-0.5 rounded-full transition-all ${lang === 'en' ? 'bg-[#2563eb] text-white shadow-xs' : 'text-neutral-500 dark:text-neutral-400'}`}>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSetLanguage('en')}
+                aria-label="English Language"
+                className={`px-2 py-0.5 rounded-full text-[10px] font-mono-tech font-extrabold transition-all cursor-pointer ${
+                  lang === 'en'
+                    ? 'bg-[#2563eb] text-white shadow-xs'
+                    : 'text-neutral-500 hover:text-[#111] dark:hover:text-white'
+                }`}
+              >
                 EN
-              </span>
-            </button>
+              </button>
+            </div>
 
             {/* Sun / Moon Pill Toggle with Top-Right Spread */}
             <button
@@ -1273,7 +1299,10 @@ export default function Portfolio() {
           <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-30">
             {(introStep === 'hey' || introStep === 'welcome') && (
               <div className="px-9 py-5 bg-[#2563eb] text-white font-display font-extrabold text-2xl sm:text-3xl rounded-2xl border-2 border-[#111] neo-shadow-lg animate-pop-in">
-                {introStep === 'hey' ? t.intro.hey : t.intro.welcome}
+                {introStep === 'hey' 
+                  ? (lang === 'id' ? (data.intro?.hey_id || t.intro.hey) : (data.intro?.hey_en || t.intro.hey))
+                  : (lang === 'id' ? (data.intro?.welcome_id || t.intro.welcome) : (data.intro?.welcome_en || t.intro.welcome))
+                }
               </div>
             )}
 

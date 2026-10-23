@@ -329,7 +329,7 @@ export const translations: Record<Language, Translations> = {
       avatarToast: 'Semoga harimu menyenangkan & produktif!'
     },
     intro: {
-      hey: 'Halo di sana',
+      hey: 'Halo!',
       welcome: 'Selamat Datang di Dunia Rashqa'
     },
     hero: {

@@ -22,7 +22,11 @@ import {
   Upload,
   Mail,
   RefreshCw,
-  Clock
+  Clock,
+  ArrowUp,
+  ArrowDown,
+  Sliders,
+  Play
 } from 'lucide-react';
 import { PortfolioData, initialPortfolioData, ProjectItem, AchievementItem } from '@/lib/data';
 
@@ -32,7 +36,8 @@ export default function AdminDashboard() {
   const [authError, setAuthError] = useState('');
   const [isDark, setIsDark] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<'PROFILE' | 'ABOUT' | 'PROJECTS' | 'ACHIEVEMENTS' | 'TECH' | 'MESSAGES'>('PROFILE');
+  const [activeTab, setActiveTab] = useState<'INTRO' | 'PROFILE' | 'ABOUT' | 'PROJECTS' | 'ACHIEVEMENTS' | 'TECH' | 'MESSAGES'>('PROFILE');
+  const [achievementFilter, setAchievementFilter] = useState<'ALL' | 'PRESTASI' | 'SERTIFIKAT' | 'ARTIKEL'>('ALL');
   const [formData, setFormData] = useState<PortfolioData>(initialPortfolioData);
   const [isNeonConnected, setIsNeonConnected] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -40,6 +45,19 @@ export default function AdminDashboard() {
   const [messages, setMessages] = useState<any[]>([]);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Load existing data on mount
+  useEffect(() => {
+    fetch('/api/portfolio')
+      .then(res => res.json())
+      .then(res => {
+        if (res.success && res.data) {
+          setFormData(res.data);
+          setIsNeonConnected(res.isNeonConnected);
+        }
+      })
+      .catch(err => console.warn('Could not load data:', err));
+  }, []);
 
   const loadMessages = async () => {
     setIsLoadingMessages(true);
@@ -101,19 +119,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Load existing data on mount
-  useEffect(() => {
-    fetch('/api/portfolio')
-      .then(res => res.json())
-      .then(res => {
-        if (res.success && res.data) {
-          setFormData(res.data);
-          setIsNeonConnected(res.isNeonConnected);
-        }
-      })
-      .catch(err => console.warn('Could not load data:', err));
-  }, []);
-
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (pinInput.trim() !== '020709') {
@@ -135,7 +140,7 @@ export default function AdminDashboard() {
       });
       const json = await res.json();
       if (json.success) {
-        setStatusMessage({ type: 'success', text: json.message || 'Perubahan berhasil disimpan dan disinkronkan!' });
+        setStatusMessage({ type: 'success', text: json.message || 'Perubahan berhasil disimpan dan disinkronkan ke Neon Postgres!' });
         setIsNeonConnected(json.isNeonConnected);
       } else {
         setStatusMessage({ type: 'error', text: json.message || 'Gagal menyimpan perubahan.' });
@@ -147,40 +152,95 @@ export default function AdminDashboard() {
     }
   };
 
+  // Reorder Projects
+  const moveProject = (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= formData.projects.length) return;
+    const updated = [...formData.projects];
+    const [moved] = updated.splice(index, 1);
+    updated.splice(targetIndex, 0, moved);
+    setFormData({ ...formData, projects: updated });
+  };
+
+  // Reorder Achievements
+  const moveAchievement = (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= formData.achievements.length) return;
+    const updated = [...formData.achievements];
+    const [moved] = updated.splice(index, 1);
+    updated.splice(targetIndex, 0, moved);
+    setFormData({ ...formData, achievements: updated });
+  };
+
+  // About Story Paragraphs
+  const handleAddParagraph = () => {
+    const updated = [...formData.aboutStory.paragraphs, 'Tulis paragraf cerita barumu di sini...'];
+    setFormData({ ...formData, aboutStory: { ...formData.aboutStory, paragraphs: updated } });
+  };
+
+  const handleRemoveParagraph = (idx: number) => {
+    const updated = formData.aboutStory.paragraphs.filter((_, i) => i !== idx);
+    setFormData({ ...formData, aboutStory: { ...formData.aboutStory, paragraphs: updated } });
+  };
+
+  // Tech Stacks Skills
+  const handleAddSkill = (groupIndex: number) => {
+    const updated = [...formData.techStacks];
+    updated[groupIndex].skills.push({ name: 'Skill Baru', level: 'Intermediate', icon: 'Code2' });
+    setFormData({ ...formData, techStacks: updated });
+  };
+
+  const handleRemoveSkill = (groupIndex: number, skillIndex: number) => {
+    const updated = [...formData.techStacks];
+    updated[groupIndex].skills.splice(skillIndex, 1);
+    setFormData({ ...formData, techStacks: updated });
+  };
+
+  const handleSkillChange = (groupIndex: number, skillIndex: number, field: 'name' | 'level', val: string) => {
+    const updated = [...formData.techStacks];
+    updated[groupIndex].skills[skillIndex][field] = val;
+    setFormData({ ...formData, techStacks: updated });
+  };
+
+  // Filtered achievements for display in tab
+  const displayedAchievements = formData.achievements.map((item, originalIdx) => ({ item, originalIdx }))
+    .filter(({ item }) => achievementFilter === 'ALL' || item.category === achievementFilter);
+
   return (
     <div className={`${isDark ? 'dark' : ''} min-h-screen bg-[#f6f5f0] dark:bg-[#121316] text-[#111] dark:text-[#f6f5f0] font-mono-tech transition-colors duration-200`}>
       
       {/* Top Admin Header */}
-      <header className="border-b-2 border-[#111] dark:border-neutral-700 bg-white dark:bg-[#1a1b1f] px-6 py-4 sticky top-0 z-40">
+      <header className="border-b-2 border-[#111] dark:border-neutral-700 bg-white dark:bg-[#1a1b1f] px-4 sm:px-6 py-4 sticky top-0 z-40">
         <div className="max-w-6xl mx-auto flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#2563eb] text-white flex items-center justify-center border-2 border-[#111] neo-shadow-sm">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="font-display font-extrabold text-xl leading-none">
-                PANEL ADMIN RASHQA
+              <h1 className="font-display font-extrabold text-lg sm:text-xl leading-none">
+                PANEL KONTROL CMS RASHQA
               </h1>
               <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
-                Rute Rahasia Pengaturan Portofolio &amp; Database Neon
+                Kustomisasi Seluruh Konten &amp; Sinkronisasi Neon Postgres
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3">
             {/* Neon Status Badge */}
             <div className={`px-3 py-1 text-xs font-extrabold rounded border-2 border-[#111] flex items-center gap-1.5 ${
               isNeonConnected ? 'bg-[#a7f3d0] text-[#064e3b]' : 'bg-[#fef08a] text-[#854d0e]'
             }`}>
               <Database className="w-3.5 h-3.5" />
-              <span>{isNeonConnected ? 'Neon DB Terhubung' : 'Penyimpanan Lokal'}</span>
+              <span className="hidden sm:inline">{isNeonConnected ? 'Neon DB Terhubung' : 'Penyimpanan Lokal'}</span>
+              <span className="sm:hidden">{isNeonConnected ? 'Neon' : 'Lokal'}</span>
             </div>
 
             {/* Dark Mode Toggle */}
             <button
               onClick={() => setIsDark(!isDark)}
               className="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-800 border-2 border-[#111] neo-shadow-sm cursor-pointer"
-              title="Toggle Theme"
+              title="Ganti Mode Gelap/Terang"
             >
               {isDark ? <Sun className="w-4 h-4 text-yellow-400" /> : <Moon className="w-4 h-4" />}
             </button>
@@ -192,7 +252,7 @@ export default function AdminDashboard() {
               rel="noopener noreferrer"
               className="px-3.5 py-1.5 bg-[#fde047] text-[#111] border-2 border-[#111] rounded-lg text-xs font-bold neo-shadow-sm neo-btn flex items-center gap-1.5 cursor-pointer"
             >
-              <span>Lihat Web Utama</span>
+              <span>Lihat Web</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
@@ -200,7 +260,7 @@ export default function AdminDashboard() {
       </header>
 
       {/* Main Content Area */}
-      <main className="max-w-6xl mx-auto p-6">
+      <main className="max-w-6xl mx-auto p-4 sm:p-6">
         
         {/* LOGIN GATE */}
         {!isAuthenticated ? (
@@ -218,13 +278,15 @@ export default function AdminDashboard() {
                 type="password"
                 value={pinInput}
                 onChange={(e) => setPinInput(e.target.value)}
-                placeholder="Masukkan 6 digit PIN..."
-                className="w-full px-4 py-3 bg-[#f6f5f0] dark:bg-neutral-800 border-2 border-[#111] rounded-xl text-center text-lg tracking-widest font-mono-tech focus:outline-none"
-                autoFocus
+                placeholder="Masukkan 6 Digit PIN..."
+                maxLength={10}
+                className="w-full px-4 py-3 bg-[#f6f5f0] dark:bg-neutral-800 border-2 border-[#111] rounded-xl text-center text-lg font-bold tracking-widest focus:outline-none"
               />
 
               {authError && (
-                <p className="text-red-500 text-xs font-bold">{authError}</p>
+                <div className="p-3 bg-[#fecaca] text-[#7f1d1d] border-2 border-[#111] rounded-lg text-xs font-bold">
+                  {authError}
+                </div>
               )}
 
               <button
@@ -244,7 +306,7 @@ export default function AdminDashboard() {
               <div className="flex items-center gap-3">
                 <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-xs font-bold">
-                  Sesi Admin Aktif • Siap Menyimpan ke {isNeonConnected ? 'Neon Cloud' : 'Data Lokal'}
+                  Sesi Admin Aktif • Siap Menyimpan ke {isNeonConnected ? 'Neon Lakebase Postgres' : 'Data Lokal'}
                 </span>
               </div>
 
@@ -255,7 +317,7 @@ export default function AdminDashboard() {
                   className="px-6 py-2.5 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-extrabold text-xs tracking-wider rounded-lg border-2 border-[#111] neo-shadow neo-btn flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   <Save className="w-4 h-4" />
-                  <span>{isSaving ? 'MENYIMPAN...' : 'SIMPAN PERUBAHAN'}</span>
+                  <span>{isSaving ? 'MENYIMPAN...' : 'SIMPAN SEMUA PERUBAHAN'}</span>
                 </button>
               </div>
             </div>
@@ -272,11 +334,12 @@ export default function AdminDashboard() {
             {/* Customization Navigation Tabs */}
             <div className="flex items-center gap-2 border-b-2 border-[#111] pb-1 overflow-x-auto">
               {[
+                { id: 'INTRO', label: '0. Intro Animation', icon: Sparkles },
                 { id: 'PROFILE', label: '1. Profil & Kontak', icon: User },
-                { id: 'ABOUT', label: '2. Cerita & Filosofi', icon: Sparkles },
-                { id: 'PROJECTS', label: '3. Proyek (Works)', icon: Layers },
+                { id: 'ABOUT', label: '2. Cerita & Filosofi', icon: Layers },
+                { id: 'PROJECTS', label: '3. Proyek (Works)', icon: Code2 },
                 { id: 'ACHIEVEMENTS', label: '4. Prestasi & Sertifikat', icon: Award },
-                { id: 'TECH', label: '5. Tech Stack', icon: Code2 },
+                { id: 'TECH', label: '5. Tech Stack', icon: Sliders },
                 { id: 'MESSAGES', label: '6. Pesan Masuk (Neon)', icon: Mail },
               ].map((tab) => {
                 const Icon = tab.icon;
@@ -290,7 +353,7 @@ export default function AdminDashboard() {
                         loadMessages();
                       }
                     }}
-                    className={`px-4 py-2.5 text-xs font-extrabold rounded-t-xl border-2 border-b-0 border-[#111] transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+                    className={`px-3.5 py-2.5 text-xs font-extrabold rounded-t-xl border-2 border-b-0 border-[#111] transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                       isActive
                         ? 'bg-[#2563eb] text-white -mb-[2px] shadow'
                         : 'bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100'
@@ -306,6 +369,96 @@ export default function AdminDashboard() {
             {/* TAB PANELS */}
             <div className="bg-white dark:bg-[#1a1b1f] border-2 border-[#111] rounded-2xl p-6 sm:p-8 neo-shadow-lg">
               
+              {/* TAB 0: INTRO ANIMATION & GREETINGS */}
+              {activeTab === 'INTRO' && (
+                <div className="space-y-6">
+                  <div className="pb-2 border-b border-neutral-200 dark:border-neutral-700">
+                    <h3 className="font-display font-extrabold text-xl">Animasi Intro Pembuka</h3>
+                    <p className="text-xs text-neutral-500 mt-1">
+                      Kustomisasi teks yang muncul saat animasi fullscreen berjalan (saat pertama kali website dibuka atau saat beralih bahasa).
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {/* Indonesian Intro */}
+                    <div className="p-5 bg-neutral-50 dark:bg-neutral-800 border-2 border-[#111] rounded-xl space-y-4 neo-shadow-sm">
+                      <div className="flex items-center gap-2 pb-2 border-b border-neutral-200 dark:border-neutral-700">
+                        <span className="px-2.5 py-0.5 bg-[#2563eb] text-white rounded font-mono-tech text-xs font-bold border border-[#111]">
+                          ID
+                        </span>
+                        <h4 className="font-bold text-xs uppercase tracking-wider">Teks Intro Versi Bahasa Indonesia</h4>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold mb-1">Teks Sapaan Awal (Tahap 1)</label>
+                        <input
+                          type="text"
+                          value={formData.intro?.hey_id ?? 'Halo!'}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            intro: { ...formData.intro, hey_id: e.target.value }
+                          })}
+                          placeholder="Contoh: Halo!"
+                          className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border-2 border-[#111] rounded-lg text-xs font-bold"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold mb-1">Teks Selamat Datang (Tahap 2)</label>
+                        <input
+                          type="text"
+                          value={formData.intro?.welcome_id ?? 'Selamat Datang di Dunia Rashqa'}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            intro: { ...formData.intro, welcome_id: e.target.value }
+                          })}
+                          placeholder="Contoh: Selamat Datang di Dunia Rashqa"
+                          className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border-2 border-[#111] rounded-lg text-xs font-bold"
+                        />
+                      </div>
+                    </div>
+
+                    {/* English Intro */}
+                    <div className="p-5 bg-neutral-50 dark:bg-neutral-800 border-2 border-[#111] rounded-xl space-y-4 neo-shadow-sm">
+                      <div className="flex items-center gap-2 pb-2 border-b border-neutral-200 dark:border-neutral-700">
+                        <span className="px-2.5 py-0.5 bg-[#38bdf8] text-[#111] rounded font-mono-tech text-xs font-bold border border-[#111]">
+                          EN
+                        </span>
+                        <h4 className="font-bold text-xs uppercase tracking-wider">English Intro Animation Text</h4>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold mb-1">First Greeting (Step 1)</label>
+                        <input
+                          type="text"
+                          value={formData.intro?.hey_en ?? 'Hey there'}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            intro: { ...formData.intro, hey_en: e.target.value }
+                          })}
+                          placeholder="Example: Hey there"
+                          className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border-2 border-[#111] rounded-lg text-xs font-bold"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold mb-1">Welcome Pitch (Step 2)</label>
+                        <input
+                          type="text"
+                          value={formData.intro?.welcome_en ?? "Welcome to Rashqa's World"}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            intro: { ...formData.intro, welcome_en: e.target.value }
+                          })}
+                          placeholder="Example: Welcome to Rashqa's World"
+                          className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border-2 border-[#111] rounded-lg text-xs font-bold"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* TAB 1: PROFILE */}
               {activeTab === 'PROFILE' && (
                 <div className="space-y-6">
@@ -336,7 +489,7 @@ export default function AdminDashboard() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold mb-1">Profesi Utama (Badge)</label>
+                      <label className="block text-xs font-bold mb-1">Profesi Utama (Badge Hero)</label>
                       <input
                         type="text"
                         value={formData.profile.role}
@@ -345,11 +498,11 @@ export default function AdminDashboard() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold mb-1">Headline Sapaan</label>
+                      <label className="block text-xs font-bold mb-1">Sub Role / Spesialisasi Tambahan</label>
                       <input
                         type="text"
-                        value={formData.profile.headline}
-                        onChange={(e) => setFormData({ ...formData, profile: { ...formData.profile, headline: e.target.value } })}
+                        value={formData.profile.subRole}
+                        onChange={(e) => setFormData({ ...formData, profile: { ...formData.profile, subRole: e.target.value } })}
                         className="w-full px-3 py-2.5 bg-[#f6f5f0] dark:bg-neutral-800 border-2 border-[#111] rounded-lg text-xs font-bold"
                       />
                     </div>
@@ -380,7 +533,7 @@ export default function AdminDashboard() {
                             placeholder="Contoh: /rashqa.png atau https://..."
                             className="flex-1 px-3 py-2 bg-white dark:bg-neutral-900 border-2 border-[#111] rounded-lg text-xs font-bold"
                           />
-                          <label className="px-3 py-2 bg-[#2563eb] text-white border-2 border-[#111] rounded-lg text-xs font-bold neo-shadow neo-btn-grand cursor-pointer flex items-center gap-1.5 flex-shrink-0">
+                          <label className="px-3 py-2 bg-[#2563eb] text-white border-2 border-[#111] rounded-lg text-xs font-bold neo-shadow neo-btn cursor-pointer flex items-center gap-1.5 flex-shrink-0">
                             <Upload className="w-3.5 h-3.5" />
                             <span>{isUploading ? 'Mengunggah...' : 'Unggah File'}</span>
                             <input
@@ -395,7 +548,7 @@ export default function AdminDashboard() {
                           </label>
                         </div>
                         <p className="text-[11px] text-neutral-500 mt-1">
-                          Foto saat ini: <code>/rashqa.png</code>. Kamu juga bisa mengunggah foto baru via tombol Unggah File di atas (otomatis terunggah ke S3/Lokal).
+                          Foto saat ini: <code>/rashqa.png</code>. Kamu juga bisa mengunggah foto baru via tombol Unggah File di atas.
                         </p>
                       </div>
 
@@ -415,12 +568,13 @@ export default function AdminDashboard() {
                   {/* Social & Contact */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-2">
                     <div>
-                      <label className="block text-xs font-bold mb-1">Nomor WhatsApp</label>
+                      <label className="block text-xs font-bold mb-1">Nomor WhatsApp (dengan kode negara)</label>
                       <input
                         type="text"
                         value={formData.profile.whatsapp}
                         onChange={(e) => setFormData({ ...formData, profile: { ...formData.profile, whatsapp: e.target.value } })}
-                        className="w-full px-3 py-2 bg-[#f6f5f0] dark:bg-neutral-800 border-2 border-[#111] rounded text-xs"
+                        placeholder="Contoh: 6285723894370"
+                        className="w-full px-3 py-2 bg-[#f6f5f0] dark:bg-neutral-800 border-2 border-[#111] rounded text-xs font-bold"
                       />
                     </div>
                     <div>
@@ -433,7 +587,7 @@ export default function AdminDashboard() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold mb-1">Lokasi</label>
+                      <label className="block text-xs font-bold mb-1">Lokasi Domisili</label>
                       <input
                         type="text"
                         value={formData.profile.location}
@@ -489,7 +643,7 @@ export default function AdminDashboard() {
                             stats: { ...formData.profile.stats, experience: e.target.value }
                           }
                         })}
-                        className="w-full px-3 py-2 bg-[#f6f5f0] dark:bg-neutral-800 border-2 border-[#111] rounded text-xs"
+                        className="w-full px-3 py-2 bg-[#f6f5f0] dark:bg-neutral-800 border-2 border-[#111] rounded text-xs font-bold"
                       />
                     </div>
                     <div>
@@ -504,7 +658,7 @@ export default function AdminDashboard() {
                             stats: { ...formData.profile.stats, projects: e.target.value }
                           }
                         })}
-                        className="w-full px-3 py-2 bg-[#f6f5f0] dark:bg-neutral-800 border-2 border-[#111] rounded text-xs"
+                        className="w-full px-3 py-2 bg-[#f6f5f0] dark:bg-neutral-800 border-2 border-[#111] rounded text-xs font-bold"
                       />
                     </div>
                   </div>
@@ -544,8 +698,56 @@ export default function AdminDashboard() {
                     />
                   </div>
 
-                  {/* 3 Pillars */}
+                  {/* Story Paragraphs CRUD */}
                   <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-[#2563eb]">
+                        Paragraf Cerita Filosofi ({formData.aboutStory.paragraphs.length} Paragraf)
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleAddParagraph}
+                        className="px-3 py-1 bg-white dark:bg-neutral-800 border-2 border-[#111] rounded text-xs font-bold neo-shadow-sm flex items-center gap-1 cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Tambah Paragraf</span>
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {formData.aboutStory.paragraphs.map((p, pIdx) => (
+                        <div key={pIdx} className="p-3 bg-neutral-50 dark:bg-neutral-800/80 border-2 border-[#111] rounded-xl flex items-start gap-3">
+                          <span className="w-6 h-6 rounded-full bg-[#fde047] text-[#111] font-bold text-xs flex items-center justify-center shrink-0 border border-[#111]">
+                            {pIdx + 1}
+                          </span>
+                          <textarea
+                            rows={3}
+                            value={p}
+                            onChange={(e) => {
+                              const updated = [...formData.aboutStory.paragraphs];
+                              updated[pIdx] = e.target.value;
+                              setFormData({
+                                ...formData,
+                                aboutStory: { ...formData.aboutStory, paragraphs: updated }
+                              });
+                            }}
+                            className="flex-1 p-2 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs leading-relaxed"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveParagraph(pIdx)}
+                            className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded"
+                            title="Hapus Paragraf"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 3 Pillars */}
+                  <div className="space-y-3 pt-2">
                     <label className="block text-xs font-bold uppercase tracking-wider text-[#2563eb]">
                       3 Pilar Keahlian &amp; Arsitektur
                     </label>
@@ -590,10 +792,12 @@ export default function AdminDashboard() {
               {/* TAB 3: PROJECTS */}
               {activeTab === 'PROJECTS' && (
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between pb-2 border-b border-neutral-200 dark:border-neutral-700">
+                  <div className="flex items-center justify-between pb-2 border-b border-neutral-200 dark:border-neutral-700 flex-wrap gap-3">
                     <div>
-                      <h3 className="font-display font-extrabold text-xl">Daftar Proyek Portofolio</h3>
-                      <p className="text-xs text-neutral-500">Ditampilkan 4 proyek per slide halaman</p>
+                      <h3 className="font-display font-extrabold text-xl">Daftar Proyek Portofolio ({formData.projects.length} Proyek)</h3>
+                      <p className="text-xs text-neutral-500">
+                        Ditampilkan 2 proyek per slide halaman. Kamu bisa mengatur urutan dengan tombol ▲ dan ▼.
+                      </p>
                     </div>
 
                     <button
@@ -603,7 +807,7 @@ export default function AdminDashboard() {
                           id: `proj-${Date.now()}`,
                           title: 'Proyek Kustom Baru',
                           tag: 'NEXT.JS • GOLANG',
-                          desc: 'Deskripsi singkat fungsionalitas dan arsitektur proyek ini...',
+                          desc: 'Deskripsi lengkap lingkup arsitektur teknis dan fitur proyek...',
                           metrics: 'High Performance API',
                           accent: '#38bdf8',
                           imageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&q=80',
@@ -621,24 +825,53 @@ export default function AdminDashboard() {
 
                   <div className="space-y-4">
                     {formData.projects.map((proj, idx) => (
-                      <div key={proj.id} className="p-4 bg-neutral-50 dark:bg-neutral-800/90 border-2 border-[#111] rounded-xl neo-shadow space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="px-2 py-0.5 bg-[#2563eb] text-white rounded text-xs font-extrabold">
-                            PROYEK #{idx + 1}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setFormData({
-                                ...formData,
-                                projects: formData.projects.filter(p => p.id !== proj.id)
-                              });
-                            }}
-                            className="p-1.5 text-red-600 hover:bg-red-50 rounded"
-                            title="Hapus Proyek"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                      <div key={proj.id} className="p-4 sm:p-5 bg-neutral-50 dark:bg-neutral-800/90 border-2 border-[#111] rounded-xl neo-shadow space-y-3">
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2.5 py-0.5 bg-[#2563eb] text-white rounded text-xs font-extrabold border border-[#111]">
+                              SLIDE {Math.floor(idx / 2) + 1} • PROYEK #{idx + 1}
+                            </span>
+                            <span className="text-[11px] text-neutral-400 font-mono-tech">{proj.id}</span>
+                          </div>
+
+                          <div className="flex items-center gap-1">
+                            {/* Move Up */}
+                            <button
+                              type="button"
+                              onClick={() => moveProject(idx, 'up')}
+                              disabled={idx === 0}
+                              className="p-1.5 bg-white dark:bg-neutral-700 border border-[#111] rounded text-xs disabled:opacity-30 cursor-pointer"
+                              title="Pindahkan ke Atas"
+                            >
+                              <ArrowUp className="w-3.5 h-3.5" />
+                            </button>
+                            {/* Move Down */}
+                            <button
+                              type="button"
+                              onClick={() => moveProject(idx, 'down')}
+                              disabled={idx === formData.projects.length - 1}
+                              className="p-1.5 bg-white dark:bg-neutral-700 border border-[#111] rounded text-xs disabled:opacity-30 cursor-pointer"
+                              title="Pindahkan ke Bawah"
+                            >
+                              <ArrowDown className="w-3.5 h-3.5" />
+                            </button>
+                            {/* Delete */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (confirm(`Hapus proyek "${proj.title}"?`)) {
+                                  setFormData({
+                                    ...formData,
+                                    projects: formData.projects.filter(p => p.id !== proj.id)
+                                  });
+                                }
+                              }}
+                              className="p-1.5 text-red-600 hover:bg-red-50 rounded ml-1 cursor-pointer"
+                              title="Hapus Proyek"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -671,22 +904,22 @@ export default function AdminDashboard() {
                         </div>
 
                         <div>
-                          <label className="block text-[11px] font-bold">Deskripsi</label>
+                          <label className="block text-[11px] font-bold">Deskripsi Lengkap &amp; Arsitektur Teknis (Tampil di Popup Modal)</label>
                           <textarea
-                            rows={2}
+                            rows={3}
                             value={proj.desc}
                             onChange={(e) => {
                               const updated = [...formData.projects];
                               updated[idx].desc = e.target.value;
                               setFormData({ ...formData, projects: updated });
                             }}
-                            className="w-full px-2.5 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs"
+                            className="w-full px-2.5 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs leading-relaxed"
                           />
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           <div>
-                            <label className="block text-[11px] font-bold">Live Preview Link</label>
+                            <label className="block text-[11px] font-bold">Live Demo / App URL</label>
                             <input
                               type="text"
                               value={proj.liveUrl || ''}
@@ -699,7 +932,7 @@ export default function AdminDashboard() {
                             />
                           </div>
                           <div>
-                            <label className="block text-[11px] font-bold">GitHub Repository Link</label>
+                            <label className="block text-[11px] font-bold">GitHub Source Code Link</label>
                             <input
                               type="text"
                               value={proj.githubUrl || ''}
@@ -712,7 +945,7 @@ export default function AdminDashboard() {
                             />
                           </div>
                           <div>
-                            <label className="block text-[11px] font-bold">Metrik / Highlights</label>
+                            <label className="block text-[11px] font-bold">Metrik / Highlights (Badge)</label>
                             <input
                               type="text"
                               value={proj.metrics || ''}
@@ -721,13 +954,13 @@ export default function AdminDashboard() {
                                 updated[idx].metrics = e.target.value;
                                 setFormData({ ...formData, projects: updated });
                               }}
-                              className="w-full px-2.5 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs"
+                              className="w-full px-2.5 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs font-bold"
                             />
                           </div>
                         </div>
 
                         <div>
-                          <label className="block text-[11px] font-bold">URL Gambar Preview Proyek (Screenshot / Thumbnail)</label>
+                          <label className="block text-[11px] font-bold">URL Gambar Preview / Screenshot</label>
                           <div className="flex gap-2 items-center">
                             <input
                               type="text"
@@ -740,9 +973,9 @@ export default function AdminDashboard() {
                               }}
                               className="flex-1 px-2.5 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs"
                             />
-                            <label className="px-2.5 py-1.5 bg-[#fde047] text-[#111] border border-[#111] rounded text-xs font-bold neo-shadow cursor-pointer flex items-center gap-1 flex-shrink-0">
-                              <Upload className="w-3 h-3" />
-                              <span>{isUploading ? '...' : 'Unggah'}</span>
+                            <label className="px-3 py-1.5 bg-[#fde047] text-[#111] border border-[#111] rounded text-xs font-bold neo-shadow cursor-pointer flex items-center gap-1 flex-shrink-0">
+                              <Upload className="w-3.5 h-3.5" />
+                              <span>{isUploading ? 'Mengunggah...' : 'Unggah'}</span>
                               <input
                                 type="file"
                                 accept="image/*"
@@ -756,7 +989,7 @@ export default function AdminDashboard() {
                               />
                             </label>
                             {proj.imageUrl && (
-                              <div className="w-12 h-9 rounded border border-[#111] overflow-hidden shrink-0 bg-neutral-200">
+                              <div className="w-14 h-9 rounded border border-[#111] overflow-hidden shrink-0 bg-neutral-200">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={proj.imageUrl} alt="preview" className="w-full h-full object-cover" />
                               </div>
@@ -769,13 +1002,15 @@ export default function AdminDashboard() {
                 </div>
               )}
 
-              {/* TAB 4: ACHIEVEMENTS */}
+              {/* TAB 4: ACHIEVEMENTS & CERTIFICATES */}
               {activeTab === 'ACHIEVEMENTS' && (
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between pb-2 border-b border-neutral-200 dark:border-neutral-700">
+                  <div className="flex items-center justify-between pb-2 border-b border-neutral-200 dark:border-neutral-700 flex-wrap gap-3">
                     <div>
                       <h3 className="font-display font-extrabold text-xl">Prestasi, Sertifikat &amp; Artikel</h3>
-                      <p className="text-xs text-neutral-500">Kelola pencapaian yang tampil di tab Achievements</p>
+                      <p className="text-xs text-neutral-500">
+                        Prestasi &amp; Sertifikat dipaginasi rapi 2 per sub-slide. Artikel dilengkapi scrollbar internal.
+                      </p>
                     </div>
 
                     <button
@@ -786,8 +1021,8 @@ export default function AdminDashboard() {
                           year: '2026',
                           title: 'Pencapaian Baru',
                           issuer: 'Lembaga / Penyelenggara',
-                          category: 'PRESTASI',
-                          description: 'Keterangan prestasi atau kompetisi...',
+                          category: achievementFilter === 'ALL' ? 'PRESTASI' : achievementFilter,
+                          description: 'Keterangan lengkap pencapaian atau ulasan sertifikat...',
                           badge: 'AWARD',
                           accent: '#fde047',
                           imageUrl: 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=900&q=80'
@@ -801,36 +1036,85 @@ export default function AdminDashboard() {
                     </button>
                   </div>
 
-                  <div className="space-y-4">
-                    {formData.achievements.map((item, idx) => (
-                      <div key={item.id} className="p-4 bg-neutral-50 dark:bg-neutral-800 border-2 border-[#111] rounded-xl neo-shadow space-y-3">
-                        <div className="flex items-center justify-between">
-                          <select
-                            value={item.category}
-                            onChange={(e) => {
-                              const updated = [...formData.achievements];
-                              updated[idx].category = e.target.value as any;
-                              setFormData({ ...formData, achievements: updated });
-                            }}
-                            className="px-2 py-1 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs font-bold"
-                          >
-                            <option value="PRESTASI">Kategori: PRESTASI</option>
-                            <option value="SERTIFIKAT">Kategori: SERTIFIKAT</option>
-                            <option value="ARTIKEL">Kategori: ARTIKEL</option>
-                          </select>
+                  {/* Filter Sub-categories */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {[
+                      { id: 'ALL', label: `Semua (${formData.achievements.length})` },
+                      { id: 'PRESTASI', label: `Prestasi (${formData.achievements.filter(a => a.category === 'PRESTASI').length})` },
+                      { id: 'SERTIFIKAT', label: `Sertifikat (${formData.achievements.filter(a => a.category === 'SERTIFIKAT').length})` },
+                      { id: 'ARTIKEL', label: `Artikel (${formData.achievements.filter(a => a.category === 'ARTIKEL').length})` },
+                    ].map((f) => (
+                      <button
+                        key={f.id}
+                        type="button"
+                        onClick={() => setAchievementFilter(f.id as any)}
+                        className={`px-3 py-1.5 rounded-lg border-2 border-[#111] text-xs font-bold cursor-pointer transition-all ${
+                          achievementFilter === f.id
+                            ? 'bg-[#2563eb] text-white neo-shadow-sm'
+                            : 'bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300'
+                        }`}
+                      >
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
 
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setFormData({
-                                ...formData,
-                                achievements: formData.achievements.filter(a => a.id !== item.id)
-                              });
-                            }}
-                            className="p-1 text-red-500 hover:text-red-700"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                  <div className="space-y-4">
+                    {displayedAchievements.map(({ item, originalIdx }) => (
+                      <div key={item.id} className="p-4 bg-neutral-50 dark:bg-neutral-800 border-2 border-[#111] rounded-xl neo-shadow space-y-3">
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={item.category}
+                              onChange={(e) => {
+                                const updated = [...formData.achievements];
+                                updated[originalIdx].category = e.target.value as any;
+                                setFormData({ ...formData, achievements: updated });
+                              }}
+                              className="px-2.5 py-1 bg-white dark:bg-neutral-900 border-2 border-[#111] rounded text-xs font-extrabold"
+                            >
+                              <option value="PRESTASI">Kategori: PRESTASI</option>
+                              <option value="SERTIFIKAT">Kategori: SERTIFIKAT</option>
+                              <option value="ARTIKEL">Kategori: ARTIKEL</option>
+                            </select>
+                            <span className="text-[11px] text-neutral-400 font-mono-tech">{item.id}</span>
+                          </div>
+
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => moveAchievement(originalIdx, 'up')}
+                              disabled={originalIdx === 0}
+                              className="p-1.5 bg-white dark:bg-neutral-700 border border-[#111] rounded text-xs disabled:opacity-30 cursor-pointer"
+                              title="Pindahkan ke Atas"
+                            >
+                              <ArrowUp className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => moveAchievement(originalIdx, 'down')}
+                              disabled={originalIdx === formData.achievements.length - 1}
+                              className="p-1.5 bg-white dark:bg-neutral-700 border border-[#111] rounded text-xs disabled:opacity-30 cursor-pointer"
+                              title="Pindahkan ke Bawah"
+                            >
+                              <ArrowDown className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (confirm(`Hapus item "${item.title}"?`)) {
+                                  setFormData({
+                                    ...formData,
+                                    achievements: formData.achievements.filter(a => a.id !== item.id)
+                                  });
+                                }
+                              }}
+                              className="p-1 text-red-500 hover:text-red-700 ml-1 cursor-pointer"
+                              title="Hapus"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -841,7 +1125,7 @@ export default function AdminDashboard() {
                               value={item.title}
                               onChange={(e) => {
                                 const updated = [...formData.achievements];
-                                updated[idx].title = e.target.value;
+                                updated[originalIdx].title = e.target.value;
                                 setFormData({ ...formData, achievements: updated });
                               }}
                               className="w-full px-2 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs font-bold"
@@ -854,7 +1138,7 @@ export default function AdminDashboard() {
                               value={item.year}
                               onChange={(e) => {
                                 const updated = [...formData.achievements];
-                                updated[idx].year = e.target.value;
+                                updated[originalIdx].year = e.target.value;
                                 setFormData({ ...formData, achievements: updated });
                               }}
                               className="w-full px-2 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs"
@@ -870,7 +1154,7 @@ export default function AdminDashboard() {
                               value={item.badge}
                               onChange={(e) => {
                                 const updated = [...formData.achievements];
-                                updated[idx].badge = e.target.value;
+                                updated[originalIdx].badge = e.target.value;
                                 setFormData({ ...formData, achievements: updated });
                               }}
                               className="w-full px-2 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs font-bold"
@@ -883,7 +1167,7 @@ export default function AdminDashboard() {
                               value={item.accent}
                               onChange={(e) => {
                                 const updated = [...formData.achievements];
-                                updated[idx].accent = e.target.value;
+                                updated[originalIdx].accent = e.target.value;
                                 setFormData({ ...formData, achievements: updated });
                               }}
                               className="w-full px-2 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs"
@@ -898,7 +1182,7 @@ export default function AdminDashboard() {
                             value={item.description}
                             onChange={(e) => {
                               const updated = [...formData.achievements];
-                              updated[idx].description = e.target.value;
+                              updated[originalIdx].description = e.target.value;
                               setFormData({ ...formData, achievements: updated });
                             }}
                             className="w-full px-2 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs"
@@ -914,7 +1198,7 @@ export default function AdminDashboard() {
                               value={item.imageUrl || ''}
                               onChange={(e) => {
                                 const updated = [...formData.achievements];
-                                updated[idx].imageUrl = e.target.value;
+                                updated[originalIdx].imageUrl = e.target.value;
                                 setFormData({ ...formData, achievements: updated });
                               }}
                               className="flex-1 px-2.5 py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs"
@@ -929,7 +1213,7 @@ export default function AdminDashboard() {
                                 className="hidden"
                                 onChange={(e) => handleFileUpload(e, (url) => {
                                   const updated = [...formData.achievements];
-                                  updated[idx].imageUrl = url;
+                                  updated[originalIdx].imageUrl = url;
                                   setFormData({ ...formData, achievements: updated });
                                 })}
                               />
@@ -951,28 +1235,60 @@ export default function AdminDashboard() {
               {/* TAB 5: TECH STACK */}
               {activeTab === 'TECH' && (
                 <div className="space-y-6">
-                  <h3 className="font-display font-extrabold text-xl pb-2 border-b border-neutral-200 dark:border-neutral-700">
-                    Kategori &amp; Skill Tech Stack
-                  </h3>
+                  <div className="pb-2 border-b border-neutral-200 dark:border-neutral-700">
+                    <h3 className="font-display font-extrabold text-xl">Kategori &amp; Skill Tech Stack</h3>
+                    <p className="text-xs text-neutral-500 mt-1">
+                      Kelola ekosistem teknologi yang kamu kuasai. Kamu bisa menambah, mengubah, dan menghapus keahlian di setiap kelompok.
+                    </p>
+                  </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     {formData.techStacks.map((group, gIdx) => (
                       <div key={group.category} className="p-4 bg-neutral-50 dark:bg-neutral-800 border-2 border-[#111] rounded-xl neo-shadow space-y-3">
                         <div className="flex items-center justify-between pb-2 border-b border-neutral-300 dark:border-neutral-700">
-                          <h4 className="font-display font-extrabold text-sm">{group.category}</h4>
+                          <div>
+                            <h4 className="font-display font-extrabold text-sm">{group.category}</h4>
+                            <span className="text-[10px] text-neutral-500">{group.skills.length} keahlian</span>
+                          </div>
                           <span className="w-3 h-3 rounded-full" style={{ backgroundColor: group.color }} />
                         </div>
 
-                        <div className="space-y-2">
+                        {/* Skill List */}
+                        <div className="space-y-2 max-h-[360px] overflow-y-auto neo-scrollbar pr-1">
                           {group.skills.map((skill, sIdx) => (
-                            <div key={skill.name} className="p-2 bg-white dark:bg-neutral-900 border border-[#111] rounded flex items-center justify-between">
-                              <span className="font-bold text-xs">{skill.name}</span>
-                              <span className="text-[10px] px-1.5 py-0.5 bg-neutral-100 dark:bg-neutral-800 rounded font-bold border border-neutral-300">
-                                {skill.level}
-                              </span>
+                            <div key={sIdx} className="p-2 bg-white dark:bg-neutral-900 border border-[#111] rounded flex items-center justify-between gap-2">
+                              <input
+                                type="text"
+                                value={skill.name}
+                                onChange={(e) => handleSkillChange(gIdx, sIdx, 'name', e.target.value)}
+                                className="font-bold text-xs bg-transparent border-0 focus:outline-none flex-1"
+                              />
+                              <input
+                                type="text"
+                                value={skill.level}
+                                onChange={(e) => handleSkillChange(gIdx, sIdx, 'level', e.target.value)}
+                                className="text-[10px] px-1.5 py-0.5 bg-neutral-100 dark:bg-neutral-800 rounded font-bold border border-neutral-300 w-24 text-center focus:outline-none"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveSkill(gIdx, sIdx)}
+                                className="text-red-500 hover:text-red-700 cursor-pointer p-0.5"
+                                title="Hapus Skill"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
                             </div>
                           ))}
                         </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleAddSkill(gIdx)}
+                          className="w-full py-1.5 bg-white dark:bg-neutral-900 border border-[#111] rounded text-xs font-bold neo-shadow-sm flex items-center justify-center gap-1 cursor-pointer hover:bg-neutral-100"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Tambah Skill</span>
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -984,7 +1300,7 @@ export default function AdminDashboard() {
                 <div className="space-y-6">
                   <div className="flex items-center justify-between pb-2 border-b border-neutral-200 dark:border-neutral-700 flex-wrap gap-3">
                     <div>
-                      <h3 className="font-display font-extrabold text-xl">Pesan Masuk dari Pengunjung</h3>
+                      <h3 className="font-display font-extrabold text-xl">Pesan Masuk dari Pengunjung ({messages.length})</h3>
                       <p className="text-xs text-neutral-500">Tersimpan secara realtime di tabel Message Neon Postgres</p>
                     </div>
 

@@ -29,6 +29,12 @@ export interface TechStackGroup {
 }
 
 export interface PortfolioData {
+  intro?: {
+    hey_id?: string;
+    welcome_id?: string;
+    hey_en?: string;
+    welcome_en?: string;
+  };
   profile: {
     fullName: string;
     nickName: string;
@@ -62,6 +68,12 @@ export interface PortfolioData {
 }
 
 export const initialPortfolioData: PortfolioData = {
+  intro: {
+    hey_id: "Halo!",
+    welcome_id: "Selamat Datang di Dunia Rashqa",
+    hey_en: "Hey there",
+    welcome_en: "Welcome to Rashqa's World"
+  },
   profile: {
     fullName: "Rashqa Andrean Fitrah Sulaeman",
     nickName: "RASHQA",
