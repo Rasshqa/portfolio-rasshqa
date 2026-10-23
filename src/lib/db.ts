@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { neon } from '@neondatabase/serverless';
-import { PortfolioData, initialPortfolioData, ProjectItem } from './data';
+import { PortfolioData, initialPortfolioData, ProjectItem, AchievementItem, TechStackGroup } from './data';
 
 function getDatabaseUrl(): string | undefined {
   return process.env.DATABASE_URL;
@@ -47,8 +47,10 @@ export async function getPortfolioData(): Promise<PortfolioData> {
       ON CONFLICT (id) DO NOTHING;
     `;
 
-    // Also populate Project table if empty
+    // Also populate relational tables (Project, Achievement, Skill)
     await syncProjectsToNeonTable(sql, initialPortfolioData.projects);
+    await syncAchievementsToNeonTable(sql, initialPortfolioData.achievements);
+    await syncSkillsToNeonTable(sql, initialPortfolioData.techStacks);
 
     return initialPortfolioData;
   } catch (error) {
@@ -91,9 +93,15 @@ export async function savePortfolioData(newData: PortfolioData): Promise<{ succe
         updated_at = CURRENT_TIMESTAMP;
     `;
 
-    // 3. Keep Project table in sync
+    // 3. Keep relational tables in sync
     if (newData.projects && Array.isArray(newData.projects)) {
       await syncProjectsToNeonTable(sql, newData.projects);
+    }
+    if (newData.achievements && Array.isArray(newData.achievements)) {
+      await syncAchievementsToNeonTable(sql, newData.achievements);
+    }
+    if (newData.techStacks && Array.isArray(newData.techStacks)) {
+      await syncSkillsToNeonTable(sql, newData.techStacks);
     }
 
     return {
@@ -147,6 +155,87 @@ async function syncProjectsToNeonTable(sql: any, projects: ProjectItem[]) {
     }
   } catch (err) {
     console.warn('Note: Project table sync skipped or already up to date:', err);
+  }
+}
+
+/**
+ * Synchronize achievements to Neon's native "Achievement" table
+ */
+async function syncAchievementsToNeonTable(sql: any, achievements: AchievementItem[]) {
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS "Achievement" (
+        id TEXT PRIMARY KEY,
+        year TEXT,
+        title TEXT NOT NULL,
+        issuer TEXT,
+        category TEXT NOT NULL,
+        description TEXT,
+        badge TEXT,
+        accent TEXT,
+        "imageUrl" TEXT,
+        "createdAt" TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    for (const a of achievements) {
+      await sql`
+        INSERT INTO "Achievement" (
+          id, year, title, issuer, category, description, badge, accent, "imageUrl", "updatedAt"
+        )
+        VALUES (
+          ${a.id},
+          ${a.year},
+          ${a.title},
+          ${a.issuer},
+          ${a.category},
+          ${a.description},
+          ${a.badge},
+          ${a.accent},
+          ${a.imageUrl || ''},
+          CURRENT_TIMESTAMP
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          year = EXCLUDED.year,
+          title = EXCLUDED.title,
+          issuer = EXCLUDED.issuer,
+          category = EXCLUDED.category,
+          description = EXCLUDED.description,
+          badge = EXCLUDED.badge,
+          accent = EXCLUDED.accent,
+          "imageUrl" = EXCLUDED."imageUrl",
+          "updatedAt" = CURRENT_TIMESTAMP;
+      `;
+    }
+  } catch (err) {
+    console.warn('Note: Achievement table sync skipped:', err);
+  }
+}
+
+/**
+ * Synchronize skills to Neon's native "Skill" table
+ */
+async function syncSkillsToNeonTable(sql: any, techStacks: TechStackGroup[]) {
+  try {
+    let order = 1;
+    for (const group of techStacks) {
+      for (const s of group.skills) {
+        const cleanId = 'skill_' + s.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        await sql`
+          INSERT INTO "Skill" (id, name, category, icon, "order", "createdAt", "updatedAt")
+          VALUES (${cleanId}, ${s.name}, ${group.category}, ${s.icon}, ${order++}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+          ON CONFLICT (id) DO UPDATE SET
+            name = EXCLUDED.name,
+            category = EXCLUDED.category,
+            icon = EXCLUDED.icon,
+            "order" = EXCLUDED."order",
+            "updatedAt" = CURRENT_TIMESTAMP;
+        `;
+      }
+    }
+  } catch (err) {
+    console.warn('Note: Skill table sync skipped:', err);
   }
 }
 

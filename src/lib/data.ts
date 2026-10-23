@@ -22,6 +22,12 @@ export interface AchievementItem {
   imageUrl?: string;
 }
 
+export interface TechStackGroup {
+  category: string;
+  color: string;
+  skills: { name: string; level: string; icon: string }[];
+}
+
 export interface PortfolioData {
   profile: {
     fullName: string;
@@ -50,11 +56,7 @@ export interface PortfolioData {
     paragraphs: string[];
     pillars: { title: string; desc: string; bg: string }[];
   };
-  techStacks: {
-    category: string;
-    color: string;
-    skills: { name: string; level: string; icon: string }[];
-  }[];
+  techStacks: TechStackGroup[];
   projects: ProjectItem[];
   achievements: AchievementItem[];
 }
