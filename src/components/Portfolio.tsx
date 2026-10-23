@@ -1204,7 +1204,21 @@ export default function Portfolio() {
                     {isActive && (
                       <span className="absolute inset-0 bg-[#38bdf8] clip-brush-nav -z-10 transform -rotate-1 scale-105 shadow-sm" />
                     )}
-                    <Icon className="w-3.5 h-3.5 stroke-[2.5]" />
+                    {item.id === 'WORKS' ? (
+                      <div className="w-4 h-4 rounded-full border border-[#111] dark:border-white overflow-hidden shrink-0 bg-[#38bdf8] flex items-center justify-center">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={data.profile.photoUrl || '/rashqa.png'}
+                          alt={data.profile.nickName}
+                          className="w-full h-full object-cover object-top"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/rashqa.png';
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <Icon className="w-3.5 h-3.5 stroke-[2.5]" />
+                    )}
                     <span>{item.label}</span>
                   </button>
                 );
@@ -1952,11 +1966,24 @@ export default function Portfolio() {
           {activeTab === 'WORKS' && (
             <div className="w-full max-w-5xl py-4 animate-pop-in">
               <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-                <div>
-                  <h2 className="font-display font-extrabold text-3xl sm:text-4xl">{t.works.title}</h2>
-                  <p className="font-mono-tech text-xs text-neutral-500 mt-0.5">
-                    {t.works.pageIndicator(worksPage, totalWorksPages)} • {t.works.lead}
-                  </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl border-2 border-[#111] dark:border-neutral-300 overflow-hidden shrink-0 bg-[#38bdf8] neo-shadow-sm">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={data.profile.photoUrl || '/rashqa.png'}
+                      alt={data.profile.nickName}
+                      className="w-full h-full object-cover object-top"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/rashqa.png';
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <h2 className="font-display font-extrabold text-3xl sm:text-4xl">{t.works.title}</h2>
+                    <p className="font-mono-tech text-xs text-neutral-500 mt-0.5">
+                      {t.works.pageIndicator(worksPage, totalWorksPages)} • {t.works.lead}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Slide Pagination Buttons */}
@@ -2660,7 +2687,21 @@ export default function Portfolio() {
                     : 'text-neutral-600 dark:text-neutral-400 font-bold hover:text-[#111] dark:hover:text-white'
                 }`}
               >
-                <Icon className="w-4 h-4 stroke-[2.5]" />
+                {item.id === 'WORKS' ? (
+                  <div className="w-5 h-5 rounded-full border border-[#111] dark:border-white overflow-hidden shrink-0 bg-[#38bdf8] flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={data.profile.photoUrl || '/rashqa.png'}
+                      alt={data.profile.nickName}
+                      className="w-full h-full object-cover object-top"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/rashqa.png';
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <Icon className="w-4 h-4 stroke-[2.5]" />
+                )}
                 <span className="text-[9px] font-mono-tech mt-0.5 tracking-tight font-extrabold">{item.label}</span>
               </button>
             );
