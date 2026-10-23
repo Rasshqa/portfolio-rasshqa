@@ -31,9 +31,12 @@ import {
   FileCode,
   Eye,
   X,
-  Maximize2
+  Maximize2,
+  BookOpen,
+  Info,
+  FileText
 } from 'lucide-react';
-import { PortfolioData, initialPortfolioData } from '@/lib/data';
+import { PortfolioData, initialPortfolioData, ProjectItem, AchievementItem } from '@/lib/data';
 import { Language, translations } from '@/lib/translations';
 import WhatsAppWidget from './WhatsAppWidget';
 
@@ -497,6 +500,180 @@ const ImagePreviewModal: React.FC<{
   );
 };
 
+const ProjectDetailModal: React.FC<{
+  project: ProjectItem | null;
+  onClose: () => void;
+  lang: Language;
+  onEnlargeImage: (preview: PreviewModalData) => void;
+}> = ({ project, onClose, lang, onEnlargeImage }) => {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (project) {
+      window.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'auto';
+    };
+  }, [project, onClose]);
+
+  if (!project) return null;
+
+  const tags = project.tag ? project.tag.split('•').map(t => t.trim()) : [];
+
+  return (
+    <div 
+      className="fixed inset-0 z-[160] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm animate-pop-in select-none"
+      onClick={onClose}
+    >
+      <div 
+        className="relative w-full max-w-3xl bg-white dark:bg-[#1a1b1f] text-[#111] dark:text-white border-2 sm:border-3 border-[#111] dark:border-neutral-300 rounded-2xl neo-shadow-lg overflow-hidden flex flex-col max-h-[92vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="p-3.5 sm:p-4 bg-neutral-100 dark:bg-neutral-800 border-b-2 border-[#111] dark:border-neutral-700 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <div className="flex items-center gap-1.5 mr-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-400 border border-[#111]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-yellow-400 border border-[#111]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-green-400 border border-[#111]" />
+            </div>
+            <span 
+              className="px-2.5 py-0.5 rounded text-[10px] sm:text-xs font-mono-tech font-extrabold text-[#111] border border-[#111] shrink-0"
+              style={{ backgroundColor: project.accent || '#fde047' }}
+            >
+              {lang === 'en' ? 'PROJECT SPEC' : 'DETAIL PROYEK'}
+            </span>
+            <span className="font-mono-tech text-xs text-neutral-400 font-bold truncate">
+              {project.id}
+            </span>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-lg bg-white dark:bg-neutral-700 border-2 border-[#111] flex items-center justify-center neo-shadow-sm neo-btn cursor-pointer shrink-0"
+            title="Tutup (ESC)"
+          >
+            <X className="w-4 h-4 stroke-[2.5]" />
+          </button>
+        </div>
+
+        {/* Scrollable Body */}
+        <div className="p-4 sm:p-6 overflow-y-auto space-y-4 bg-[#f6f5f0] dark:bg-[#121316] neo-scrollbar" data-scrollable="true">
+          {/* Banner with Zoom */}
+          <div 
+            onClick={() => onEnlargeImage({
+              title: project.title,
+              categoryOrTag: project.tag,
+              desc: project.desc,
+              imageUrl: project.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&q=80',
+              accent: project.accent,
+              metrics: project.metrics,
+              liveUrl: project.liveUrl,
+              githubUrl: project.githubUrl
+            })}
+            className="relative w-full h-44 sm:h-64 rounded-xl border-2 border-[#111] overflow-hidden bg-neutral-900 group cursor-pointer select-none"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={project.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&q=80'}
+              alt={project.title}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=900&q=80';
+              }}
+            />
+            <div className="absolute inset-0 bg-[#111]/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <span className="px-3 py-1.5 bg-white text-[#111] text-xs font-mono-tech font-extrabold rounded-md border-2 border-[#111] neo-shadow-sm flex items-center gap-1.5">
+                <Eye className="w-3.5 h-3.5" />
+                <span>{lang === 'en' ? 'Click to Enlarge Fullscreen' : 'Klik untuk Memperbesar Gambar'}</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Title & Metrics */}
+          <div>
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-[#111] dark:text-white">
+                {project.title}
+              </h2>
+              {project.metrics && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-300 dark:bg-amber-950 text-[#111] dark:text-amber-200 text-xs font-mono-tech font-extrabold rounded-md border-2 border-[#111]">
+                  <Zap className="w-3.5 h-3.5 fill-current text-amber-600 dark:text-amber-400" />
+                  <span>{project.metrics}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Tech Tags */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+              {tags.map((t) => (
+                <span
+                  key={t}
+                  className="px-2.5 py-1 bg-white dark:bg-neutral-800 text-[#111] dark:text-neutral-200 text-xs font-mono-tech font-extrabold rounded border border-[#111] shadow-xs"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Detailed Scope */}
+          <div className="p-4 sm:p-5 bg-white dark:bg-neutral-800/90 border-2 border-[#111] rounded-xl neo-shadow space-y-2">
+            <div className="flex items-center gap-2 pb-2 border-b border-neutral-200 dark:border-neutral-700">
+              <BookOpen className="w-4 h-4 text-[#2563eb]" />
+              <h4 className="font-mono-tech font-extrabold text-xs uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                {lang === 'en' ? 'Architecture & Technical Scope' : 'Arsitektur & Lingkup Teknis'}
+              </h4>
+            </div>
+            <p className="font-mono-tech text-xs sm:text-sm text-neutral-800 dark:text-neutral-200 leading-relaxed whitespace-pre-line">
+              {project.desc}
+            </p>
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="p-3.5 sm:p-4 bg-white dark:bg-neutral-800 border-t-2 border-[#111] dark:border-neutral-700 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            {project.liveUrl && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-mono-tech font-extrabold rounded-md border-2 border-[#111] neo-shadow neo-btn flex items-center gap-2"
+              >
+                <span>{lang === 'en' ? 'Open Live App' : 'Buka Demo Langsung'}</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            )}
+            {project.githubUrl && (
+              <a
+                href={project.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-white dark:bg-neutral-700 hover:bg-neutral-100 text-[#111] dark:text-white text-xs font-mono-tech font-extrabold rounded-md border-2 border-[#111] neo-shadow-sm neo-btn flex items-center gap-2"
+              >
+                <span>GitHub Source</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </a>
+            )}
+          </div>
+
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 text-[#111] dark:text-white text-xs font-mono-tech font-bold rounded-md border-2 border-[#111] cursor-pointer"
+          >
+            {lang === 'en' ? 'Close' : 'Tutup'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function Portfolio() {
   const [data, setData] = useState<PortfolioData>(initialPortfolioData);
 
@@ -540,18 +717,42 @@ export default function Portfolio() {
   const [mounted, setMounted] = useState(false);
   const [activePreview, setActivePreview] = useState<PreviewModalData | null>(null);
 
+  // Active Modals
+  const [activeProjectDetail, setActiveProjectDetail] = useState<ProjectItem | null>(null);
+
   // Slide Sub-navigation States
   const [aboutSlide, setAboutSlide] = useState<number>(0);
   const [worksPage, setWorksPage] = useState<number>(0);
   const [blogSlide, setBlogSlide] = useState<number>(0);
+  const [prestasiPage, setPrestasiPage] = useState<number>(0);
+  const [sertifikatPage, setSertifikatPage] = useState<number>(0);
 
-  // Works Pagination
-  const projectsPerPage = 4;
-  const totalWorksPages = Math.ceil(data.projects.length / projectsPerPage);
+  // Works Pagination (2 Projects Per Slide)
+  const projectsPerPage = 2;
+  const totalWorksPages = Math.max(1, Math.ceil(data.projects.length / projectsPerPage));
   const currentProjects = data.projects.slice(
     worksPage * projectsPerPage,
     (worksPage + 1) * projectsPerPage
   );
+
+  // Achievements Sub-pagination
+  const prestasiItems = data.achievements.filter(i => i.category === 'PRESTASI');
+  const prestasiPerPage = 2;
+  const totalPrestasiPages = Math.max(1, Math.ceil(prestasiItems.length / prestasiPerPage));
+  const currentPrestasi = prestasiItems.slice(
+    prestasiPage * prestasiPerPage,
+    (prestasiPage + 1) * prestasiPerPage
+  );
+
+  const sertifikatItems = data.achievements.filter(i => i.category === 'SERTIFIKAT');
+  const sertifikatPerPage = 2;
+  const totalSertifikatPages = Math.max(1, Math.ceil(sertifikatItems.length / sertifikatPerPage));
+  const currentSertifikat = sertifikatItems.slice(
+    sertifikatPage * sertifikatPerPage,
+    (sertifikatPage + 1) * sertifikatPerPage
+  );
+
+  const artikelItems = data.achievements.filter(i => i.category === 'ARTIKEL');
 
   // Custom Cursor & Hold Invert Lens
   const [mousePos, setMousePos] = useState({ x: 520, y: 360 });
@@ -625,21 +826,91 @@ export default function Portfolio() {
   }, [mousePos]);
 
   // SCROLL WHEEL TO NAVIGATE TABS (HOME -> ABOUT -> WORKS -> BLOG -> CONTACT)
+  // Refined: Will NOT switch tabs accidentally. Requires deliberate scroll intent,
+  // respects internally scrollable elements (like articles), and checks scroll bounds.
   const isScrollingRef = useRef(false);
+  const accumulatedWheelRef = useRef(0);
+  const lastWheelTimestampRef = useRef(0);
+
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       if (introStep !== 'ready') return;
+      if (activePreview || activeProjectDetail) return;
+
       const target = e.target as HTMLElement | null;
-      if (target && (target.closest('input') || target.closest('textarea') || target.closest('form') || target.closest('select'))) {
+      if (target && target.closest('input, textarea, form, select')) {
         return;
       }
-      if (Math.abs(e.deltaY) < 30) return;
+
+      // 1. Check if hovering/scrolling inside an internal scrollable element (like article list)
+      const scrollable = target?.closest('.overflow-y-auto, .overflow-y-scroll, [data-scrollable="true"]') as HTMLElement | null;
+      if (scrollable) {
+        const { scrollTop, scrollHeight, clientHeight } = scrollable;
+        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 6;
+        const isAtTop = scrollTop <= 6;
+
+        // If scrolling down and not yet at bottom of the container, let it scroll internally
+        if (e.deltaY > 0 && !isAtBottom) {
+          accumulatedWheelRef.current = 0;
+          return;
+        }
+        // If scrolling up and not yet at top of the container, let it scroll internally
+        if (e.deltaY < 0 && !isAtTop) {
+          accumulatedWheelRef.current = 0;
+          return;
+        }
+      }
+
+      // 2. Check document/window scroll (if any scroll exists on smaller screens)
+      if (typeof window !== 'undefined') {
+        const windowScrollTop = window.scrollY || document.documentElement.scrollTop;
+        const windowScrollHeight = document.documentElement.scrollHeight;
+        const windowClientHeight = window.innerHeight;
+        const isWindowAtBottom = windowScrollTop + windowClientHeight >= windowScrollHeight - 12;
+        const isWindowAtTop = windowScrollTop <= 12;
+
+        if (e.deltaY > 0 && !isWindowAtBottom) {
+          accumulatedWheelRef.current = 0;
+          return;
+        }
+        if (e.deltaY < 0 && !isWindowAtTop) {
+          accumulatedWheelRef.current = 0;
+          return;
+        }
+      }
+
+      // 3. Prevent accidental twitch triggers: accumulate wheel delta with a decay window
+      const now = Date.now();
+      if (now - lastWheelTimestampRef.current > 380) {
+        accumulatedWheelRef.current = 0;
+      }
+      lastWheelTimestampRef.current = now;
+
+      // Reset if user reverses direction
+      if (
+        (accumulatedWheelRef.current > 0 && e.deltaY < 0) ||
+        (accumulatedWheelRef.current < 0 && e.deltaY > 0)
+      ) {
+        accumulatedWheelRef.current = 0;
+      }
+
+      accumulatedWheelRef.current += e.deltaY;
+
+      // Require a deliberate cumulative threshold (>= 260px)
+      if (Math.abs(accumulatedWheelRef.current) < 260) {
+        return;
+      }
+
       if (isScrollingRef.current) return;
 
       isScrollingRef.current = true;
+      const direction = accumulatedWheelRef.current > 0 ? 1 : -1;
+      accumulatedWheelRef.current = 0;
+
+      // 950ms cooldown prevents skipping multiple tabs in a single continuous scroll
       setTimeout(() => {
         isScrollingRef.current = false;
-      }, 550);
+      }, 950);
 
       const tabList: Array<'HOME' | 'ABOUT' | 'WORKS' | 'BLOG' | 'CONTACT'> = [
         'HOME',
@@ -651,7 +922,7 @@ export default function Portfolio() {
 
       setActiveTab((current) => {
         const idx = tabList.indexOf(current);
-        if (e.deltaY > 0) {
+        if (direction > 0) {
           return tabList[Math.min(tabList.length - 1, idx + 1)];
         } else {
           return tabList[Math.max(0, idx - 1)];
@@ -661,7 +932,7 @@ export default function Portfolio() {
 
     window.addEventListener('wheel', handleWheel, { passive: true });
     return () => window.removeEventListener('wheel', handleWheel);
-  }, [introStep]);
+  }, [introStep, activePreview, activeProjectDetail]);
 
   // KEYBOARD ARROW NAVIGATION FOR SLIDES AND TABS
   useEffect(() => {
@@ -1664,12 +1935,12 @@ export default function Portfolio() {
                 </div>
               </div>
 
-              {/* 4 Projects Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+              {/* 2 Projects Per Slide Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {currentProjects.map((proj, idx) => (
                   <InspectableBox
                     key={proj.id}
-                    dimensions="480 × 260"
+                    dimensions="480 × 340"
                     color="#2563eb"
                     badgePosition="bottom"
                     delay={idx * 70}
@@ -1688,7 +1959,7 @@ export default function Portfolio() {
                             liveUrl: proj.liveUrl,
                             githubUrl: proj.githubUrl,
                           })}
-                          className="relative w-full h-36 sm:h-40 rounded-lg border-2 border-[#111] dark:border-neutral-700 overflow-hidden mb-3 bg-neutral-100 dark:bg-neutral-800 group/thumb cursor-pointer select-none"
+                          className="relative w-full h-40 sm:h-44 rounded-lg border-2 border-[#111] dark:border-neutral-700 overflow-hidden mb-3 bg-neutral-100 dark:bg-neutral-800 group/thumb cursor-pointer select-none"
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
@@ -1720,52 +1991,70 @@ export default function Portfolio() {
                         </div>
 
                         <h3 className="font-display font-extrabold text-lg sm:text-xl mb-1.5">{proj.title}</h3>
-                        <p className="font-mono-tech text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed mb-3">
+                        <p className="font-mono-tech text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed mb-3 line-clamp-2">
                           {proj.desc}
                         </p>
 
-                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 text-[10px] font-mono-tech font-bold text-neutral-600 dark:text-neutral-400 rounded border border-neutral-300 dark:border-neutral-700">
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-100 dark:bg-amber-950/60 text-[#111] dark:text-amber-300 text-[10px] font-mono-tech font-bold rounded border border-amber-400 dark:border-amber-800">
                           <Zap className="w-3 h-3 text-amber-500 fill-amber-500 shrink-0" />
                           <span>{proj.metrics}</span>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-3 mt-3 border-t border-neutral-200 dark:border-neutral-700">
-                        <div className="flex items-center gap-3">
-                          <a
-                            href={proj.liveUrl || proj.githubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="font-mono-tech text-xs font-bold flex items-center gap-1.5 text-[#2563eb] dark:text-[#38bdf8] hover:underline"
+                      <div className="pt-3 mt-3 border-t border-neutral-200 dark:border-neutral-700 space-y-2.5">
+                        {/* Toggle Button for Full Project Description / Specs Modal */}
+                        <div className="flex items-center justify-between gap-2">
+                          <button
+                            onClick={() => setActiveProjectDetail(proj)}
+                            className="px-3 py-1.5 bg-[#fde047] hover:bg-yellow-400 text-[#111] font-mono-tech font-extrabold text-xs rounded border-2 border-[#111] neo-shadow-sm neo-btn flex items-center gap-1.5 cursor-pointer"
                           >
-                            {t.works.viewLive} <ExternalLink className="w-3.5 h-3.5" />
-                          </a>
-                          <a
-                            href={proj.githubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="font-mono-tech text-xs font-bold text-neutral-500 hover:text-[#111] dark:hover:text-white"
+                            <BookOpen className="w-3.5 h-3.5 stroke-[2.5]" />
+                            <span>{t.works.viewDetails}</span>
+                          </button>
+
+                          <button
+                            onClick={() => setActivePreview({
+                              title: proj.title,
+                              categoryOrTag: proj.tag,
+                              desc: proj.desc,
+                              imageUrl: proj.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&q=80',
+                              accent: proj.accent,
+                              metrics: proj.metrics,
+                              liveUrl: proj.liveUrl,
+                              githubUrl: proj.githubUrl,
+                            })}
+                            className="p-1.5 bg-neutral-100 dark:bg-neutral-800 text-[#111] dark:text-white rounded border border-[#111] hover:scale-105 transition-transform cursor-pointer"
+                            title={lang === 'en' ? 'Inspect Image' : 'Lihat Gambar Preview'}
                           >
-                            {t.works.sourceCode} →
-                          </a>
+                            <Eye className="w-3.5 h-3.5" />
+                          </button>
                         </div>
 
-                        <button
-                          onClick={() => setActivePreview({
-                            title: proj.title,
-                            categoryOrTag: proj.tag,
-                            desc: proj.desc,
-                            imageUrl: proj.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&q=80',
-                            accent: proj.accent,
-                            metrics: proj.metrics,
-                            liveUrl: proj.liveUrl,
-                            githubUrl: proj.githubUrl,
-                          })}
-                          className="p-1.5 bg-neutral-100 dark:bg-neutral-800 text-[#111] dark:text-white rounded border border-[#111] hover:scale-105 transition-transform cursor-pointer"
-                          title="Lihat Gambar Preview"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                        </button>
+                        {/* External Links */}
+                        <div className="flex items-center justify-between pt-1">
+                          <div className="flex items-center gap-3">
+                            {proj.liveUrl && (
+                              <a
+                                href={proj.liveUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-mono-tech text-xs font-bold flex items-center gap-1.5 text-[#2563eb] dark:text-[#38bdf8] hover:underline"
+                              >
+                                {t.works.viewLive} <ExternalLink className="w-3.5 h-3.5" />
+                              </a>
+                            )}
+                            {proj.githubUrl && (
+                              <a
+                                href={proj.githubUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-mono-tech text-xs font-bold text-neutral-500 hover:text-[#111] dark:hover:text-white"
+                              >
+                                {t.works.sourceCode} →
+                              </a>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </InspectableBox>
@@ -1809,107 +2098,348 @@ export default function Portfolio() {
                     </div>
                   </div>
 
-                  {/* Filtered Achievements with Rich Image Previews */}
-                  <div className="space-y-4 animate-slide-right">
-                    {data.achievements
-                      .filter((item) => {
-                        if (blogSlide === 0) return item.category === 'PRESTASI';
-                        if (blogSlide === 1) return item.category === 'SERTIFIKAT';
-                        return item.category === 'ARTIKEL';
-                      })
-                      .map((item) => (
-                        <div
-                          key={item.id}
-                          className="bg-white dark:bg-neutral-800/90 border-2 border-[#111] rounded-xl p-4 sm:p-5 neo-shadow neo-card-grand flex flex-col sm:flex-row items-start sm:items-center gap-4"
-                        >
-                          {/* Dedicated Image Preview Thumbnail */}
-                          <div
-                            onClick={() => setActivePreview({
-                              title: item.title,
-                              categoryOrTag: item.category,
-                              desc: item.description,
-                              imageUrl: item.imageUrl || (blogSlide === 0 
-                                ? 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=900&q=80'
-                                : blogSlide === 1 
-                                ? 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=900&q=80'
-                                : 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=80'
-                              ),
-                              accent: item.accent,
-                              badge: item.badge,
-                              issuer: item.issuer,
-                              year: item.year
-                            })}
-                            className="relative w-full sm:w-44 h-36 sm:h-28 shrink-0 rounded-lg border-2 border-[#111] overflow-hidden group/ach cursor-pointer bg-neutral-100 dark:bg-neutral-900 select-none"
-                          >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={item.imageUrl || (blogSlide === 0 
-                                ? 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=900&q=80'
-                                : blogSlide === 1 
-                                ? 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=900&q=80'
-                                : 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=80'
-                              )}
-                              alt={item.title}
-                              className="w-full h-full object-cover transition-transform duration-300 group-hover/ach:scale-105"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=900&q=80';
-                              }}
-                            />
-                            <div className="absolute inset-0 bg-[#111]/30 opacity-0 group-hover/ach:opacity-100 transition-opacity flex items-center justify-center">
-                              <span className="px-2.5 py-1 bg-white text-[#111] text-[10px] font-mono-tech font-extrabold rounded border border-[#111] flex items-center gap-1 shadow-sm">
-                                <Eye className="w-3 h-3" />
-                                <span>{lang === 'en' ? 'Preview' : 'Lihat'}</span>
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Content Details */}
-                          <div className="flex-1 space-y-1.5 w-full">
-                            <div className="flex flex-wrap items-center justify-between gap-2">
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs font-mono-tech font-bold text-neutral-500">
-                                  {item.year} • {item.issuer}
-                                </span>
-                                <span 
-                                  className="px-2 py-0.5 rounded text-[10px] font-mono-tech font-extrabold text-[#111] border border-[#111]"
-                                  style={{ backgroundColor: item.accent }}
-                                >
-                                  {item.badge}
-                                </span>
+                  {/* Category 0: PRESTASI (Sub-paginated 2 per slide) */}
+                  {blogSlide === 0 && (
+                    <div className="space-y-4 animate-slide-right">
+                      {currentPrestasi.length === 0 ? (
+                        <div className="p-8 text-center bg-[#f6f5f0] dark:bg-neutral-800/60 rounded-xl border-2 border-dashed border-neutral-300 dark:border-neutral-700">
+                          <p className="font-mono-tech text-xs text-neutral-500">
+                            {lang === 'en' ? 'No awards logged yet.' : 'Belum ada data prestasi.'}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3.5">
+                          {currentPrestasi.map((item) => (
+                            <div
+                              key={item.id}
+                              className="bg-white dark:bg-neutral-800/90 border-2 border-[#111] rounded-xl p-4 sm:p-5 neo-shadow neo-card-grand flex flex-col sm:flex-row items-start sm:items-center gap-4"
+                            >
+                              {/* Dedicated Image Preview Thumbnail */}
+                              <div
+                                onClick={() => setActivePreview({
+                                  title: item.title,
+                                  categoryOrTag: item.category,
+                                  desc: item.description,
+                                  imageUrl: item.imageUrl || 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=900&q=80',
+                                  accent: item.accent,
+                                  badge: item.badge,
+                                  issuer: item.issuer,
+                                  year: item.year
+                                })}
+                                className="relative w-full sm:w-44 h-36 sm:h-28 shrink-0 rounded-lg border-2 border-[#111] overflow-hidden group/ach cursor-pointer bg-neutral-100 dark:bg-neutral-900 select-none"
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={item.imageUrl || 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=900&q=80'}
+                                  alt={item.title}
+                                  className="w-full h-full object-cover transition-transform duration-300 group-hover/ach:scale-105"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=900&q=80';
+                                  }}
+                                />
+                                <div className="absolute inset-0 bg-[#111]/30 opacity-0 group-hover/ach:opacity-100 transition-opacity flex items-center justify-center">
+                                  <span className="px-2.5 py-1 bg-white text-[#111] text-[10px] font-mono-tech font-extrabold rounded border border-[#111] flex items-center gap-1 shadow-sm">
+                                    <Eye className="w-3 h-3" />
+                                    <span>{lang === 'en' ? 'Preview' : 'Lihat'}</span>
+                                  </span>
+                                </div>
                               </div>
 
-                              <span className="px-2.5 py-1 bg-[#f6f5f0] dark:bg-neutral-900 border border-[#111] rounded font-mono-tech font-bold text-[11px] flex items-center gap-1">
-                                VERIFIED <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                              </span>
+                              {/* Content Details */}
+                              <div className="flex-1 space-y-1.5 w-full">
+                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs font-mono-tech font-bold text-neutral-500">
+                                      {item.year} • {item.issuer}
+                                    </span>
+                                    <span 
+                                      className="px-2 py-0.5 rounded text-[10px] font-mono-tech font-extrabold text-[#111] border border-[#111]"
+                                      style={{ backgroundColor: item.accent }}
+                                    >
+                                      {item.badge}
+                                    </span>
+                                  </div>
+
+                                  <span className="px-2.5 py-1 bg-[#f6f5f0] dark:bg-neutral-900 border border-[#111] rounded font-mono-tech font-bold text-[11px] flex items-center gap-1">
+                                    VERIFIED <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                  </span>
+                                </div>
+
+                                <h3 className="font-display font-extrabold text-base sm:text-lg text-[#111] dark:text-white leading-tight">
+                                  {item.title}
+                                </h3>
+                                <p className="font-mono-tech text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed line-clamp-2">
+                                  {item.description}
+                                </p>
+
+                                <button
+                                  onClick={() => setActivePreview({
+                                    title: item.title,
+                                    categoryOrTag: item.category,
+                                    desc: item.description,
+                                    imageUrl: item.imageUrl || 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=900&q=80',
+                                    accent: item.accent,
+                                    badge: item.badge,
+                                    issuer: item.issuer,
+                                    year: item.year
+                                  })}
+                                  className="inline-flex items-center gap-1 text-[11px] font-mono-tech font-bold text-[#2563eb] dark:text-[#38bdf8] hover:underline pt-1 cursor-pointer"
+                                >
+                                  <Eye className="w-3 h-3" />
+                                  <span>{lang === 'en' ? 'Inspect Award / Preview →' : 'Lihat Piagam / Prestasi →'}</span>
+                                </button>
+                              </div>
                             </div>
+                          ))}
 
-                            <h3 className="font-display font-extrabold text-base sm:text-lg text-[#111] dark:text-white leading-tight">
-                              {item.title}
-                            </h3>
-                            <p className="font-mono-tech text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
-                              {item.description}
-                            </p>
-
-                            <button
-                              onClick={() => setActivePreview({
-                                title: item.title,
-                                categoryOrTag: item.category,
-                                desc: item.description,
-                                imageUrl: item.imageUrl || 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=900&q=80',
-                                accent: item.accent,
-                                badge: item.badge,
-                                issuer: item.issuer,
-                                year: item.year
-                              })}
-                              className="inline-flex items-center gap-1 text-[11px] font-mono-tech font-bold text-[#2563eb] dark:text-[#38bdf8] hover:underline pt-1 cursor-pointer"
-                            >
-                              <Eye className="w-3 h-3" />
-                              <span>{lang === 'en' ? 'Inspect Certificate / Preview →' : 'Lihat Dokumen / Sertifikat →'}</span>
-                            </button>
-                          </div>
+                          {/* Sub-slide pagination for Prestasi */}
+                          {totalPrestasiPages > 1 && (
+                            <div className="flex items-center justify-between pt-3 border-t border-neutral-200 dark:border-neutral-700">
+                              <button
+                                onClick={() => setPrestasiPage(p => Math.max(0, p - 1))}
+                                disabled={prestasiPage === 0}
+                                className="px-3 py-1.5 bg-white dark:bg-neutral-800 border-2 border-[#111] rounded text-xs font-mono-tech font-bold neo-shadow-sm neo-btn-grand disabled:opacity-40 flex items-center gap-1 cursor-pointer"
+                              >
+                                <ChevronLeft className="w-3.5 h-3.5" />
+                                <span>{t.achievements.prev}</span>
+                              </button>
+                              <span className="text-xs font-mono-tech font-bold text-neutral-500">
+                                {lang === 'en' ? `Page ${prestasiPage + 1} of ${totalPrestasiPages}` : `Halaman ${prestasiPage + 1} dari ${totalPrestasiPages}`}
+                              </span>
+                              <button
+                                onClick={() => setPrestasiPage(p => Math.min(totalPrestasiPages - 1, p + 1))}
+                                disabled={prestasiPage >= totalPrestasiPages - 1}
+                                className="px-3 py-1.5 bg-[#2563eb] text-white border-2 border-[#111] rounded text-xs font-mono-tech font-extrabold neo-shadow-sm neo-btn-grand disabled:opacity-40 flex items-center gap-1 cursor-pointer"
+                              >
+                                <span>{t.achievements.next}</span>
+                                <ChevronRight className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          )}
                         </div>
-                      ))}
-                  </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Category 1: SERTIFIKAT (Sub-paginated 2 per slide) */}
+                  {blogSlide === 1 && (
+                    <div className="space-y-4 animate-slide-right">
+                      {currentSertifikat.length === 0 ? (
+                        <div className="p-8 text-center bg-[#f6f5f0] dark:bg-neutral-800/60 rounded-xl border-2 border-dashed border-neutral-300 dark:border-neutral-700">
+                          <p className="font-mono-tech text-xs text-neutral-500">
+                            {lang === 'en' ? 'No certificates logged yet.' : 'Belum ada data sertifikat.'}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3.5">
+                          {currentSertifikat.map((item) => (
+                            <div
+                              key={item.id}
+                              className="bg-white dark:bg-neutral-800/90 border-2 border-[#111] rounded-xl p-4 sm:p-5 neo-shadow neo-card-grand flex flex-col sm:flex-row items-start sm:items-center gap-4"
+                            >
+                              {/* Dedicated Image Preview Thumbnail */}
+                              <div
+                                onClick={() => setActivePreview({
+                                  title: item.title,
+                                  categoryOrTag: item.category,
+                                  desc: item.description,
+                                  imageUrl: item.imageUrl || 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=900&q=80',
+                                  accent: item.accent,
+                                  badge: item.badge,
+                                  issuer: item.issuer,
+                                  year: item.year
+                                })}
+                                className="relative w-full sm:w-44 h-36 sm:h-28 shrink-0 rounded-lg border-2 border-[#111] overflow-hidden group/ach cursor-pointer bg-neutral-100 dark:bg-neutral-900 select-none"
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={item.imageUrl || 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=900&q=80'}
+                                  alt={item.title}
+                                  className="w-full h-full object-cover transition-transform duration-300 group-hover/ach:scale-105"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=900&q=80';
+                                  }}
+                                />
+                                <div className="absolute inset-0 bg-[#111]/30 opacity-0 group-hover/ach:opacity-100 transition-opacity flex items-center justify-center">
+                                  <span className="px-2.5 py-1 bg-white text-[#111] text-[10px] font-mono-tech font-extrabold rounded border border-[#111] flex items-center gap-1 shadow-sm">
+                                    <Eye className="w-3 h-3" />
+                                    <span>{lang === 'en' ? 'Preview' : 'Lihat'}</span>
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Content Details */}
+                              <div className="flex-1 space-y-1.5 w-full">
+                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs font-mono-tech font-bold text-neutral-500">
+                                      {item.year} • {item.issuer}
+                                    </span>
+                                    <span 
+                                      className="px-2 py-0.5 rounded text-[10px] font-mono-tech font-extrabold text-[#111] border border-[#111]"
+                                      style={{ backgroundColor: item.accent }}
+                                    >
+                                      {item.badge}
+                                    </span>
+                                  </div>
+
+                                  <span className="px-2.5 py-1 bg-[#f6f5f0] dark:bg-neutral-900 border border-[#111] rounded font-mono-tech font-bold text-[11px] flex items-center gap-1">
+                                    VERIFIED <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                  </span>
+                                </div>
+
+                                <h3 className="font-display font-extrabold text-base sm:text-lg text-[#111] dark:text-white leading-tight">
+                                  {item.title}
+                                </h3>
+                                <p className="font-mono-tech text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed line-clamp-2">
+                                  {item.description}
+                                </p>
+
+                                <button
+                                  onClick={() => setActivePreview({
+                                    title: item.title,
+                                    categoryOrTag: item.category,
+                                    desc: item.description,
+                                    imageUrl: item.imageUrl || 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=900&q=80',
+                                    accent: item.accent,
+                                    badge: item.badge,
+                                    issuer: item.issuer,
+                                    year: item.year
+                                  })}
+                                  className="inline-flex items-center gap-1 text-[11px] font-mono-tech font-bold text-[#2563eb] dark:text-[#38bdf8] hover:underline pt-1 cursor-pointer"
+                                >
+                                  <Eye className="w-3 h-3" />
+                                  <span>{lang === 'en' ? 'Inspect Certificate / Preview →' : 'Lihat Dokumen / Sertifikat →'}</span>
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+
+                          {/* Sub-slide pagination for Sertifikat */}
+                          {totalSertifikatPages > 1 && (
+                            <div className="flex items-center justify-between pt-3 border-t border-neutral-200 dark:border-neutral-700">
+                              <button
+                                onClick={() => setSertifikatPage(p => Math.max(0, p - 1))}
+                                disabled={sertifikatPage === 0}
+                                className="px-3 py-1.5 bg-white dark:bg-neutral-800 border-2 border-[#111] rounded text-xs font-mono-tech font-bold neo-shadow-sm neo-btn-grand disabled:opacity-40 flex items-center gap-1 cursor-pointer"
+                              >
+                                <ChevronLeft className="w-3.5 h-3.5" />
+                                <span>{t.achievements.prev}</span>
+                              </button>
+                              <span className="text-xs font-mono-tech font-bold text-neutral-500">
+                                {lang === 'en' ? `Page ${sertifikatPage + 1} of ${totalSertifikatPages}` : `Halaman ${sertifikatPage + 1} dari ${totalSertifikatPages}`}
+                              </span>
+                              <button
+                                onClick={() => setSertifikatPage(p => Math.min(totalSertifikatPages - 1, p + 1))}
+                                disabled={sertifikatPage >= totalSertifikatPages - 1}
+                                className="px-3 py-1.5 bg-[#2563eb] text-white border-2 border-[#111] rounded text-xs font-mono-tech font-extrabold neo-shadow-sm neo-btn-grand disabled:opacity-40 flex items-center gap-1 cursor-pointer"
+                              >
+                                <span>{t.achievements.next}</span>
+                                <ChevronRight className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Category 2: ARTIKEL (Internally scrollable container for rich archives) */}
+                  {blogSlide === 2 && (
+                    <div className="animate-slide-right">
+                      {artikelItems.length === 0 ? (
+                        <div className="p-8 text-center bg-[#f6f5f0] dark:bg-neutral-800/60 rounded-xl border-2 border-dashed border-neutral-300 dark:border-neutral-700">
+                          <p className="font-mono-tech text-xs text-neutral-500">
+                            {lang === 'en' ? 'No published articles yet.' : 'Belum ada artikel yang dipublikasikan.'}
+                          </p>
+                        </div>
+                      ) : (
+                        <div 
+                          className="space-y-3.5 max-h-[350px] sm:max-h-[380px] overflow-y-auto neo-scrollbar pr-1.5"
+                          data-scrollable="true"
+                        >
+                          {artikelItems.map((item) => (
+                            <div
+                              key={item.id}
+                              className="bg-white dark:bg-neutral-800/90 border-2 border-[#111] rounded-xl p-4 sm:p-5 neo-shadow neo-card-grand flex flex-col sm:flex-row items-start sm:items-center gap-4"
+                            >
+                              {/* Thumbnail */}
+                              <div
+                                onClick={() => setActivePreview({
+                                  title: item.title,
+                                  categoryOrTag: item.category,
+                                  desc: item.description,
+                                  imageUrl: item.imageUrl || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=80',
+                                  accent: item.accent,
+                                  badge: item.badge,
+                                  issuer: item.issuer,
+                                  year: item.year
+                                })}
+                                className="relative w-full sm:w-44 h-36 sm:h-28 shrink-0 rounded-lg border-2 border-[#111] overflow-hidden group/ach cursor-pointer bg-neutral-100 dark:bg-neutral-900 select-none"
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={item.imageUrl || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=80'}
+                                  alt={item.title}
+                                  className="w-full h-full object-cover transition-transform duration-300 group-hover/ach:scale-105"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=80';
+                                  }}
+                                />
+                                <div className="absolute inset-0 bg-[#111]/30 opacity-0 group-hover/ach:opacity-100 transition-opacity flex items-center justify-center">
+                                  <span className="px-2.5 py-1 bg-white text-[#111] text-[10px] font-mono-tech font-extrabold rounded border border-[#111] flex items-center gap-1 shadow-sm">
+                                    <Eye className="w-3 h-3" />
+                                    <span>{lang === 'en' ? 'Preview' : 'Lihat'}</span>
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Details */}
+                              <div className="flex-1 space-y-1.5 w-full">
+                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs font-mono-tech font-bold text-neutral-500">
+                                      {item.year} • {item.issuer}
+                                    </span>
+                                    <span 
+                                      className="px-2 py-0.5 rounded text-[10px] font-mono-tech font-extrabold text-[#111] border border-[#111]"
+                                      style={{ backgroundColor: item.accent }}
+                                    >
+                                      {item.badge}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <h3 className="font-display font-extrabold text-base sm:text-lg text-[#111] dark:text-white leading-tight">
+                                  {item.title}
+                                </h3>
+                                <p className="font-mono-tech text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                                  {item.description}
+                                </p>
+
+                                <button
+                                  onClick={() => setActivePreview({
+                                    title: item.title,
+                                    categoryOrTag: item.category,
+                                    desc: item.description,
+                                    imageUrl: item.imageUrl || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=80',
+                                    accent: item.accent,
+                                    badge: item.badge,
+                                    issuer: item.issuer,
+                                    year: item.year
+                                  })}
+                                  className="inline-flex items-center gap-1 text-[11px] font-mono-tech font-bold text-[#2563eb] dark:text-[#38bdf8] hover:underline pt-1 cursor-pointer"
+                                >
+                                  <Eye className="w-3 h-3" />
+                                  <span>{lang === 'en' ? 'Read Article / Preview →' : 'Baca Artikel / Pratinjau →'}</span>
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Bottom Slide Switcher */}
@@ -2107,6 +2637,14 @@ export default function Portfolio() {
         data={activePreview}
         onClose={() => setActivePreview(null)}
         lang={lang}
+      />
+
+      {/* Project Detail Modal */}
+      <ProjectDetailModal
+        project={activeProjectDetail}
+        onClose={() => setActiveProjectDetail(null)}
+        lang={lang}
+        onEnlargeImage={(preview) => setActivePreview(preview)}
       />
 
     </div>

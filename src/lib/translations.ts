@@ -86,6 +86,8 @@ export interface Translations {
     viewLive: string;
     sourceCode: string;
     architectureTag: string;
+    viewDetails: string;
+    detailModalTitle: string;
     prev: string;
     next: string;
   };
@@ -242,6 +244,8 @@ export const translations: Record<Language, Translations> = {
       viewLive: 'Live Demo',
       sourceCode: 'Source Code',
       architectureTag: 'Architecture',
+      viewDetails: 'Project Details',
+      detailModalTitle: 'Project Architecture & Details',
       prev: 'Prev',
       next: 'Next'
     },
@@ -412,6 +416,8 @@ export const translations: Record<Language, Translations> = {
       viewLive: 'Lihat Demo',
       sourceCode: 'Kode Sumber',
       architectureTag: 'Arsitektur',
+      viewDetails: 'Info & Detail Proyek',
+      detailModalTitle: 'Detail Arsitektur & Lingkup Proyek',
       prev: 'Sebelumnya',
       next: 'Selanjutnya'
     },
