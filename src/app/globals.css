@@ -65,111 +65,247 @@ body {
   box-shadow: 4px 4px 0px 0px #ca8a04;
 }
 
-/* Grandiose Card Hover */
+/* Grandiose Card Hover with 3D Spring Lift */
 .neo-card-grand {
-  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition:
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, box-shadow;
 }
 .neo-card-grand:hover {
-  transform: translateY(-5px) scale(1.015);
-  box-shadow: 8px 8px 0px 0px #111111, 0 12px 28px -6px rgba(37, 99, 235, 0.25);
+  transform: translate3d(-3px, -6px, 0) scale(1.015);
+  box-shadow: 8px 8px 0px 0px #111111, 0 16px 32px -8px rgba(37, 99, 235, 0.28);
 }
 .dark .neo-card-grand:hover {
-  box-shadow: 8px 8px 0px 0px #000000, 0 12px 28px -6px rgba(56, 189, 248, 0.25);
+  box-shadow: 8px 8px 0px 0px #000000, 0 16px 32px -8px rgba(56, 189, 248, 0.28);
 }
 
 /* Grandiose Button Hover */
 .neo-btn-grand {
-  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition:
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.15s ease;
+  will-change: transform, box-shadow;
 }
 .neo-btn-grand:hover {
-  transform: translate(-2px, -2px);
+  transform: translate3d(-2.5px, -2.5px, 0);
   box-shadow: 6px 6px 0px 0px #111111;
 }
 .dark .neo-btn-grand:hover {
   box-shadow: 6px 6px 0px 0px #000000;
 }
 .neo-btn-grand:active {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0px 0px #111111;
+  transform: translate3d(2px, 2px, 0);
+  box-shadow: 1px 1px 0px 0px #111111;
 }
 .dark .neo-btn-grand:active {
-  box-shadow: 2px 2px 0px 0px #000000;
+  box-shadow: 1px 1px 0px 0px #000000;
+}
+
+/* Standard neo-btn quick tactile press */
+.neo-btn {
+  transition:
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.neo-btn:hover {
+  transform: translate3d(-1.5px, -1.5px, 0);
+}
+.neo-btn:active {
+  transform: translate3d(1.5px, 1.5px, 0);
 }
 
 /* Grandiose Sticker Hover */
 .neo-sticker-grand {
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition:
+    transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
 }
 .neo-sticker-grand:hover {
-  transform: scale(1.1) rotate(calc(var(--tw-rotate, 0deg) + 4deg));
-  box-shadow: 6px 6px 0px 0px #111111, 0 0 25px rgba(245, 158, 11, 0.35);
+  transform: scale(1.12) rotate(calc(var(--tw-rotate, 0deg) + 5deg)) translateY(-4px);
+  box-shadow: 7px 7px 0px 0px #111111, 0 0 28px rgba(245, 158, 11, 0.4);
 }
 
-/* Subtle floating animations for stickers and interactive hero elements */
+/* Multi-axis organic floating animations for stickers and hero doodles */
 @keyframes floatSlow {
-  0%, 100% { transform: translateY(0px) rotate(var(--tw-rotate, 0deg)); }
-  50% { transform: translateY(-7px) rotate(var(--tw-rotate, 0deg)); }
+  0%, 100% { transform: translate3d(0px, 0px, 0) rotate(var(--tw-rotate, 0deg)); }
+  50% { transform: translate3d(0px, -9px, 0) rotate(calc(var(--tw-rotate, 0deg) + 1.5deg)); }
 }
 
 @keyframes floatGentle {
-  0%, 100% { transform: translateY(0px) rotate(var(--tw-rotate, 0deg)); }
-  50% { transform: translateY(-9px) rotate(calc(var(--tw-rotate, 0deg) + 1.5deg)); }
+  0%, 100% { transform: translate3d(0px, 0px, 0) rotate(var(--tw-rotate, 0deg)); }
+  33% { transform: translate3d(2px, -8px, 0) rotate(calc(var(--tw-rotate, 0deg) + 2deg)); }
+  66% { transform: translate3d(-2px, -4px, 0) rotate(calc(var(--tw-rotate, 0deg) - 1deg)); }
 }
 
 @keyframes floatDelayed {
-  0%, 100% { transform: translateY(0px) rotate(var(--tw-rotate, 0deg)); }
-  50% { transform: translateY(8px) rotate(calc(var(--tw-rotate, 0deg) - 1.5deg)); }
+  0%, 100% { transform: translate3d(0px, 0px, 0) rotate(var(--tw-rotate, 0deg)); }
+  50% { transform: translate3d(-3px, 9px, 0) rotate(calc(var(--tw-rotate, 0deg) - 2.5deg)); }
 }
 
 @keyframes floatBob {
-  0%, 100% { transform: translateY(0px) rotate(var(--tw-rotate, 0deg)); }
-  50% { transform: translateY(-6px) rotate(var(--tw-rotate, 0deg)); }
+  0%, 100% { transform: translate3d(0px, 0px, 0) rotate(var(--tw-rotate, 0deg)) scale(1); }
+  50% { transform: translate3d(0px, -8px, 0) rotate(calc(var(--tw-rotate, 0deg) + 3deg)) scale(1.04); }
 }
 
 @keyframes floatSway {
-  0%, 100% { transform: translateY(0px) translateX(0px) rotate(var(--tw-rotate, 0deg)); }
-  50% { transform: translateY(-7px) translateX(3.5px) rotate(calc(var(--tw-rotate, 0deg) + 2deg)); }
+  0%, 100% { transform: translate3d(0px, 0px, 0) rotate(var(--tw-rotate, 0deg)); }
+  50% { transform: translate3d(5px, -8px, 0) rotate(calc(var(--tw-rotate, 0deg) + 2.5deg)); }
 }
 
 .animate-float-slow {
-  animation: floatSlow 4s ease-in-out infinite;
+  animation: floatSlow 4.2s ease-in-out infinite;
 }
 
 .animate-float-gentle {
-  animation: floatGentle 4.2s ease-in-out infinite;
+  animation: floatGentle 4.6s ease-in-out infinite;
 }
 
 .animate-float-delayed {
-  animation: floatDelayed 5.2s ease-in-out 0.8s infinite;
+  animation: floatDelayed 5.2s ease-in-out 0.6s infinite;
 }
 
 .animate-float-bob {
-  animation: floatBob 3.6s ease-in-out 1.2s infinite;
+  animation: floatBob 3.4s ease-in-out 0.4s infinite;
 }
 
 .animate-float-sway {
-  animation: floatSway 4.8s ease-in-out 0.5s infinite;
+  animation: floatSway 4.8s ease-in-out 0.3s infinite;
 }
 
+/* Springy Pop-In Entrance (with fill-mode: both so delayed items stay hidden until start) */
 @keyframes popIn {
-  0% { opacity: 0; transform: scale(0.6) translateY(20px); }
-  70% { transform: scale(1.05) translateY(-2px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0) scale(0.84);
+  }
+  65% {
+    opacity: 1;
+    transform: translate3d(0, -4px, 0) scale(1.025);
+  }
+  85% {
+    transform: translate3d(0, 1.5px, 0) scale(0.995);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
 }
 
+/* Intro Card 3D Spring Entrance */
+@keyframes introCardPop {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 32px, 0) scale(0.7) rotate(-4deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translate3d(0, -6px, 0) scale(1.06) rotate(1.5deg);
+  }
+  80% {
+    transform: translate3d(0, 2px, 0) scale(0.98) rotate(-0.5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+}
+
+/* Directional Slide Transitions */
 @keyframes slideInRight {
-  from { opacity: 0; transform: translateX(28px); }
-  to { opacity: 1; transform: translateX(0); }
+  0% {
+    opacity: 0;
+    transform: translate3d(38px, 0, 0) scale(0.98);
+  }
+  70% {
+    opacity: 1;
+    transform: translate3d(-3px, 0, 0) scale(1.005);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
 }
 
 @keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-28px); }
-  to { opacity: 1; transform: translateX(0); }
+  0% {
+    opacity: 0;
+    transform: translate3d(-38px, 0, 0) scale(0.98);
+  }
+  70% {
+    opacity: 1;
+    transform: translate3d(3px, 0, 0) scale(1.005);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
 }
 
-@keyframes burstLine {
-  0% { stroke-dashoffset: 30; opacity: 1; }
-  100% { stroke-dashoffset: -30; opacity: 0; }
+/* Radial Burst Ray Animation for Intro Finale */
+@keyframes burstRay {
+  0% {
+    stroke-dasharray: 0 60;
+    stroke-dashoffset: 0;
+    opacity: 1;
+    transform: scale(0.5);
+  }
+  50% {
+    stroke-dasharray: 36 60;
+    stroke-dashoffset: -12;
+    opacity: 1;
+  }
+  100% {
+    stroke-dasharray: 4 60;
+    stroke-dashoffset: -48;
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+/* Self-drawing SVG path animation for hand-drawn underlines & arrows */
+@keyframes drawStroke {
+  0% {
+    stroke-dashoffset: 240;
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+/* Subtle Nav Brush Morph */
+@keyframes navBrushIn {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.6) scaleY(0.8) rotate(-3deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scaleX(1.08) scaleY(1.06) rotate(-0.5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleX(1.05) scaleY(1.05) rotate(-1deg);
+  }
+}
+
+/* Bounding Box Handle Pop */
+@keyframes boundingBoxIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* View Transition circular theme spread (Top-Right Origin) */
@@ -185,7 +321,7 @@ body {
 
 ::view-transition-new(root) {
   z-index: 9999;
-  animation: circularThemeSpread 0.75s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+  animation: circularThemeSpread 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes circularThemeSpread {
@@ -210,19 +346,41 @@ body {
 }
 
 .animate-theme-spread {
-  animation: spreadFromTopRight 0.75s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+  animation: spreadFromTopRight 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .animate-pop-in {
-  animation: popIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: popIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-intro-card {
+  animation: introCardPop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .animate-slide-right {
-  animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideInRight 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .animate-slide-left {
-  animation: slideInLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideInLeft 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-draw-stroke {
+  stroke-dasharray: 240;
+  animation: drawStroke 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
+}
+
+.animate-burst-ray {
+  transform-origin: 100px 100px;
+  animation: burstRay 0.48s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-nav-brush {
+  animation: navBrushIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-bbox-in {
+  animation: boundingBoxIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Rough paint brush clip path for active nav item & photo backdrop */
@@ -233,43 +391,43 @@ body {
 /* Invert Lens expanding animation */
 @keyframes lensExpand {
   0% {
-    transform: scale(0.12);
+    transform: scale(0.15) rotate(-6deg);
     opacity: 0;
   }
-  60% {
-    transform: scale(1.08);
+  65% {
+    transform: scale(1.06) rotate(1deg);
     opacity: 1;
   }
-  80% {
-    transform: scale(0.96);
+  85% {
+    transform: scale(0.98) rotate(0deg);
   }
   100% {
-    transform: scale(1);
+    transform: scale(1) rotate(0deg);
     opacity: 1;
   }
 }
 
 @keyframes lensShockwave {
   0% {
-    transform: scale(0.4);
-    opacity: 0.9;
+    transform: scale(0.35);
+    opacity: 0.95;
   }
   60% {
-    opacity: 0.5;
+    opacity: 0.45;
   }
   100% {
-    transform: scale(1.4);
+    transform: scale(1.45);
     opacity: 0;
   }
 }
 
 .animate-lens-expand {
-  animation: lensExpand 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation: lensExpand 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   transform-origin: center center;
 }
 
 .animate-lens-shockwave {
-  animation: lensShockwave 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation: lensShockwave 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   transform-origin: center center;
 }
 
@@ -278,6 +436,16 @@ body {
   backdrop-filter: invert(100%) contrast(110%);
   -webkit-backdrop-filter: invert(100%) contrast(110%);
   background-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-slow,
+  .animate-float-gentle,
+  .animate-float-delayed,
+  .animate-float-bob,
+  .animate-float-sway {
+    animation: none !important;
+  }
 }
 
 /* Prevent unwanted browser ghost drags on interactive elements */

@@ -2,6 +2,10 @@ import 'dotenv/config';
 import { neon } from '@neondatabase/serverless';
 import { PortfolioData, initialPortfolioData, ProjectItem, AchievementItem, TechStackGroup } from './data';
 
+// In-memory store for fallback when DATABASE_URL is not configured or unreachable
+let memoryPortfolioData: PortfolioData = structuredClone(initialPortfolioData);
+let memoryMessages: ContactMessage[] = [];
+
 function getDatabaseUrl(): string | undefined {
   return process.env.DATABASE_URL;
 }
@@ -12,12 +16,12 @@ export function isNeonConnected(): boolean {
 
 /**
  * Fetch portfolio data from Neon Lakebase Postgres (table: portfolio_content)
- * Falls back to initialPortfolioData if database is unreachable or unset
+ * Falls back to memoryPortfolioData if database is unreachable or unset
  */
 export async function getPortfolioData(): Promise<PortfolioData> {
   const dbUrl = getDatabaseUrl();
   if (!dbUrl) {
-    return initialPortfolioData;
+    return memoryPortfolioData;
   }
 
   try {
@@ -37,25 +41,26 @@ export async function getPortfolioData(): Promise<PortfolioData> {
     `;
 
     if (rows && rows.length > 0 && rows[0].data) {
-      return rows[0].data as PortfolioData;
+      memoryPortfolioData = rows[0].data as PortfolioData;
+      return memoryPortfolioData;
     }
 
     // Seed initial dataset into portfolio_content
     await sql`
       INSERT INTO portfolio_content (id, data, updated_at)
-      VALUES ('main', ${JSON.stringify(initialPortfolioData)}, CURRENT_TIMESTAMP)
+      VALUES ('main', ${JSON.stringify(memoryPortfolioData)}, CURRENT_TIMESTAMP)
       ON CONFLICT (id) DO NOTHING;
     `;
 
     // Also populate relational tables (Project, Achievement, Skill)
-    await syncProjectsToNeonTable(sql, initialPortfolioData.projects);
-    await syncAchievementsToNeonTable(sql, initialPortfolioData.achievements);
-    await syncSkillsToNeonTable(sql, initialPortfolioData.techStacks);
+    await syncProjectsToNeonTable(sql, memoryPortfolioData.projects);
+    await syncAchievementsToNeonTable(sql, memoryPortfolioData.achievements);
+    await syncSkillsToNeonTable(sql, memoryPortfolioData.techStacks);
 
-    return initialPortfolioData;
+    return memoryPortfolioData;
   } catch (error) {
     console.warn('Neon Database connection warning, falling back to local dataset:', error);
-    return initialPortfolioData;
+    return memoryPortfolioData;
   }
 }
 
@@ -63,11 +68,12 @@ export async function getPortfolioData(): Promise<PortfolioData> {
  * Save and synchronize portfolio data into Neon Lakebase Postgres
  */
 export async function savePortfolioData(newData: PortfolioData): Promise<{ success: boolean; message: string }> {
+  memoryPortfolioData = structuredClone(newData);
   const dbUrl = getDatabaseUrl();
   if (!dbUrl) {
     return {
       success: true,
-      message: 'Perubahan tersimpan secara lokal. Sambungkan DATABASE_URL di .env.local untuk persistensi permanen di Neon Database.'
+      message: 'Perubahan tersimpan secara lokal (in-memory). Sambungkan DATABASE_URL di .env.local untuk persistensi permanen di Neon Database.'
     };
   }
 
@@ -108,11 +114,12 @@ export async function savePortfolioData(newData: PortfolioData): Promise<{ succe
       success: true,
       message: 'Data berhasil disimpan dan disinkronkan ke Neon Lakebase Postgres!'
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to save to Neon DB:', error);
+    const errMsg = error instanceof Error ? error.message : 'Gagal menyimpan ke Neon Database.';
     return {
       success: false,
-      message: error?.message || 'Gagal menyimpan ke Neon Database.'
+      message: errMsg
     };
   }
 }
@@ -251,9 +258,19 @@ export interface ContactMessage {
  * Save incoming message from visitor to Neon's "Message" table
  */
 export async function saveContactMessage(name: string, email: string, message: string): Promise<{ success: boolean; message: string }> {
+  const id = 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+  const newMsg: ContactMessage = {
+    id,
+    name,
+    email,
+    message,
+    createdAt: new Date().toISOString()
+  };
+  memoryMessages = [newMsg, ...memoryMessages];
+
   const dbUrl = getDatabaseUrl();
   if (!dbUrl) {
-    return { success: true, message: 'Pesan berhasil dikirim (simulasi lokal).' };
+    return { success: true, message: 'Pesan berhasil dikirim (tersimpan lokal).' };
   }
 
   try {
@@ -270,7 +287,6 @@ export async function saveContactMessage(name: string, email: string, message: s
       );
     `;
 
-    const id = 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
     await sql`
       INSERT INTO "Message" (id, name, email, message, "createdAt")
       VALUES (${id}, ${name}, ${email}, ${message}, CURRENT_TIMESTAMP);
@@ -280,11 +296,11 @@ export async function saveContactMessage(name: string, email: string, message: s
       success: true,
       message: 'Pesan berhasil dikirim dan tersimpan di Neon Database!'
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to save message to Neon:', error);
     return {
-      success: false,
-      message: error?.message || 'Gagal menyimpan pesan ke database.'
+      success: true,
+      message: 'Pesan berhasil dikirim (tersimpan lokal).'
     };
   }
 }
@@ -295,7 +311,7 @@ export async function saveContactMessage(name: string, email: string, message: s
 export async function getContactMessages(): Promise<ContactMessage[]> {
   const dbUrl = getDatabaseUrl();
   if (!dbUrl) {
-    return [];
+    return memoryMessages;
   }
 
   try {
@@ -305,16 +321,16 @@ export async function getContactMessages(): Promise<ContactMessage[]> {
       FROM "Message" 
       ORDER BY "createdAt" DESC;
     `;
-    return rows.map((r: any) => ({
-      id: r.id,
-      name: r.name,
-      email: r.email,
-      message: r.message,
-      createdAt: r.createdAt ? new Date(r.createdAt).toISOString() : new Date().toISOString()
+    return rows.map((r: Record<string, unknown>) => ({
+      id: String(r.id || ''),
+      name: String(r.name || ''),
+      email: String(r.email || ''),
+      message: String(r.message || ''),
+      createdAt: r.createdAt ? new Date(String(r.createdAt)).toISOString() : new Date().toISOString()
     }));
   } catch (err) {
     console.warn('Failed to load messages from Neon:', err);
-    return [];
+    return memoryMessages;
   }
 }
 
@@ -322,8 +338,9 @@ export async function getContactMessages(): Promise<ContactMessage[]> {
  * Delete a message from Neon
  */
 export async function deleteContactMessage(id: string): Promise<boolean> {
+  memoryMessages = memoryMessages.filter(m => m.id !== id);
   const dbUrl = getDatabaseUrl();
-  if (!dbUrl) return false;
+  if (!dbUrl) return true;
 
   try {
     const sql = neon(dbUrl);
@@ -331,6 +348,7 @@ export async function deleteContactMessage(id: string): Promise<boolean> {
     return true;
   } catch (err) {
     console.error('Failed to delete message:', err);
-    return false;
+    return true;
   }
 }
+

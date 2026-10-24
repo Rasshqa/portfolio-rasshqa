@@ -1,22 +1,22 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
-  cacheComponents: true,
-  partialPrefetching: true,
-  experimental: {
-    optimizePackageImports: ['lucide-react'],
-  },
-  turbopack: {
-    rules: {
-      "*.css": {
-        loaders: ["@tailwindcss/turbopack"],
-        as: "*.css",
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
       },
-    },
+    ],
+  },
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
   },
 };
 
 export default nextConfig;
+

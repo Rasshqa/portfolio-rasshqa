@@ -113,41 +113,50 @@ const InspectableBox: React.FC<InspectableBoxProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onMouseDown={handleMouseDown}
+      onDoubleClick={() => {
+        if (defaultDraggable) setPos({ x: 0, y: 0 });
+      }}
       onClick={onClick}
       style={{
         transform: `translate3d(${pos.x}px, ${pos.y}px, 0)`,
-        animationDelay: `${delay}ms`,
-        opacity: isReady ? 1 : 0,
+        transition: isDragging ? 'none' : 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
       }}
-      className={`relative inline-block transition-transform duration-200 ${
-        isReady ? 'animate-pop-in' : 'opacity-0 pointer-events-none'
-      } ${defaultDraggable ? 'cursor-grab active:cursor-grabbing' : ''} ${className}`}
+      className={`relative inline-block ${
+        defaultDraggable ? 'cursor-grab active:cursor-grabbing' : ''
+      } ${className}`}
     >
-      {/* Bounding Box Border & Corner Handles */}
-      {isHovered && (
-        <div 
-          className="absolute -inset-1.5 pointer-events-none z-30 transition-all duration-150"
-          style={{ border: `1.5px solid ${color}` }}
-        >
-          {/* 4 Corner Handles */}
-          <span className="absolute -top-1.5 -left-1.5 w-2.5 h-2.5 bg-white border-[1.5px] rounded-full" style={{ borderColor: color }} />
-          <span className="absolute -top-1.5 -right-1.5 w-2.5 h-2.5 bg-white border-[1.5px] rounded-full" style={{ borderColor: color }} />
-          <span className="absolute -bottom-1.5 -left-1.5 w-2.5 h-2.5 bg-white border-[1.5px] rounded-full" style={{ borderColor: color }} />
-          <span className="absolute -bottom-1.5 -right-1.5 w-2.5 h-2.5 bg-white border-[1.5px] rounded-full" style={{ borderColor: color }} />
-
-          {/* Dimension Pill Tag */}
-          <div
-            className={`absolute left-1/2 -translate-x-1/2 px-2 py-0.5 text-[10px] font-mono-tech font-bold text-white rounded shadow-sm whitespace-nowrap tracking-tighter ${
-              badgePosition === 'top' ? '-top-6' : '-bottom-6'
-            }`}
-            style={{ backgroundColor: color }}
+      <div
+        style={{
+          animationDelay: `${delay}ms`,
+        }}
+        className={isReady ? 'animate-pop-in' : 'opacity-0 pointer-events-none'}
+      >
+        {/* Bounding Box Border & Corner Handles */}
+        {isHovered && (
+          <div 
+            className="absolute -inset-1.5 pointer-events-none z-30 animate-bbox-in"
+            style={{ border: `1.5px solid ${color}` }}
           >
-            {measuredDims}
-          </div>
-        </div>
-      )}
+            {/* 4 Corner Handles */}
+            <span className="absolute -top-1.5 -left-1.5 w-2.5 h-2.5 bg-white border-[1.5px] rounded-full shadow-xs" style={{ borderColor: color }} />
+            <span className="absolute -top-1.5 -right-1.5 w-2.5 h-2.5 bg-white border-[1.5px] rounded-full shadow-xs" style={{ borderColor: color }} />
+            <span className="absolute -bottom-1.5 -left-1.5 w-2.5 h-2.5 bg-white border-[1.5px] rounded-full shadow-xs" style={{ borderColor: color }} />
+            <span className="absolute -bottom-1.5 -right-1.5 w-2.5 h-2.5 bg-white border-[1.5px] rounded-full shadow-xs" style={{ borderColor: color }} />
 
-      {children}
+            {/* Dimension Pill Tag */}
+            <div
+              className={`absolute left-1/2 -translate-x-1/2 px-2 py-0.5 text-[10px] font-mono-tech font-bold text-white rounded shadow-sm whitespace-nowrap tracking-tighter ${
+                badgePosition === 'top' ? '-top-6' : '-bottom-6'
+              }`}
+              style={{ backgroundColor: color }}
+            >
+              {measuredDims}
+            </div>
+          </div>
+        )}
+
+        {children}
+      </div>
     </div>
   );
 };
@@ -223,49 +232,84 @@ const renderTechSkillIcon = (name: string, iconKey: string) => {
   return <span className="font-mono-tech font-extrabold text-[9px]">{iconKey}</span>;
 };
 
-/* Portrait Component with dark tape, real photo support, and high-contrast SVG styling */
-const StylizedPortrait = ({ isInverted, photoUrl, onClick }: { isInverted: boolean; photoUrl?: string; onClick?: () => void }) => (
-  <div 
-    onClick={onClick}
-    className="relative w-[270px] sm:w-[350px] md:w-[410px] h-[310px] sm:h-[400px] md:h-[450px] max-w-full select-none cursor-pointer group neo-card-grand"
-  >
-    {/* Dark Tape at top right */}
-    <div className="absolute -top-3 right-12 w-24 h-8 bg-[#1e242b] rotate-[22deg] z-20 opacity-95 shadow-sm" />
+/* Portrait Component with dark tape, interactive 3D tilt parallax, real photo support, and high-contrast SVG styling */
+const StylizedPortrait = ({ isInverted, photoUrl, onClick }: { isInverted: boolean; photoUrl?: string; onClick?: () => void }) => {
+  const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0, shiftX: 0, shiftY: 0 });
 
-    {/* Electric Blue Rough Paint Brush Backdrop */}
-    <svg 
-      viewBox="0 0 400 430" 
-      className="absolute inset-0 w-full h-full drop-shadow-md"
-      fill="none"
-    >
-      <path 
-        d="M55 75 C80 55, 150 50, 195 52 C240 40, 320 35, 355 50 C375 85, 365 180, 378 265 C382 325, 385 375, 365 405 C295 412, 140 410, 45 405 C32 340, 42 260, 38 190 C35 120, 40 90, 55 75 Z" 
-        fill="#2563EB"
-      />
-      <path d="M35 160 L50 145 L45 190 Z" fill="#2563EB" />
-      <path d="M360 110 L382 125 L370 165 Z" fill="#2563EB" />
-      <path d="M180 42 L245 34 L230 58 Z" fill="#2563EB" />
-    </svg>
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const normX = (e.clientX - rect.left) / rect.width - 0.5;
+    const normY = (e.clientY - rect.top) / rect.height - 0.5;
+    setTilt({
+      rotateX: -normY * 10,
+      rotateY: normX * 12,
+      shiftX: normX * 10,
+      shiftY: normY * 8,
+    });
+  };
 
-    {/* White Paper Cutout + Character Portrait or Real Photo */}
+  const handleMouseLeave = () => {
+    setTilt({ rotateX: 0, rotateY: 0, shiftX: 0, shiftY: 0 });
+  };
+
+  return (
     <div 
-      className={`relative z-10 w-full h-full flex items-end justify-center overflow-hidden transition-all duration-300 ${
-        isInverted ? 'invert contrast-125' : ''
-      }`}
+      onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        transform: `perspective(900px) rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg)`,
+        transition: tilt.rotateX === 0 && tilt.rotateY === 0
+          ? 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)'
+          : 'transform 0.1s ease-out',
+      }}
+      className="relative w-[270px] sm:w-[350px] md:w-[410px] h-[310px] sm:h-[400px] md:h-[450px] max-w-full select-none cursor-pointer group"
     >
-      {photoUrl ? (
-        <div className="relative w-full h-full flex items-end justify-center select-none pointer-events-none pb-1">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={photoUrl}
-            alt="Rashqa Andrean"
-            className="w-auto h-[96%] max-w-[96%] object-contain select-none transition-transform duration-300 group-hover:scale-[1.03] pointer-events-auto"
-            style={{
-              filter: 'drop-shadow(0 0 0 4px #ffffff) drop-shadow(0 12px 20px rgba(0,0,0,0.35))',
-            }}
-          />
-        </div>
-      ) : (
+      {/* Dark Tape at top right */}
+      <div className="absolute -top-3 right-12 w-24 h-8 bg-[#1e242b] rotate-[22deg] z-20 opacity-95 shadow-sm transition-transform duration-300 group-hover:rotate-[19deg] group-hover:scale-105" />
+
+      {/* Electric Blue Rough Paint Brush Backdrop with Depth Parallax */}
+      <svg 
+        viewBox="0 0 400 430" 
+        style={{
+          transform: `translate3d(${-tilt.shiftX * 0.7}px, ${-tilt.shiftY * 0.7}px, 0)`,
+          transition: 'transform 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
+        }}
+        className="absolute inset-0 w-full h-full drop-shadow-md"
+        fill="none"
+      >
+        <path 
+          d="M55 75 C80 55, 150 50, 195 52 C240 40, 320 35, 355 50 C375 85, 365 180, 378 265 C382 325, 385 375, 365 405 C295 412, 140 410, 45 405 C32 340, 42 260, 38 190 C35 120, 40 90, 55 75 Z" 
+          fill="#2563EB"
+        />
+        <path d="M35 160 L50 145 L45 190 Z" fill="#2563EB" />
+        <path d="M360 110 L382 125 L370 165 Z" fill="#2563EB" />
+        <path d="M180 42 L245 34 L230 58 Z" fill="#2563EB" />
+      </svg>
+
+      {/* White Paper Cutout + Character Portrait or Real Photo */}
+      <div 
+        style={{
+          transform: `translate3d(${tilt.shiftX * 0.5}px, ${tilt.shiftY * 0.5}px, 0)`,
+          transition: 'transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), filter 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
+        }}
+        className={`relative z-10 w-full h-full flex items-end justify-center overflow-hidden ${
+          isInverted ? 'invert contrast-125' : ''
+        }`}
+      >
+        {photoUrl ? (
+          <div className="relative w-full h-full flex items-end justify-center select-none pointer-events-none pb-1">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={photoUrl}
+              alt="Rashqa Andrean"
+              className="w-auto h-[96%] max-w-[96%] object-contain select-none transition-transform duration-500 cubic-bezier(0.22, 1, 0.36, 1) group-hover:scale-[1.045] pointer-events-auto"
+              style={{
+                filter: 'drop-shadow(0 0 0 4px #ffffff) drop-shadow(0 12px 20px rgba(0,0,0,0.35))',
+              }}
+            />
+          </div>
+        ) : (
         <svg viewBox="0 0 400 440" className="w-full h-full">
           {/* Paper Cutout Outline */}
           <path 
@@ -354,7 +398,8 @@ const StylizedPortrait = ({ isInverted, photoUrl, onClick }: { isInverted: boole
       </svg>
     </div>
   </div>
-);
+  );
+};
 
 interface PreviewModalData {
   title: string;
@@ -742,12 +787,28 @@ export default function Portfolio() {
   // Active Modals
   const [activeProjectDetail, setActiveProjectDetail] = useState<ProjectItem | null>(null);
 
-  // Slide Sub-navigation States
+  // Slide Sub-navigation States & Directional Animation State
   const [aboutSlide, setAboutSlide] = useState<number>(0);
   const [worksPage, setWorksPage] = useState<number>(0);
   const [blogSlide, setBlogSlide] = useState<number>(0);
   const [prestasiPage, setPrestasiPage] = useState<number>(0);
   const [sertifikatPage, setSertifikatPage] = useState<number>(0);
+  const [slideDir, setSlideDir] = useState<'left' | 'right'>('right');
+
+  const changeAboutSlide = (nextIdx: number) => {
+    setSlideDir(nextIdx >= aboutSlide ? 'right' : 'left');
+    setAboutSlide(nextIdx);
+  };
+
+  const changeWorksPage = (nextIdx: number) => {
+    setSlideDir(nextIdx >= worksPage ? 'right' : 'left');
+    setWorksPage(nextIdx);
+  };
+
+  const changeBlogSlide = (nextIdx: number) => {
+    setSlideDir(nextIdx >= blogSlide ? 'right' : 'left');
+    setBlogSlide(nextIdx);
+  };
 
   // Works Pagination (2 Projects Per Slide)
   const projectsPerPage = 2;
@@ -776,13 +837,14 @@ export default function Portfolio() {
 
   const artikelItems = data.achievements.filter(i => i.category === 'ARTIKEL');
 
-  // Custom Cursor & Hold Invert Lens
+  // High-frequency 60fps Custom Cursor & Hold Invert Lens (Ref-driven to avoid React re-render lag)
   const [mousePos, setMousePos] = useState({ x: 520, y: 360 });
-  const [cursorRingPos, setCursorRingPos] = useState({ x: 520, y: 360 });
+  const mousePosRef = useRef({ x: 520, y: 360 });
+  const cursorRingRef = useRef({ x: 520, y: 360 });
+  const cursorDomRef = useRef<HTMLDivElement>(null);
   const [isHoveringInteractive, setIsHoveringInteractive] = useState(false);
-  
   const [isHoldingClick, setIsHoldingClick] = useState(false);
-  const [lensRadius, setLensRadius] = useState(0);
+  const isHoldingClickRef = useRef(false);
 
   // Fetch live CMS data from API on mount
   useEffect(() => {
@@ -818,34 +880,44 @@ export default function Portfolio() {
     setTimeout(() => setIntroStep('ready'), 2150);
   };
 
-  // Track mouse coordinates
+  // Track mouse coordinates & run 60fps spring follower loop without React state thrashing
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-      const target = e.target as HTMLElement | null;
-      if (target && (target.closest('button') || target.closest('a') || target.closest('input') || target.closest('textarea') || target.closest('[data-interactive="true"]'))) {
-        setIsHoveringInteractive(true);
-      } else {
-        setIsHoveringInteractive(false);
+      mousePosRef.current = { x: e.clientX, y: e.clientY };
+      if (isHoldingClickRef.current) {
+        setMousePos({ x: e.clientX, y: e.clientY });
       }
+      const target = e.target as HTMLElement | null;
+      const interactive = Boolean(
+        target &&
+          (target.closest('button') ||
+            target.closest('a') ||
+            target.closest('input') ||
+            target.closest('textarea') ||
+            target.closest('[data-interactive="true"]'))
+      );
+      setIsHoveringInteractive((prev) => (prev !== interactive ? interactive : prev));
     };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
-  // Smooth follower cursor
-  useEffect(() => {
     let animationFrameId: number;
     const followMouse = () => {
-      setCursorRingPos((prev) => ({
-        x: prev.x + (mousePos.x - prev.x) * 0.22,
-        y: prev.y + (mousePos.y - prev.y) * 0.22,
-      }));
+      const target = mousePosRef.current;
+      const ring = cursorRingRef.current;
+      ring.x += (target.x - ring.x) * 0.24;
+      ring.y += (target.y - ring.y) * 0.24;
+      if (cursorDomRef.current) {
+        cursorDomRef.current.style.transform = `translate3d(${ring.x.toFixed(1)}px, ${ring.y.toFixed(1)}px, 0)`;
+      }
       animationFrameId = requestAnimationFrame(followMouse);
     };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     animationFrameId = requestAnimationFrame(followMouse);
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [mousePos]);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
 
   // SCROLL WHEEL TO NAVIGATE TABS (HOME -> ABOUT -> WORKS -> BLOG -> CONTACT)
   // Refined: Will NOT switch tabs accidentally. Requires deliberate scroll intent,
@@ -974,6 +1046,7 @@ export default function Portfolio() {
       ];
 
       if (e.key === 'ArrowRight') {
+        setSlideDir('right');
         if (activeTab === 'ABOUT') {
           setAboutSlide(prev => Math.min(2, prev + 1));
         } else if (activeTab === 'WORKS') {
@@ -984,6 +1057,7 @@ export default function Portfolio() {
           setActiveTab(curr => tabList[Math.min(tabList.length - 1, tabList.indexOf(curr) + 1)]);
         }
       } else if (e.key === 'ArrowLeft') {
+        setSlideDir('left');
         if (activeTab === 'ABOUT') {
           setAboutSlide(prev => Math.max(0, prev - 1));
         } else if (activeTab === 'WORKS') {
@@ -1013,20 +1087,26 @@ export default function Portfolio() {
       if (target && (target.closest('button') || target.closest('a') || target.closest('input') || target.closest('textarea') || target.closest('select'))) {
         return;
       }
+      mousePosRef.current = { x: e.clientX, y: e.clientY };
       setMousePos({ x: e.clientX, y: e.clientY });
+      isHoldingClickRef.current = true;
       setIsHoldingClick(true);
     };
 
     const handlePointerMove = (e: PointerEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
+      mousePosRef.current = { x: e.clientX, y: e.clientY };
+      if (isHoldingClickRef.current) {
+        setMousePos({ x: e.clientX, y: e.clientY });
+      }
     };
 
     const handlePointerUp = () => {
+      isHoldingClickRef.current = false;
       setIsHoldingClick(false);
     };
 
     window.addEventListener('pointerdown', handlePointerDown);
-    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
     window.addEventListener('pointerup', handlePointerUp);
     window.addEventListener('pointercancel', handlePointerUp);
     window.addEventListener('blur', handlePointerUp);
@@ -1155,9 +1235,10 @@ export default function Portfolio() {
       {/* Custom Follower Cursor ("YOU") */}
       {mounted && (
         <div
-          className="fixed top-0 left-0 pointer-events-none z-[100] hidden sm:block"
+          ref={cursorDomRef}
+          className="fixed top-0 left-0 pointer-events-none z-[100] hidden sm:block will-change-transform"
           style={{
-            transform: `translate3d(${cursorRingPos.x}px, ${cursorRingPos.y}px, 0)`,
+            transform: `translate3d(${mousePosRef.current.x}px, ${mousePosRef.current.y}px, 0)`,
           }}
         >
           <div
@@ -1213,7 +1294,7 @@ export default function Portfolio() {
                     }`}
                   >
                     {isActive && (
-                      <span className="absolute inset-0 bg-[#38bdf8] clip-brush-nav -z-10 transform -rotate-1 scale-105 shadow-sm" />
+                      <span className="absolute inset-0 bg-[#38bdf8] clip-brush-nav -z-10 animate-nav-brush shadow-sm" />
                     )}
                     {item.id === 'WORKS' ? (
                       <div className="w-4 h-4 rounded-full border border-[#111] dark:border-white overflow-hidden shrink-0 bg-[#38bdf8] flex items-center justify-center">
@@ -1339,29 +1420,39 @@ export default function Portfolio() {
         {introStep !== 'ready' && (
           <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-30">
             {(introStep === 'hey' || introStep === 'welcome') && (
-              <div className="px-9 py-5 bg-[#2563eb] text-white font-display font-extrabold text-2xl sm:text-3xl rounded-2xl border-2 border-[#111] neo-shadow-lg animate-pop-in">
+              <div
+                key={introStep}
+                className="relative px-9 py-5 bg-[#2563eb] text-white font-display font-extrabold text-2xl sm:text-3xl rounded-2xl border-2 border-[#111] neo-shadow-lg animate-intro-card"
+              >
+                <span className="absolute -top-3.5 -left-3.5 w-7 h-7 rounded-full bg-[#fde047] text-[#111] border-2 border-[#111] flex items-center justify-center neo-shadow-sm animate-float-bob">
+                  <Sparkles className="w-3.5 h-3.5" />
+                </span>
                 {introStep === 'hey' 
                   ? (lang === 'id' ? (data.intro?.hey_id || t.intro.hey) : (data.intro?.hey_en || t.intro.hey))
                   : (lang === 'id' ? (data.intro?.welcome_id || t.intro.welcome) : (data.intro?.welcome_en || t.intro.welcome))
                 }
+                <span className="absolute -bottom-3 -right-3 px-2 py-0.5 bg-[#a7f3d0] text-[#111] font-mono-tech text-[10px] font-extrabold rounded border-2 border-[#111] neo-shadow-sm rotate-6">
+                  {introStep === 'hey' ? '01 / 02' : '02 / 02'}
+                </span>
               </div>
             )}
 
             {introStep === 'burst' && (
               <div className="relative flex items-center justify-center">
-                <svg width="260" height="260" viewBox="0 0 200 200" className="-translate-x-48 -translate-y-24">
+                <div className="absolute w-32 h-32 rounded-full border-3 border-[#2563eb] dark:border-[#38bdf8] animate-lens-shockwave" />
+                <svg width="260" height="260" viewBox="0 0 200 200">
                   {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle) => (
                     <line
                       key={angle}
                       x1="100"
-                      y1="30"
+                      y1="42"
                       x2="100"
-                      y2="10"
-                      stroke={isDark ? '#fff' : '#9ca3af'}
-                      strokeWidth="2.5"
+                      y2="8"
+                      stroke={angle % 60 === 0 ? '#2563eb' : isDark ? '#fde047' : '#111111'}
+                      strokeWidth="3.5"
                       strokeLinecap="round"
                       transform={`rotate(${angle} 100 100)`}
-                      className="animate-ping"
+                      className="animate-burst-ray"
                     />
                   ))}
                 </svg>
@@ -1473,8 +1564,8 @@ export default function Portfolio() {
                     }`}
                   >
                     <svg width="42" height="42" viewBox="0 0 46 46" fill="none">
-                      <path d="M8 6 C 28 10, 38 22, 26 38" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />
-                      <path d="M18 34 L 26 38 L 32 30" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M8 6 C 28 10, 38 22, 26 38" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" className={isReady ? 'animate-draw-stroke' : ''} />
+                      <path d="M18 34 L 26 38 L 32 30" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" className={isReady ? 'animate-draw-stroke' : ''} />
                     </svg>
                   </div>
 
@@ -1495,7 +1586,7 @@ export default function Portfolio() {
                     {/* Doodle underline below name (Matching Image 0) */}
                     <div className="w-36 sm:w-48 h-3.5 pl-2 mt-2">
                       <svg viewBox="0 0 180 14" className="w-full h-full fill-none text-[#111] dark:text-white">
-                        <path d="M4 8 Q 90 12, 170 5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                        <path d="M4 8 Q 90 12, 170 5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className={isReady ? 'animate-draw-stroke' : ''} />
                         <circle cx="174" cy="5" r="2.5" fill="currentColor" />
                       </svg>
                     </div>
@@ -1804,7 +1895,7 @@ export default function Portfolio() {
                       {[t.about.slideTabs.profile, t.about.slideTabs.story, t.about.slideTabs.tech].map((label, idx) => (
                         <button
                           key={label}
-                          onClick={() => setAboutSlide(idx)}
+                          onClick={() => changeAboutSlide(idx)}
                           className={`px-3 py-1.5 text-xs font-mono-tech font-extrabold rounded transition-all cursor-pointer ${
                             aboutSlide === idx
                               ? 'bg-[#2563eb] text-white shadow'
@@ -1819,7 +1910,7 @@ export default function Portfolio() {
 
                   {/* SLIDE 0: PROFILE */}
                   {aboutSlide === 0 && (
-                    <div className="space-y-6 animate-slide-right">
+                    <div className={`space-y-6 ${slideDir === 'right' ? 'animate-slide-right' : 'animate-slide-left'}`}>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="p-4 bg-[#bae6fd] text-[#111] rounded-xl border-2 border-[#111] neo-shadow neo-card-grand">
                           <span className="text-[10px] font-mono-tech font-extrabold uppercase">{t.about.profile.fullName}</span>
@@ -1879,7 +1970,7 @@ export default function Portfolio() {
 
                   {/* SLIDE 1: ABOUT ME */}
                   {aboutSlide === 1 && (
-                    <div className="space-y-6 animate-slide-right">
+                    <div className={`space-y-6 ${slideDir === 'right' ? 'animate-slide-right' : 'animate-slide-left'}`}>
                       <p className="font-mono-tech text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">
                         {lang === 'en' ? t.about.story.lead : data.aboutStory.lead}
                       </p>
@@ -1906,7 +1997,7 @@ export default function Portfolio() {
 
                   {/* SLIDE 2: TECH STACK */}
                   {aboutSlide === 2 && (
-                    <div className="space-y-4 animate-slide-right">
+                    <div className={`space-y-4 ${slideDir === 'right' ? 'animate-slide-right' : 'animate-slide-left'}`}>
                       <p className="font-mono-tech text-xs text-neutral-600 dark:text-neutral-400">
                         {t.about.tech.lead}
                       </p>
@@ -1947,7 +2038,7 @@ export default function Portfolio() {
                 {/* Slide Bottom Controls */}
                 <div className="pt-6 mt-6 border-t-2 border-neutral-200 dark:border-neutral-700 flex items-center justify-between">
                   <button
-                    onClick={() => setAboutSlide(prev => Math.max(0, prev - 1))}
+                    onClick={() => changeAboutSlide(Math.max(0, aboutSlide - 1))}
                     disabled={aboutSlide === 0}
                     className="px-4 py-2 bg-white dark:bg-neutral-800 border-2 border-[#111] rounded font-mono-tech font-bold text-xs neo-shadow neo-btn-grand disabled:opacity-40 flex items-center gap-1.5 cursor-pointer"
                   >
@@ -1960,7 +2051,7 @@ export default function Portfolio() {
                   </div>
 
                   <button
-                    onClick={() => setAboutSlide(prev => Math.min(2, prev + 1))}
+                    onClick={() => changeAboutSlide(Math.min(2, aboutSlide + 1))}
                     disabled={aboutSlide === 2}
                     className="px-4 py-2 bg-[#2563eb] text-white border-2 border-[#111] rounded font-mono-tech font-extrabold text-xs neo-shadow neo-btn-grand disabled:opacity-40 flex items-center gap-1.5 cursor-pointer"
                   >
@@ -2000,7 +2091,7 @@ export default function Portfolio() {
                 {/* Slide Pagination Buttons */}
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setWorksPage(prev => Math.max(0, prev - 1))}
+                    onClick={() => changeWorksPage(Math.max(0, worksPage - 1))}
                     disabled={worksPage === 0}
                     className="px-3.5 py-2 bg-white dark:bg-[#23252a] border-2 border-[#111] font-mono-tech font-bold text-xs rounded neo-shadow neo-btn-grand disabled:opacity-40 flex items-center gap-1 cursor-pointer"
                   >
@@ -2008,7 +2099,7 @@ export default function Portfolio() {
                     <span>{t.works.prev}</span>
                   </button>
                   <button
-                    onClick={() => setWorksPage(prev => Math.min(totalWorksPages - 1, prev + 1))}
+                    onClick={() => changeWorksPage(Math.min(totalWorksPages - 1, worksPage + 1))}
                     disabled={worksPage >= totalWorksPages - 1}
                     className="px-3.5 py-2 bg-[#2563eb] text-white border-2 border-[#111] font-mono-tech font-extrabold text-xs rounded neo-shadow neo-btn-grand disabled:opacity-40 flex items-center gap-1 cursor-pointer"
                   >
@@ -2019,14 +2110,19 @@ export default function Portfolio() {
               </div>
 
               {/* 2 Projects Per Slide Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <div
+                key={`works-page-${worksPage}`}
+                className={`grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 ${
+                  slideDir === 'right' ? 'animate-slide-right' : 'animate-slide-left'
+                }`}
+              >
                 {currentProjects.map((proj, idx) => (
                   <InspectableBox
                     key={proj.id}
                     dimensions="480 × 340"
                     color="#2563eb"
                     badgePosition="bottom"
-                    delay={idx * 70}
+                    delay={idx * 90}
                   >
                     <div className="bg-white dark:bg-[#23252a] border-2 border-[#111] dark:border-neutral-400 rounded-xl p-4 sm:p-5 neo-shadow neo-card-grand flex flex-col justify-between h-full">
                       <div>
@@ -2168,7 +2264,7 @@ export default function Portfolio() {
                       {[t.achievements.categories.prestasi, t.achievements.categories.sertifikat, t.achievements.categories.artikel].map((cat, idx) => (
                         <button
                           key={cat}
-                          onClick={() => setBlogSlide(idx)}
+                          onClick={() => changeBlogSlide(idx)}
                           className={`px-3 py-1.5 text-xs font-mono-tech font-extrabold rounded transition-all cursor-pointer ${
                             blogSlide === idx
                               ? 'bg-[#2563eb] text-white shadow'
@@ -2183,7 +2279,7 @@ export default function Portfolio() {
 
                   {/* Category 0: PRESTASI (Sub-paginated 2 per slide) */}
                   {blogSlide === 0 && (
-                    <div className="space-y-4 animate-slide-right">
+                    <div className={`space-y-4 ${slideDir === 'right' ? 'animate-slide-right' : 'animate-slide-left'}`}>
                       {currentPrestasi.length === 0 ? (
                         <div className="p-8 text-center bg-[#f6f5f0] dark:bg-neutral-800/60 rounded-xl border-2 border-dashed border-neutral-300 dark:border-neutral-700">
                           <p className="font-mono-tech text-xs text-neutral-500">
@@ -2306,7 +2402,7 @@ export default function Portfolio() {
 
                   {/* Category 1: SERTIFIKAT (Sub-paginated 2 per slide) */}
                   {blogSlide === 1 && (
-                    <div className="space-y-4 animate-slide-right">
+                    <div className={`space-y-4 ${slideDir === 'right' ? 'animate-slide-right' : 'animate-slide-left'}`}>
                       {currentSertifikat.length === 0 ? (
                         <div className="p-8 text-center bg-[#f6f5f0] dark:bg-neutral-800/60 rounded-xl border-2 border-dashed border-neutral-300 dark:border-neutral-700">
                           <p className="font-mono-tech text-xs text-neutral-500">
@@ -2429,7 +2525,7 @@ export default function Portfolio() {
 
                   {/* Category 2: ARTIKEL (Internally scrollable container for rich archives) */}
                   {blogSlide === 2 && (
-                    <div className="animate-slide-right">
+                    <div className={slideDir === 'right' ? 'animate-slide-right' : 'animate-slide-left'}>
                       {artikelItems.length === 0 ? (
                         <div className="p-8 text-center bg-[#f6f5f0] dark:bg-neutral-800/60 rounded-xl border-2 border-dashed border-neutral-300 dark:border-neutral-700">
                           <p className="font-mono-tech text-xs text-neutral-500">
@@ -2528,7 +2624,7 @@ export default function Portfolio() {
                 {/* Bottom Slide Switcher */}
                 <div className="pt-5 mt-5 border-t-2 border-neutral-200 dark:border-neutral-700 flex items-center justify-between">
                   <button
-                    onClick={() => setBlogSlide(prev => Math.max(0, prev - 1))}
+                    onClick={() => changeBlogSlide(Math.max(0, blogSlide - 1))}
                     disabled={blogSlide === 0}
                     className="px-4 py-2 bg-white dark:bg-neutral-800 border-2 border-[#111] rounded font-mono-tech font-bold text-xs neo-shadow neo-btn-grand disabled:opacity-40 flex items-center gap-1.5 cursor-pointer"
                   >
@@ -2541,7 +2637,7 @@ export default function Portfolio() {
                   </div>
 
                   <button
-                    onClick={() => setBlogSlide(prev => Math.min(2, prev + 1))}
+                    onClick={() => changeBlogSlide(Math.min(2, blogSlide + 1))}
                     disabled={blogSlide === 2}
                     className="px-4 py-2 bg-[#2563eb] text-white border-2 border-[#111] rounded font-mono-tech font-extrabold text-xs neo-shadow neo-btn-grand disabled:opacity-40 flex items-center gap-1.5 cursor-pointer"
                   >
