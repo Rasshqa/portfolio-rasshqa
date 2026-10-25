@@ -1238,7 +1238,7 @@ export default function Portfolio() {
           ref={cursorDomRef}
           className="fixed top-0 left-0 pointer-events-none z-[100] hidden sm:block will-change-transform"
           style={{
-            transform: `translate3d(${mousePosRef.current.x}px, ${mousePosRef.current.y}px, 0)`,
+            transform: `translate3d(${mousePos.x}px, ${mousePos.y}px, 0)`,
           }}
         >
           <div
